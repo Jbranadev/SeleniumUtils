@@ -1,37 +1,26 @@
 package io.github.josecarlosbran;
 
-import com.aventstack.extentreports.MediaEntityBuilder;
-import com.aventstack.extentreports.Status;
-import com.aventstack.extentreports.markuputils.ExtentColor;
-import com.aventstack.extentreports.markuputils.MarkupHelper;
 import com.josebran.LogsJB.LogsJB;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
-import org.testng.Reporter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.*;
-import java.net.URI;
-import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.File;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -41,6 +30,9 @@ public class SeleniumUtils {
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PACKAGE)
     static ExecutorService seleniumEjecutor = Executors.newVirtualThreadPerTaskExecutor();
+    @Getter
+    @Setter
+    private static String inespecific = "N/E";
     @Getter
     @Setter
     private static Integer searchTime = 2500;
@@ -80,7 +72,6 @@ public class SeleniumUtils {
             Assert.fail("Error inesperado al presionar una tecla: ");
         }
     }
-
 
     /***
      * Obtiene una espera fluida, con el fin de mejorar los tiempos.
@@ -134,14 +125,12 @@ public class SeleniumUtils {
     /**
      * Función que convierte un array de objetos en un ArrayList de cadenas
      *
-     * @param object El Array de objetos que se desea convertit en cadenas
+     * @param object  El Array de objetos que se desea convertit en cadenas
      * @param acierto Variable booleana que decide si será un acierto(True) o un fallo (False)
      * @return Un ArrayList que contiene las representaciones en forma de cadena de los objetos
      */
     public static ArrayList<String> convertObjectToArrayString(Object[] object, Boolean acierto) {
-        if(acierto) {
-
-
+        if (acierto) {
             try {
                 ArrayList<String> array = new ArrayList<>();
                 for (Object o : object) {
@@ -153,11 +142,10 @@ public class SeleniumUtils {
                 LogsJB.fatal(e.getMessage());
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
-        }else{
+        } else {
             LogsJB.fatal("error al parsear el Objeto object a strings");
         }
         return null;
-
     }
 
     /***
@@ -393,144 +381,50 @@ public class SeleniumUtils {
         return false;
     }
 
-
-    public File getFileResource(String filename) {
-        try {
-            URI uri = this.getClass()
-                    .getClassLoader()
-                    .getResource(filename)
-                    .toURI();
-            return new File(uri);
-        } catch (Exception e) {
-            writeLog("Excepcion capturada al tratar de obtener el recurso: " + filename);
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            throw new IllegalArgumentException("Unable to find file from resources: " + filename);
-        }
-    }
-
     /**
-     * Setea el elemento encontrado, de lo contrario setea null en elementscreenshott
+     * Función que se utiliza para verificar si un valor es invalido o no cumple ciertos criterios prefefinidos
      *
-     * @param driver             Driver que controla el navegador
-     * @param Elementscreenshott Atributo del elemento a encontrar
+     * @param value Valor que se desea verificar para determianr si es inválido
+     * @return Verdadero si el valor es considerado, o Falso si el valor cumple con los citerios validos
      */
-    public void setElementscreenshott(SearchContext driver, String Elementscreenshott) {
-        WebElement temp = obtenerWebElementx2(driver, Elementscreenshott);
-        try {
-            testContext.setElementscreenshott(temp);
-        } catch (Exception e) {
-            writeLog("Excepcion capturada al setear el elemento para tomar la screnshot");
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+    public static boolean isanvalidValue(String value) {
+        if (!SeleniumUtils.stringIsNullOrEmpty(value)) {
+            return !value.equalsIgnoreCase(SeleniumUtils.getInespecific());
         }
+        return false;
     }
-
     /**
      * Función para pasar a la pestáña anterior
      *
      * @param driver WebDriver representa el controlador e interactua con el navegador
      */
-    public void movetoPreviousTab(WebDriver driver) {
-        if (utilitiesPortalFinanciero.isanvalidValue(this.testContext.getPreviousTab())) {
+
+    /****
+     * Verifica si una cadena está vacía o es nula
+     * @param cadena Cadena a Validar
+     * @return Retorna True si la cadena envíada está vacía o nula, de lo contrario retorna false
+     */
+    public static boolean stringIsNullOrEmpty(String cadena) {
+        return Objects.isNull(cadena) || cadena.trim().isEmpty();
+    }
+
+    /***
+     * Mueve el navegador a la tab que esta recibiendo como parametro
+     * @param driver Driver que esta manipulando el navegador
+     * @param previousTab Previous Tab al que nos queremos mover
+     */
+    public void movetoPreviousTab(WebDriver driver, String previousTab) {
+        if (SeleniumUtils.isanvalidValue(previousTab)) {
             //Loop through until we find a new window handle
             for (String windowHandle : driver.getWindowHandles()) {
-                writeLog("Previus Tab: " + this.testContext.getPreviousTab());
+                writeLog("Previus Tab: " + previousTab);
                 writeLog("Windows Handle: " + windowHandle);
-                if (this.testContext.getPreviousTab().contentEquals(windowHandle)) {
+                if (previousTab.contentEquals(windowHandle)) {
                     writeLog("Se movera a la primera Tab");
                     driver.switchTo().window(windowHandle);
                     break;
                 }
             }
-        }
-    }
-
-
-
-
-
-
-    /***
-     * Hace una pausa sobre el hilo en ejecución por el tiempo especificado
-     * @param milisegundos Tiempo en milisegundos que se detendra la ejecucion
-     */
-    public void threadslepp(int milisegundos) {
-        try {
-            Thread.sleep(milisegundos);
-        } catch (Exception e) {
-            writeLogError("Se ha capturado un error en threadsleep");
-            writeLogError("Stacktrace de la excepcion capturada: " + ExceptionUtils.getStackTrace(e));
-        }
-    }
-
-    public void initDoc() {
-        try {
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Evidencia de Pruebas - " + this.testContext.usuario + "_" + this.testContext.nameTest + "_" + this.testContext.caso + ".docx";
-            ruta = ruta.replace(" ", "_");
-            this.testContext.setCasos(0);
-            this.testContext.setCont(0);
-            addTitle addsubtitle = new addTitle(this.testContext);
-            addsubtitle.setPlantilla(getFileResource("Plantilla.docx"));
-            addsubtitle.setRuta(ruta);
-            addsubtitle.initDoc();
-        } catch (Exception e) {
-            writeLogError("Excepcion capturada al escribir el Titulo del Documento");
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al Escribir el Titulo del documento: " + e.getMessage());
-        }
-    }
-
-    /***
-     * Crea el documento de evidencia de pruebas de Test en ejecución
-     * @param Title Tituló del Test de Pruebas a ejecutar
-     */
-    public void writeTitleDoc(String Title) {
-        try {
-            //Rutas de archivos
-            if (!Objects.isNull(testContext.test)) {
-                testContext.test.log(Status.INFO, MarkupHelper.createLabel(Title, ExtentColor.BLUE));
-            }
-            String ruta = "C:/Reportes/Evidencia de Pruebas - " + this.testContext.usuario + "_" + this.testContext.nameTest + "_" + this.testContext.caso + ".docx";
-            ruta = ruta.replace(" ", "_");
-            this.testContext.setCasos(0);
-            this.testContext.setCont(0);
-            addTitle addsubtitle = new addTitle(this.testContext);
-            addsubtitle.setTitle(Title);
-            addsubtitle.setIsTitle(true);
-            addsubtitle.setRuta(ruta);
-            addsubtitle.run();
-        } catch (Exception e) {
-            writeLogError("Excepción capturada al escribir el titulo del documento");
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al escribir el titulo del documento: " + e.getMessage());
-        }
-    }
-
-
-    /***
-     * Crea un subtituló, sobre un nuevo TestCase que ejecutara
-     * @param Title Texto que será colocado como titulo del Test Case
-     */
-    public void writeSubTitleDoc(String Title) {
-        try {
-            threadslepp(25);
-            if (!Objects.isNull(testContext.test)) {
-                testContext.test.log(Status.INFO, MarkupHelper.createLabel(Title, ExtentColor.GREY));
-            }
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Evidencia de Pruebas - " + this.testContext.usuario + "_" + this.testContext.nameTest + "_" + this.testContext.caso + ".docx";
-            ruta = ruta.replace(" ", "_");
-            this.testContext.setCasos(this.testContext.getCasos() + 1);
-            addTitle addsubtitle = new addTitle(this.testContext);
-            addsubtitle.setTitle(Title);
-            addsubtitle.setIsTitle(false);
-            addsubtitle.setRuta(ruta);
-            addsubtitle.run();
-            threadslepp(100);
-        } catch (Exception e) {
-            writeLogError("Excepcion capturada al escribir el subtitulo del documento");
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al crear el subtitulo del documento: " + e.getMessage());
         }
     }
 
@@ -540,9 +434,9 @@ public class SeleniumUtils {
      * @param driver WebDriver que representa la sesión del navegador
      * @return Retorna a un objeto File que representa la captura de pantalla de la pagina web
      */
-    private File getImageScrennshot(WebDriver driver) {
-        if (!Objects.isNull(this.testContext.getElementscreenshott())) {
-            WebElement element = RefreshReferenceToElement(this.testContext.getElementscreenshott());
+    private File getImageScrennshot(WebDriver driver, WebElement elementScreenshot) {
+        if (!Objects.isNull(elementScreenshot)) {
+            WebElement element = RefreshReferenceToElement(driver, elementScreenshot);
             // Desplazarse hasta el elemento
             Actions actions = new Actions(driver);
             actions.moveToElement(element);
@@ -570,7 +464,7 @@ public class SeleniumUtils {
                     System.out.println("El valor de zoomActual no es numérico: " + zoomActual);
                 }
             }
-            File scrFile = getImageScrennshotIE(driver);
+            File scrFile = getImageScrennshotIE(driver, elementScreenshot);
             if (Objects.isNull(scrFile)) {
                 TakesScreenshot scrShot = ((TakesScreenshot) driver);
                 // Restáurar el zoom a 100% si fue ajustado
@@ -593,10 +487,10 @@ public class SeleniumUtils {
      * @param driver WebDriver representa la sesión de internet Explorer
      * @return Retorna a un objeto File que representa la captura de pantalla de la pagina web
      */
-    private File getImageScrennshotIE(WebDriver driver) {
+    private File getImageScrennshotIE(WebDriver driver, WebElement elementScreenshot) {
         try {
-            if (!Objects.isNull(this.testContext.getElementscreenshott())) {
-                String tempelement = RefreshReferenceToElement(this.testContext.getElementscreenshott()).toString().split(" -> ")[1];
+            if (!Objects.isNull(elementScreenshot)) {
+                String tempelement = RefreshReferenceToElement(driver, elementScreenshot).toString().split(" -> ")[1];
                 String[] data = tempelement.split(": ");
                 String locator = data[0];
                 String term = data[1];
@@ -628,8 +522,8 @@ public class SeleniumUtils {
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
             return null;
         } catch (Exception e) {
-            writeLogError("Excepción capturada al tomar la captura de pantalla");
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Excepción capturada al tomar la captura de pantalla");
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             return null;
         }
         return null;
@@ -641,7 +535,7 @@ public class SeleniumUtils {
      * @param elemento Elemento a refrescar
      * @return null si no logra refrescar el elemento, caso contrario la referencia al elemento
      */
-    private WebElement RefreshReferenceToElement(WebElement elemento) {
+    private WebElement RefreshReferenceToElement(WebDriver driver, WebElement elemento) {
         try {
             if (!Objects.isNull(elemento)) {
                 String tempelement = elemento.toString().split(" -> ")[1];
@@ -655,29 +549,29 @@ public class SeleniumUtils {
                 }
                 switch (locator) {
                     case "xpath":
-                        return this.testContext.driver.findElement(By.xpath(term));
+                        return driver.findElement(By.xpath(term));
                     case "css selector":
-                        return this.testContext.driver.findElement(By.cssSelector(term));
+                        return driver.findElement(By.cssSelector(term));
                     case "id":
-                        return this.testContext.driver.findElement(By.id(term));
+                        return driver.findElement(By.id(term));
                     case "tag name":
-                        return this.testContext.driver.findElement(By.tagName(term));
+                        return driver.findElement(By.tagName(term));
                     case "name":
-                        return this.testContext.driver.findElement(By.name(term));
+                        return driver.findElement(By.name(term));
                     case "link text":
-                        return this.testContext.driver.findElement(By.linkText(term));
+                        return driver.findElement(By.linkText(term));
                     case "partial link text":
-                        return this.testContext.driver.findElement(By.partialLinkText(term));
+                        return driver.findElement(By.partialLinkText(term));
                     case "class name":
-                        return this.testContext.driver.findElement(By.className(term));
+                        return driver.findElement(By.className(term));
                 }
             }
             writeLog("No fue posible refrescar la referencia al elemento");
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
             return null;
         } catch (Exception e) {
-            writeLogError("Excepción al refrescar el elemento");
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Excepción al refrescar el elemento");
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             return null;
         }
         return null;
@@ -697,285 +591,6 @@ public class SeleniumUtils {
         return data[1];
     }
 
-    /***
-     * Toma una captura y la adjunta al archivo de evidencia del Test
-     * @param driver El Driver que está controlando el navegador
-     * @param Title El texto que se colocara a la imagen capturada
-     */
-    public void takeScreenShotJB(WebDriver driver, String Title) {
-        String imageroute = "C:/Reportes/" + this.testContext.nameTest + "_" + this.testContext.getCont() + ".png";
-        imageroute = imageroute.replace(" ", "_");
-        try {
-            writeLogTransaccion(Title);
-            this.testContext.setCont(this.testContext.getCont() + 1);
-            File SrcFile = getImageScrennshot(driver);
-            File DestFile = new File(imageroute);
-            FileUtils.copyFile(SrcFile, DestFile);
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Evidencia de Pruebas - " + this.testContext.usuario + "_" + this.testContext.nameTest + "_" + this.testContext.caso + ".docx";
-            ruta = ruta.replace(" ", "_");
-            addParrafo addparrafo = new addParrafo(this.testContext);
-            addparrafo.setImageroute(imageroute);
-            addparrafo.setRuta(ruta);
-            addparrafo.setTitle(Title);
-            addparrafo.run();
-            if (!Objects.isNull(testContext.test)) {
-                String base64Image = convertImageToBase64(imageroute);
-                testContext.test.info(Title, MediaEntityBuilder.createScreenCaptureFromBase64String(base64Image).build());
-            }
-        } catch (Exception e) {
-            writeLogError("Error inesperado al tomar la captura de pantalla: " + imageroute + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al tomar la captura de pantalla: " + imageroute);
-        }
-    }
-
-    /**
-     * Funcion para capturar un screenshot de un elemento web y lo guarda en un archivo
-     *
-     * @param SrcFile El archivo en el cual se guardará la captura
-     * @param Title   Él tituló o descripción del screenshot, se utiliza para nombrar el archivo
-     */
-    public void writeScreenshotElement(File SrcFile, String Title) {
-        String imageroute = "C:/Reportes/" + this.testContext.nameTest + "_" + this.testContext.getCont() + ".png";
-        imageroute = imageroute.replace(" ", "_");
-        try {
-            writeLog(Title);
-            this.testContext.setCont(this.testContext.getCont() + 1);
-            File DestFile = new File(imageroute);
-            FileUtils.copyFile(SrcFile, DestFile);
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Evidencia de Pruebas - " + this.testContext.usuario + "_" + this.testContext.nameTest + "_" + this.testContext.caso + ".docx";
-            ruta = ruta.replace(" ", "_");
-            addParrafo addparrafo = new addParrafo(this.testContext);
-            addparrafo.setImageroute(imageroute);
-            addparrafo.setRuta(ruta);
-            addparrafo.setTitle(Title);
-            addparrafo.run();
-            if (!Objects.isNull(testContext.test)) {
-                String base64Image = convertImageToBase64(imageroute);
-                testContext.test.info(Title, MediaEntityBuilder.createScreenCaptureFromBase64String(base64Image).build());
-            }
-        } catch (Exception e) {
-            writeLogError("Error inesperado al tomar la captura de pantalla: " + imageroute + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al tomar la captura de pantalla: " + imageroute);
-        }
-    }
-
-    /***
-     * Toma una captura y la adjunta al archivo de evidencia del Test al momento de dar un error
-     * @param driver El Driver que está controlando el navegador
-     * @param Title El texto que se colocara a la imagen capturada
-     */
-    public void takeScreenShotError(WebDriver driver, String Title) {
-        String imageroute = "C:/Reportes/Errors/" + this.testContext.getUsuario() + "/" + this.testContext.getUsuario() + "_" + this.testContext.nameTest + "_" + this.testContext.getCont() + ".png";
-        String imageroute2 = "C:\\Reportes\\Errors\\" + this.testContext.getUsuario() + "\\" + this.testContext.getUsuario() + "_" + this.testContext.nameTest + "_" + this.testContext.getCont() + ".png";
-        try {
-            writeLogErrorTransaccion(Title);
-            //Verifica si existe la carpeta Logs, si no existe, la Crea
-            File directorio = new File("C:/Reportes/Errors/" + this.testContext.getUsuario());
-            if (!directorio.exists()) {
-                if (directorio.mkdirs()) {
-                    writeLog("Crea el directorio donde almacenara las capturas de pantalla de los errores capturados");
-                }
-            }
-            this.testContext.setCont(this.testContext.getCont() + 1);
-            File SrcFile = getImageScrennshot(driver);
-            File DestFile = new File(imageroute);
-            FileUtils.copyFile(SrcFile, DestFile);
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Evidencia de Pruebas - " + this.testContext.usuario + "_" + this.testContext.nameTest + "_" + this.testContext.caso + ".docx";
-            ruta = ruta.replace(" ", "_");
-            addError addparrafo = new addError(this.testContext);
-            addparrafo.setImageroute(imageroute);
-            addparrafo.setRuta(ruta);
-            addparrafo.setTitle(Title);
-            addparrafo.run();
-            logParrafo("<a target=\"_blank\" href=\"" +
-                    imageroute2 +
-                    "\">Error Capturado</a>");
-            if (!Objects.isNull(testContext.test)) {
-                String base64Image = convertImageToBase64(imageroute);
-                testContext.test.log(Status.FAIL, MarkupHelper.createLabel(Title, ExtentColor.RED), MediaEntityBuilder.createScreenCaptureFromBase64String(base64Image).build());
-            }
-        } catch (Exception e) {
-            writeLogError("Error inesperado al tomar la captura de pantalla: " + imageroute + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al tomar la captura de pantalla: " + imageroute);
-        }
-    }
-
-    /***
-     * Toma una captura y la adjunta al archivo de evidencia del Test al obtener un resultado satisfactorio
-     * @param driver El Driver que está controlando el navegador
-     * @param Title El texto que se colocara a la imagen capturada
-     */
-    public void takeScreenShotSuccessful(WebDriver driver, String Title) {
-        String imageroute = "C:/Reportes/Successful/" + this.testContext.getUsuario() + "/" + this.testContext.getUsuario() + "_" + this.testContext.getNameTest() + "_" + this.testContext.getCont() + ".png";
-        String imageroute2 = "C:\\Reportes\\Successful\\" + this.testContext.getUsuario() + "\\" + this.testContext.getUsuario() + "_" + this.testContext.getNameTest() + "_" + this.testContext.getCont() + ".png";
-        try {
-            //Verifica si existe la carpeta Logs, si no existe, la Crea
-            File directorio = new File("C:/Reportes/Successful/" + this.testContext.getUsuario());
-            if (!directorio.exists()) {
-                if (directorio.mkdirs()) {
-                    writeLog("Crea el directorio donde almacenara las capturas de pantalla de los test realizados correctamente");
-                }
-            }
-            writeLog(Title);
-            this.testContext.setCont(this.testContext.getCont() + 1);
-            File SrcFile = getImageScrennshot(driver);
-            File DestFile = new File(imageroute);
-            FileUtils.copyFile(SrcFile, DestFile);
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Evidencia de Pruebas - " + this.testContext.getNameTest() + "_" + this.testContext.caso + ".docx";
-            ruta = ruta.replace(" ", "_");
-            addError addparrafo = new addError(this.testContext);
-            addparrafo.setImageroute(imageroute);
-            addparrafo.setRuta(ruta);
-            addparrafo.setTitle(Title);
-            addparrafo.run();
-            logParrafo("<a target=\"_blank\" href=\"" +
-                    imageroute2 +
-                    "\">Transaccion Procesada</a>");
-            if (!Objects.isNull(testContext.test)) {
-                String base64Image = convertImageToBase64(imageroute);
-                testContext.test.log(Status.PASS, MarkupHelper.createLabel(Title, ExtentColor.GREEN), MediaEntityBuilder.createScreenCaptureFromBase64String(base64Image).build());
-            }
-        } catch (Exception e) {
-            writeLogError("Error inesperado al tomar la captura de pantalla: " + imageroute + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al tomar la captura de pantalla: " + imageroute);
-        }
-    }
-
-    /***
-     * Toma una captura y la adjunta al archivo de evidencia del Test al visualizar una advertencia
-     * @param driver El Driver que está controlando el navegador
-     * @param Title El texto que se colocara a la imagen capturada
-     */
-    public void takeScreenShotWarning(WebDriver driver, String Title) {
-        String imageroute = "C:/Reportes/Warning/" + this.testContext.getUsuario() + "/" + this.testContext.getUsuario() + "_" + this.testContext.getNameTest() + "_" + this.testContext.getCont() + ".png";
-        String imageroute2 = "C:\\Reportes\\Warning\\" + this.testContext.getUsuario() + "\\" + this.testContext.getUsuario() + "_" + this.testContext.getNameTest() + "_" + this.testContext.getCont() + ".png";
-        try {
-            writeLog(Title);
-            //Verifica si existe la carpeta Logs, si no existe, la Crea
-            File directorio = new File("C:/Reportes/Warning/" + this.testContext.getUsuario());
-            if (!directorio.exists()) {
-                if (directorio.mkdirs()) {
-                    writeLog("Crea el directorio donde almacenara las capturas de pantalla de los test realizados correctamente");
-                }
-            }
-            this.testContext.setCont(this.testContext.getCont() + 1);
-            File SrcFile = getImageScrennshot(driver);
-            File DestFile = new File(imageroute);
-            FileUtils.copyFile(SrcFile, DestFile);
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Evidencia de Pruebas - " + this.testContext.getNameTest() + "_" + this.testContext.caso + ".docx";
-            ruta = ruta.replace(" ", "_");
-            addError addparrafo = new addError(this.testContext);
-            addparrafo.setImageroute(imageroute);
-            addparrafo.setRuta(ruta);
-            addparrafo.setTitle(Title);
-            addparrafo.run();
-            logParrafo("<a target=\"_blank\" href=\"" +
-                    imageroute2 +
-                    "\">Advertencia capturada</a>");
-            if (!Objects.isNull(testContext.test)) {
-                String base64Image = convertImageToBase64(imageroute);
-                testContext.test.log(Status.WARNING, MarkupHelper.createLabel(Title, ExtentColor.AMBER), MediaEntityBuilder.createScreenCaptureFromBase64String(base64Image).build());
-            }
-        } catch (Exception e) {
-            writeLogError("Error inesperado al tomar la captura de pantalla: " + imageroute + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al tomar la captura de pantalla: " + imageroute);
-        }
-    }
-
-    /**
-     * Método para convertir una imagen a cadena Base64
-     *
-     * @param imagePath Ubicación de la imagen
-     */
-    public String convertImageToBase64(String imagePath) throws IOException {
-        return convertImageToBase64(new File(imagePath));
-    }
-
-    /**
-     * Método para convertir una imagen a cadena Base64
-     *
-     * @param imagen Imagen a Obtener la cadena Base64
-     */
-    public String convertImageToBase64(File imagen) throws IOException {
-        byte[] fileContent = Files.readAllBytes(imagen.toPath());
-        return Base64.getEncoder().encodeToString(fileContent);
-    }
-
-    /***
-     * Agrega un párrafo al log del ReportNG
-     * @param s string que queremos escribir en el log
-     */
-    private void logParrafo(String s) {
-        s = "<p> <font size=\"2\">" + s +
-                "</font></p> <br>";
-        Reporter.log(s);
-    }
-
-    /***
-     * Agrega un parrafo al log del ReportNg
-     * @param s string que queremos escribir en el log
-     * @param terminal Indicamos si queremos que escriba en la terminal, lo mismo que escribira en el log
-     */
-    private void logParrafo(String s, boolean terminal) {
-        if (terminal) {
-            writeLog("*");
-            writeLog(s);
-            writeLog("*");
-        }
-        s = "<p><font size=\"2\">" + s + "</font></p> <br>";
-        Reporter.log(s);
-    }
-
-    /***
-     * Agrega un parrafo al log del ReportNg
-     * @param s string que queremos escribir en el log
-     * @param terminal Indicamos si queremos que escriba en la terminal, lo mismo que escribira en el log
-     */
-    private void logParrafoError(String s, boolean terminal) {
-        if (terminal) {
-            writeLogError("*");
-            writeLogError(s);
-            writeLogError("*");
-        }
-        s = "<p><font size=\"2\">" + s + "</font></p> <br>";
-        Reporter.log(s);
-    }
-
-    /***
-     * Obtiene una espera fluida, con el fin de mejorar los tiempos.
-     * @param driver driver que está controlando el navegador.
-     * @param timeduration tiempo máximo de la espera en mili segundos.
-     * @param timerepetition tiempo de espera entre cada intento en mili segundos, tiene que ser menor al tiempo máximo.
-     * @return Retorna una espera del tipo WebDriver, la cual es fluida, no causara una excepción si la operación realizada falla.
-     */
-    public Wait<WebDriver> getFluentWait(WebDriver driver, int timeduration, int timerepetition) {
-        Wait<WebDriver> wait = new FluentWait<>(driver)
-                .withTimeout(Duration.ofMillis(timeduration))
-                .pollingEvery(Duration.ofMillis(timerepetition))
-                .ignoring(UnhandledAlertException.class)
-                .ignoring(java.lang.Exception.class)
-                .ignoring(TimeoutException.class)
-                .ignoring(org.openqa.selenium.NoSuchElementException.class)
-                .ignoring(InvalidElementStateException.class)
-                .ignoring(JavascriptException.class)
-                .ignoring(StaleElementReferenceException.class)
-                .ignoring(org.openqa.selenium.remote.UnreachableBrowserException.class)
-                .ignoring(org.openqa.selenium.InvalidSelectorException.class)
-                .ignoring(org.openqa.selenium.WebDriverException.class)
-                .ignoring(ElementClickInterceptedException.class);
-        return wait;
-    }
-
     /**
      * Espera implícita de 30 segundos, luego de los 30 segundos lanzara excepción
      *
@@ -990,14 +605,14 @@ public class SeleniumUtils {
             });
         } catch (TimeoutException ignored) {
         } catch (Exception e) {
-            writeLogError("Error inesperado al esperar la aparicion del elemento: " + by);
-            writeLogError(convertir_fecha() + "*");
-            writeLogError(convertir_fecha() + " " + e);
-            writeLogError(convertir_fecha() + " Tipo de Excepción : " + e.getClass());
-            writeLogError(convertir_fecha() + " Causa de la Excepción : " + e.getCause());
-            writeLogError(convertir_fecha() + " Mensaje de la Excepción : " + e.getMessage());
-            writeLogError(convertir_fecha() + "*");
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
+            LogsJB.fatal(convertir_fecha() + "*");
+            LogsJB.fatal(convertir_fecha() + " " + e);
+            LogsJB.fatal(convertir_fecha() + " Tipo de Excepción : " + e.getClass());
+            LogsJB.fatal(convertir_fecha() + " Causa de la Excepción : " + e.getCause());
+            LogsJB.fatal(convertir_fecha() + " Mensaje de la Excepción : " + e.getMessage());
+            LogsJB.fatal(convertir_fecha() + "*");
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
         }
     }
@@ -1014,14 +629,14 @@ public class SeleniumUtils {
             wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
         } catch (TimeoutException ignored) {
         } catch (Exception e) {
-            writeLogError("Error inesperado al esperar la aparicion del elemento: " + by);
-            writeLogError(convertir_fecha() + "*");
-            writeLogError(convertir_fecha() + " " + e);
-            writeLogError(convertir_fecha() + " Tipo de Excepción : " + e.getClass());
-            writeLogError(convertir_fecha() + " Causa de la Excepción : " + e.getCause());
-            writeLogError(convertir_fecha() + " Mensaje de la Excepción : " + e.getMessage());
-            writeLogError(convertir_fecha() + "*");
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
+            LogsJB.fatal(convertir_fecha() + "*");
+            LogsJB.fatal(convertir_fecha() + " " + e);
+            LogsJB.fatal(convertir_fecha() + " Tipo de Excepción : " + e.getClass());
+            LogsJB.fatal(convertir_fecha() + " Causa de la Excepción : " + e.getCause());
+            LogsJB.fatal(convertir_fecha() + " Mensaje de la Excepción : " + e.getMessage());
+            LogsJB.fatal(convertir_fecha() + "*");
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
         }
     }
@@ -1039,19 +654,17 @@ public class SeleniumUtils {
             });
         } catch (TimeoutException ignored) {
         } catch (Exception e) {
-            writeLogError("Error inesperado al esperar la aparicion del elemento: " + by);
-            writeLogError(convertir_fecha() + "*");
-            writeLogError(convertir_fecha() + " " + e);
-            writeLogError(convertir_fecha() + " Tipo de Excepción : " + e.getClass());
-            writeLogError(convertir_fecha() + " Causa de la Excepción : " + e.getCause());
-            writeLogError(convertir_fecha() + " Mensaje de la Excepción : " + e.getMessage());
-            writeLogError(convertir_fecha() + "*");
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
+            LogsJB.fatal(convertir_fecha() + "*");
+            LogsJB.fatal(convertir_fecha() + " " + e);
+            LogsJB.fatal(convertir_fecha() + " Tipo de Excepción : " + e.getClass());
+            LogsJB.fatal(convertir_fecha() + " Causa de la Excepción : " + e.getCause());
+            LogsJB.fatal(convertir_fecha() + " Mensaje de la Excepción : " + e.getMessage());
+            LogsJB.fatal(convertir_fecha() + "*");
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
         }
     }
-
-
 
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
@@ -1064,10 +677,10 @@ public class SeleniumUtils {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.confirm=function(){return " + aceptar + "}");
         } catch (WebDriverException e) {
-            writeLogError("Error WebDriver al interactuar con la alerta: " + e.getMessage());
+            LogsJB.fatal("Error WebDriver al interactuar con la alerta: " + e.getMessage());
             // Puedes agregar más manejo de excepciones específicas según sea necesario
         } catch (Exception e) {
-            writeLogError("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
+            LogsJB.fatal("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
         }
     }
 
@@ -1094,14 +707,14 @@ public class SeleniumUtils {
             alert.accept();
         } catch (java.util.NoSuchElementException e) {
             // Manejar la falta de alerta específica si es necesario
-            writeLogError("No se encontró ninguna alerta presente.");
+            LogsJB.fatal("No se encontró ninguna alerta presente.");
             JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
             jsExecutor.executeScript("window.alert = function() {};");
         } catch (WebDriverException e) {
-            writeLogError("Error WebDriver al interactuar con la alerta: " + e.getMessage());
+            LogsJB.fatal("Error WebDriver al interactuar con la alerta: " + e.getMessage());
             // Puedes agregar más manejo de excepciones específicas según sea necesario
         } catch (Exception e) {
-            writeLogError("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
+            LogsJB.fatal("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
         }
     }
 
@@ -1665,9 +1278,6 @@ public class SeleniumUtils {
         return false;
     }
 
-
-
-
     /***
      * Obtiene el texto del elemento indicado, si este existe en el contexto actual
      * @param driver Driver que está manipulando el navegador
@@ -2107,8 +1717,6 @@ public class SeleniumUtils {
         return null;
     }
 
-
-
     /***
      * Obtiene los elementos que cumplen con el criterio de busqueda especificado
      * @param driver Driver que está controlando el navegador
@@ -2338,19 +1946,6 @@ public class SeleniumUtils {
     }
 
     /***
-     * Verifica Si el usuario indicado corresponde al usuario del sistema Operativo
-     * @param Usuario Usuario que se desea sea el que escriba en el Log
-     * @throws NoSuchFieldException NoSuchFieldException
-     * @throws IllegalAccessException IllegalAccessException
-     */
-    protected void verificarUsuario(String Usuario) {
-        if (stringIsNullOrEmpty(Usuario) || Usuario.equals(this.testContext.getUsuario())) {
-        } else {
-            this.testContext.setUsuario(Usuario);
-        }
-    }
-
-    /***
      * Obtiene la fecha actual en formato dd/MM/YYYY HH:MM:SS
      * @return Retorna una cadena de texto con la fecha obtenida
      */
@@ -2363,291 +1958,6 @@ public class SeleniumUtils {
     }
 
     /***
-     * Metodo para escribir en el Log, lo que está sucediendo dentro de la prueba,
-     * imprime en consola el texto que sera agregado al Log
-     * @param Texto Texto que deseamos que almacene en el Log
-     */
-    public void writeLogTransaccion(String Texto) {
-        try {
-            //Aumenta la Cantidad de Veces que se a escrito el Log
-            if (!Objects.isNull(testContext.test)) {
-                testContext.test.log(Status.INFO, Texto);
-            }
-            this.testContext.setLogtext(this.testContext.getLogtext() + 1);
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Logs/" + this.testContext.getUsuario() + "_" + this.testContext.getNameTest() + ".txt";
-            //Verifica si existe la carpeta Logs, si no existe, la Crea
-            if (Objects.isNull(fichero)) {
-                File directorio = new File("C:/Reportes/Logs");
-                if (!directorio.exists()) {
-                    if (directorio.mkdirs()) {
-                        System.out.println("*");
-                        System.out.println("Crea el directorio donde almacenara el Log de la prueba");
-                        System.out.println("*");
-                    }
-                }
-                /////Esta seccion se encarga de Crear y escribir en el Log/////
-                fichero = new File(ruta);
-            }
-
-            /*Si es un nuevo Test se ejecuta el siguiente codigo, tomando en cuenta que sea el primer
-             * TestCase del Test actual*/
-            //Si el fichero no Existe, lo creara y agregara el siguiente texto
-            if (!fichero.exists()) {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(fichero));
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator());
-                logParrafo(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator(), true);
-                bw.close();
-            } else {
-                if (this.testContext.getLogtext() == 1) {
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(fichero.getAbsoluteFile(), true));
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator());
-                    logParrafo(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator(), true);
-                    bw.close();
-                } else {
-                    //Agrega en el fichero el Log
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(fichero.getAbsoluteFile(), true));
-                    bw.write(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator());
-                    bw.close();
-                    logParrafo(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator(), true);
-                }
-            }
-        } catch (Exception ex) {
-            System.err.println("Excepcion capturada al escribir el log del Text " +
-                    this.testContext.getNameTest() + ": " + ex.getMessage());
-            System.err.println("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(ex));
-            Assert.fail("Error inesperado al escribir el log del Text: " +
-                    this.testContext.getNameTest() + " - " + ex.getMessage());
-        }
-    }
-
-    /***
-     * Metodo para escribir en el Log, lo que está sucediendo dentro de la prueba, al capturar una excepción,
-     * imprime en consola el texto que sera agregado al Log
-     * @param Texto Texto que deseamos que almacene en el Log
-     */
-    public void writeLogErrorTransaccion(String Texto) {
-        try {
-            if (!Objects.isNull(testContext.test)) {
-                testContext.test.log(Status.FAIL, MarkupHelper.createLabel(Texto, ExtentColor.RED));
-            }
-            //Aumenta la Cantidad de Veces que se a escrito el Log
-            this.testContext.setLogtext(testContext.getLogtext() + 1);
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Logs/" + this.testContext.getUsuario() + "_" + this.testContext.getNameTest() + ".txt";//Verifica si existe la carpeta Logs, si no existe, la Crea
-            //Verifica si existe la carpeta Logs, si no existe, la Crea
-            if (Objects.isNull(fichero)) {
-                File directorio = new File("C:/Reportes/Logs");
-                if (!directorio.exists()) {
-                    if (directorio.mkdirs()) {
-                        System.out.println("*");
-                        System.out.println("Crea el directorio donde almacenara el Log de la prueba");
-                        System.out.println("*");
-                    }
-                }
-                /////Esta seccion se encarga de Crear y escribir en el Log/////
-                fichero = new File(ruta);
-            }
-
-            /*Si es un nuevo Test se ejecuta el siguiente codigo, tomando en cuenta que sea el primer
-             * TestCase del Test actual*/
-            //Si el fichero no Existe, lo creara y agregara el siguiente texto
-            if (!fichero.exists()) {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(fichero));
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator());
-                logParrafoError(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator(), true);
-                bw.close();
-            } else {
-                if (testContext.getLogtext() == 1) {
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(fichero.getAbsoluteFile(), true));
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator());
-                    logParrafoError(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator(), true);
-                    bw.close();
-                } else {
-                    //Agrega en el fichero el Log
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(fichero.getAbsoluteFile(), true));
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.close();
-                    logParrafoError(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + "*" + System.lineSeparator(), true);
-                    logParrafoError(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + "*" + System.lineSeparator(), true);
-                    logParrafoError(convertir_fecha() + "    " + "    " + this.testContext.getUsuario() + "    " + "    " + this.testContext.getNameTest() + "    " + "    " + "    " + Texto + System.lineSeparator(), true);
-                }
-            }
-        } catch (Exception ex) {
-            System.err.println("Excepcion capturada al escribir el log del Text " +
-                    this.testContext.getNameTest() + ": " + ex.getMessage());
-            System.err.println("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(ex));
-            Assert.fail("Error inesperado al escribir el log del Text: " +
-                    this.testContext.getNameTest() + " - " + ex.getMessage());
-        }
-    }
-
-    /***
-     * Metodo para escribir en el Log, lo que está sucediendo dentro de la prueba,
-     * imprime en consola el texto que sera agregado al Log
-     * @param Texto Texto que deseamos que almacene en el Log
-     */
-    public void writeLog(String Texto) {
-        try {
-            //Aumenta la Cantidad de Veces que se a escrito el Log
-            this.testContext.setLogtext(this.testContext.getLogtext() + 1);
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Logs/" + this.testContext.getUsuario() + "_" + this.testContext.getNameTest() + ".txt";
-            //Verifica si existe la carpeta Logs, si no existe, la Crea
-            if (Objects.isNull(fichero)) {
-                File directorio = new File("C:/Reportes/Logs");
-                if (!directorio.exists()) {
-                    if (directorio.mkdirs()) {
-                        System.out.println("*");
-                        System.out.println("Crea el directorio donde almacenara el Log de la prueba");
-                        System.out.println("*");
-                    }
-                }
-                /////Esta seccion se encarga de Crear y escribir en el Log/////
-                fichero = new File(ruta);
-            }
-
-            /*Si es un nuevo Test se ejecuta el siguiente codigo, tomando en cuenta que sea el primer
-             * TestCase del Test actual*/
-            //Si el fichero no Existe, lo creara y agregara el siguiente texto
-            if (!fichero.exists()) {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(fichero));
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write(Texto + System.lineSeparator());
-                System.out.println(Texto);
-                bw.close();
-            } else {
-                if (this.testContext.getLogtext() == 1) {
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(fichero.getAbsoluteFile(), true));
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write(Texto + System.lineSeparator());
-                    System.out.println(Texto);
-                    bw.close();
-                } else {
-                    //Agrega en el fichero el Log
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(fichero.getAbsoluteFile(), true));
-                    bw.write(Texto + System.lineSeparator());
-                    System.out.println(Texto);
-                    bw.close();
-                }
-            }
-        } catch (Exception ex) {
-            System.err.println("Excepcion capturada al escribir el log del Text " +
-                    this.testContext.getNameTest() + ": " + ex.getMessage());
-            System.err.println("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(ex));
-            Assert.fail("Error inesperado al escribir el log del Text: " +
-                    this.testContext.getNameTest() + " - " + ex.getMessage());
-        }
-    }
-
-    /***
-     * Metodo para escribir en el Log, lo que está sucediendo dentro de la prueba, al capturar una excepción,
-     * imprime en consola el texto que sera agregado al Log
-     * @param Texto Texto que deseamos que almacene en el Log
-     */
-    public void writeLogError(String Texto) {
-        try {
-            //Aumenta la Cantidad de Veces que se a escrito el Log
-            this.testContext.setLogtext(testContext.getLogtext() + 1);
-            //Rutas de archivos
-            String ruta = "C:/Reportes/Logs/" + this.testContext.getUsuario() + "_" + this.testContext.getNameTest() + ".txt";
-            //Verifica si existe la carpeta Logs, si no existe, la Crea
-            if (Objects.isNull(fichero)) {
-                File directorio = new File("C:/Reportes/Logs");
-                if (!directorio.exists()) {
-                    if (directorio.mkdirs()) {
-                        System.out.println("*");
-                        System.out.println("Crea el directorio donde almacenara el Log de la prueba");
-                        System.out.println("*");
-                    }
-                }
-                /////Esta seccion se encarga de Crear y escribir en el Log/////
-                fichero = new File(ruta);
-            }
-            /*Si es un nuevo Test se ejecuta el siguiente codigo, tomando en cuenta que sea el primer
-             * TestCase del Test actual*/
-            //Si el fichero no Existe, lo creara y agregara el siguiente texto
-            if (!fichero.exists()) {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(fichero));
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write("*" + System.lineSeparator());
-                bw.write(Texto + System.lineSeparator());
-                System.err.println("*");
-                System.err.println(Texto);
-                System.err.println("*");
-                bw.close();
-            } else {
-                if (testContext.getLogtext() == 1) {
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(fichero.getAbsoluteFile(), true));
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write(Texto + System.lineSeparator());
-                    System.err.println("*");
-                    System.err.println(Texto);
-                    System.err.println("*");
-                    bw.close();
-                } else {
-                    //Agrega en el fichero el Log
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(fichero.getAbsoluteFile(), true));
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + System.lineSeparator());
-                    bw.write(Texto + System.lineSeparator());
-                    System.err.println("*");
-                    System.err.println(Texto);
-                    System.err.println("*");
-                    bw.write("*" + System.lineSeparator());
-                    bw.write("*" + "\n");
-                    bw.close();
-                }
-            }
-        } catch (Exception ex) {
-            System.err.println("Excepcion capturada al escribir el log del Text " +
-                    this.testContext.getNameTest() + ": " + ex.getMessage());
-            System.err.println("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(ex));
-            Assert.fail("Error inesperado al escribir el log del Text: " +
-                    this.testContext.getNameTest() + " - " + ex.getMessage());
-        }
-    }
-
-    /***
      * Presiona la tecla indicada en el condigo numerico indicado
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
@@ -2657,8 +1967,8 @@ public class SeleniumUtils {
             Actions actions = new Actions(testContext.driver);
             actions.keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).perform();
         } catch (Exception e) {
-            writeLogError("Error inesperado al presionar una tecla: " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
         }
     }
@@ -2672,8 +1982,8 @@ public class SeleniumUtils {
             Actions actions = new Actions(testContext.driver);
             actions.sendKeys(codigo).perform();
         } catch (Exception e) {
-            writeLogError("Error inesperado al presionar una tecla: " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
         }
     }
@@ -2694,8 +2004,8 @@ public class SeleniumUtils {
                 threadslepp(100);
             }
         } catch (Exception e) {
-            writeLogError("Error inesperado al presionar una tecla: " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
         }
     }
@@ -2717,8 +2027,8 @@ public class SeleniumUtils {
                 threadslepp(100);
             }
         } catch (Exception e) {
-            writeLogError("Error inesperado al presionar una tecla: " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
         }
     }
@@ -2735,8 +2045,8 @@ public class SeleniumUtils {
         try {
             cambiarZOOM(repeticiones, Keys.SUBTRACT);
         } catch (Exception e) {
-            writeLogError("Error inesperado al presionar una tecla: " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
         }
     }
@@ -2758,8 +2068,8 @@ public class SeleniumUtils {
             writeLog("Se realizo el movimiento del scroll: ");
             threadslepp(100);
         } catch (Exception e) {
-            writeLogError("Error inesperado al realizar un el scroll: " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al intentar realizar el scroll: ");
         }
     }
@@ -2776,8 +2086,8 @@ public class SeleniumUtils {
                 actions.sendKeys(Keys.PAGE_DOWN).build().perform();
             }
         } catch (Exception e) {
-            writeLogError("Error inesperado al realizar el scroll: " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al intentar realizar el scroll: ");
         }
     }
@@ -2794,8 +2104,8 @@ public class SeleniumUtils {
                 actions.sendKeys(Keys.PAGE_UP).build().perform();
             }
         } catch (Exception e) {
-            writeLogError("Error inesperado al realizar el scroll: " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al intentar realizar el scroll: ");
         }
     }
@@ -2832,8 +2142,8 @@ public class SeleniumUtils {
                 writeLog("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
             }
         } catch (Exception e) {
-            writeLogError("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al seleccionar el elemento: " + element);
         }
     }
@@ -2879,8 +2189,8 @@ public class SeleniumUtils {
                 writeLog("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
             }
         } catch (Exception e) {
-            writeLogError("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
         }
         return false;
     }
@@ -2918,8 +2228,8 @@ public class SeleniumUtils {
                 writeLog("No Existe Mensaje de Error!!!");
             }
         } catch (Exception e) {
-            writeLogError("Error inesperado al buscar la existencia de un error: " + element + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al buscar la existencia de un error: " + element + " " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al buscar la existencia de un error: " + element);
         }
     }
@@ -2975,9 +2285,9 @@ public class SeleniumUtils {
                 response = "ERR";
             }
         } catch (Exception e) {
-            writeLogError("Error inesperado al verificar si el test fue exitoso: " + element);
-            writeLogError("Error inesperado al verificar si el test fue exitoso: " + element + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element);
+            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element + " " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al verificar si el test fue exitoso: " + element);
         }
         return response;
@@ -3031,9 +2341,9 @@ public class SeleniumUtils {
                 return response;
             }
         } catch (Exception e) {
-            writeLogError("Error inesperado al verificar si el test fue exitoso: " + element);
-            writeLogError("Error inesperado al verificar si el test fue exitoso: " + element + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element);
+            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element + " " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al verificar si el test fue exitoso: " + element);
         }
         return response;
@@ -3087,9 +2397,9 @@ public class SeleniumUtils {
                 writeLog("No Encontro el texto del elemento indicado, por lo que no se pudo verificar si la transaccion fue exitosa!!!");
             }
         } catch (Exception e) {
-            writeLogError("Error inesperado al verificar si el test fue exitoso: " + element);
-            writeLogError("Error inesperado al verificar si el test fue exitoso: " + element + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element);
+            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element + " " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al verificar si el test fue exitoso: " + element);
         }
     }
@@ -3143,51 +2453,6 @@ public class SeleniumUtils {
             writeLog("El servicio si está habilitado");
             writeLog("*");
         }
-    }
-
-    /***
-     * Obtiene el libro de excel especificado en la ruta, si está es valida
-     * @param ruta ruta del archivo de excel que se desea obtener
-     * @return retorna null si no encontro el archivo, si lo encontro y lo obtuvo, retorna el archivo
-     */
-    public XSSFWorkbook getExcel(String ruta) {
-        XSSFWorkbook wordBook;
-        try {
-            // Abre el archivo a leer
-            FileInputStream inputStream = new FileInputStream(ruta);
-            // Leer el libro de trabajo
-            wordBook = new XSSFWorkbook(inputStream);
-            // Cerrar el flujo de entrada
-            inputStream.close();
-            return wordBook;
-        } catch (Exception e) {
-            writeLogError("Error inesperado al leer el archivo de excel en la ruta: " + ruta);
-            writeLogError("Error inesperado al leer el archivo de excel en la ruta: " + ruta + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al leer el archivo de excel en la ruta: " + ruta);
-        }
-        return null;
-    }
-
-    /****
-     *Obtiene la hoja indicada del libro excel proporcionado
-     * @param name Nombre de la hoja que queremos obtener
-     * @param wordBook Libro del cual queremos obtener la hoja
-     * @return Retorna la hoja obtenida del libro
-     */
-    public XSSFSheet getShettName(String name, XSSFWorkbook wordBook) {
-        XSSFSheet sheet;
-        try {
-            // Leer la hoja de trabajo, comenzando desde 0
-            sheet = wordBook.getSheet(name);
-            return sheet;
-        } catch (Exception e) {
-            writeLogError("Errror inesperado al obtener la hoja de excel con el nombre de: " + name);
-            writeLogError("Errror inesperado al obtener la hoja de excel con el nombre de: " + name + " " + e.getMessage());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Errror inesperado al obtener la hoja de excel con el nombre de: " + name);
-        }
-        return null;
     }
 
     /***
@@ -3426,31 +2691,6 @@ public class SeleniumUtils {
         return retorno;
     }
 
-    /****
-     * Verifica si una cadena está vacía o es nula
-     * @param cadena Cadena a Validar
-     * @return Retorna True si la cadena envíada está vacía o nula, de lo contrario retorna false
-     */
-    public boolean stringIsNullOrEmpty(String cadena) {
-        return Objects.isNull(cadena) || cadena.trim().isEmpty();
-    }
-
-
-
-
-
-
-    public String GetCONT_TRAN() throws SQLException {
-        String Contador;
-        String url = "jdbc:sqlserver://10.253.15.56;databaseName=AUTOMATIZACION;user=Engage2;password=$eguridad2020;encrypt=true;trustServerCertificate=true;";
-        Connection conn = DriverManager.getConnection(url);
-        ResultSet rs = conn.prepareStatement("SELECT CONTADOR FROM CONT_TRAN WITH (NOLOCK)").executeQuery();
-        rs.next();
-        Contador = rs.getString("CONTADOR");
-        conn.prepareStatement("UPDATE CONT_TRAN SET CONTADOR = CONTADOR + 1").executeUpdate();
-        return Contador;
-    }
-
     /**
      * Envia carácter por carácter al elemento especificado
      *
@@ -3476,61 +2716,10 @@ public class SeleniumUtils {
         }
     }
 
-
-
-
-
-    public boolean elementIsDisabled(WebElement element) {
-        try {
-            if (Objects.isNull(element)) {
-                writeLogError("El elemento es nulo. No se puede verificar la habilitación.");
-                return true; // Se puede considerar deshabilitado si el elemento es nulo
-            }
-            // Verificar si el elemento está deshabilitado o no visible
-            if (!element.isEnabled() || !element.isDisplayed()) {
-                writeLog("El elemento está deshabilitado o no visible.");
-                return true;
-            }
-            // Si se llega hasta aquí, el elemento está habilitado y visible
-            return false;
-        } catch (Exception e) {
-            writeLogError("Excepción al intentar verificar si el elemento está deshabilitado: " + ExceptionUtils.getStackTrace(e));
-            return true; // En caso de excepción, consideramos el elemento como deshabilitado
-        }
-    }
-
-
-    /**
-     * Función que se utiliza para posicionarsee en un elemento, utilizando un controlador WebDriver
-     *
-     * @param driver   WebDriver se utiliza para interactuar con el entorno
-     * @param elemento WebElement el elemento al que se desea posicionarse
-     */
-    public void posicionarmeEn(WebDriver driver, WebElement elemento) {
-        try {
-            if (Objects.isNull(elemento)) {
-                return;
-            }
-            try {
-                // Crear un objeto Actions
-                Actions actions = new Actions(driver);
-                // Desplazar el scroll hasta el elemento
-                actions.moveToElement(elemento);
-                actions.perform();
-            } catch (WebDriverException e) {
-                // Desplazar el scroll hasta el elemento
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elemento);
-            }
-        } catch (Exception e) {
-            writeLogError("Excepción capturada al intentar hacer scroll en el elemento: " + elemento.toString());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-        }
-    }
-
     public boolean clickToElement(WebElement element) {
         try {
             if (Objects.isNull(element)) {
-                writeLogError("El elemento es nulo. No se puede hacer clic.");
+                LogsJB.fatal("El elemento es nulo. No se puede hacer clic.");
                 return false;
             }
             try {
@@ -3539,19 +2728,18 @@ public class SeleniumUtils {
                 writeLog("Hizo clic en el elemento directamente.");
                 return true;
             } catch (WebDriverException e) {
-                writeLogError("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
+                LogsJB.fatal("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
                 JavascriptExecutor js = (JavascriptExecutor) testContext.getDriver();
                 js.executeScript("arguments[0].click();", element);
                 writeLog("Hizo clic en el elemento por medio de JavaScript.");
                 return true;
             }
         } catch (Exception e) {
-            writeLogError("Excepción capturada al intentar hacer clic en el elemento: " + element.toString());
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Excepción capturada al intentar hacer clic en el elemento: " + element.toString());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             return false;
         }
     }
-
 
     public String getTextOfWebElement(WebElement element) {
         if (Objects.isNull(element)) {
@@ -3572,8 +2760,8 @@ public class SeleniumUtils {
                 text = getTextUsingJavaScript(element);
             }
         } catch (WebDriverException e) {
-            writeLogError("El elemento ya no existe en el contexto actual ");
-            writeLogError("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("El elemento ya no existe en el contexto actual ");
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
         }
         if (stringIsNullOrEmpty(text)) {
             writeLog(convertir_fecha() + " No se pudo obtener el texto del elemento, comuniquese con los administradores ");
@@ -3586,7 +2774,7 @@ public class SeleniumUtils {
             JavascriptExecutor jsExecutor = (JavascriptExecutor) testContext.getDriver(); // Asegúrate de tener una instancia válida de WebDriver
             return (String) jsExecutor.executeScript("return arguments[0].textContent", element);
         } catch (Exception e) {
-            writeLogError("Error al intentar obtener el texto mediante JavaScript: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Error al intentar obtener el texto mediante JavaScript: " + ExceptionUtils.getStackTrace(e));
             return "";
         }
     }
@@ -3634,12 +2822,6 @@ public class SeleniumUtils {
         driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
     }
 
-
-
-
-
-
-
     public ArrayList<String> SepararCadena(String cadena) {
         ArrayList<String> nuevaLista = new ArrayList<String>();
         for (int i = 0; i < cadena.length(); i++) {
@@ -3647,6 +2829,4 @@ public class SeleniumUtils {
         }
         return nuevaLista;
     }
-
-
 }
