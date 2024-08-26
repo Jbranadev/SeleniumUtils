@@ -322,9 +322,9 @@ public class SeleniumUtils {
                 SeleniumUtils.getSearchTime() +
                 " mili segundos: " + fecha2);
         if (fecha2.after(fecha)) {
-            LogsJB.info(" No Existe el elemento especificado: " + element);
+            LogsJB.info(" No logro limpiar el elemento especificado: " + element);
         } else {
-            LogsJB.info(" Logro encontrar el elemento especificado: " + element);
+            LogsJB.info(" Logro limpiar el elemento especificado: " + element);
             return true;
         }
         //Retorna Falso si el elemento no Existe
