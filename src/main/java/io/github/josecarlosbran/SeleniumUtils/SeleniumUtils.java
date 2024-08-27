@@ -392,11 +392,7 @@ public class SeleniumUtils {
         }
         return false;
     }
-    /**
-     * Función para pasar a la pestáña anterior
-     *
-     * @param driver WebDriver representa el controlador e interactua con el navegador
-     */
+
     /****
      * Verifica si una cadena está vacía o es nula
      * @param cadena Cadena a Validar
@@ -491,7 +487,7 @@ public class SeleniumUtils {
                         return driver.findElement(By.className(term));
                 }
             }
-            writeLog("No fue posible refrescar la referencia al elemento");
+            LogsJB.info("No fue posible refrescar la referencia al elemento");
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
             return null;
         } catch (Exception e) {
@@ -1022,7 +1018,7 @@ public class SeleniumUtils {
 //         String text=driver.switchTo().alert().getText();
 //         writeLog(text);
 //            driver.switchTo().alert().accept();
-            writeLog(text);
+            LogsJB.info(text);
             alert.accept();
         } catch (java.util.NoSuchElementException e) {
             // Manejar la falta de alerta específica si es necesario
@@ -1044,7 +1040,7 @@ public class SeleniumUtils {
      * @return Retorna la lista de elementos que cumplen con los criterios de busqueda, si no encuentra ningun elemento retorna una lista
      * vacía
      */
-    public List<WebElement> getElementsIfExist(SearchContext driver, String element) {
+    public static List<WebElement> getElementsIfExist(SearchContext driver, String element) {
         //Para optimizar el tiempo de respuestá
         writeLog(convertir_fecha() + "* ");
         writeLog(convertir_fecha() + " Buscara si existen los elementos indicados para obtenerlos: " + element);
@@ -1269,7 +1265,7 @@ public class SeleniumUtils {
      * Obtiene la fecha actual en formato dd/MM/YYYY HH:MM:SS
      * @return Retorna una cadena de texto con la fecha obtenida
      */
-    public String convertir_fecha() {
+    public static String convertir_fecha() {
         String temp;
         DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         //convertir_fecha()
@@ -1281,7 +1277,7 @@ public class SeleniumUtils {
      * Presiona la tecla indicada en el condigo numerico indicado
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
-    public void keyPress(int codigo) {
+    public static void keyPress(int codigo) {
         try {
             char asciiValue = (char) codigo;
             Actions actions = new Actions(testContext.driver);
@@ -1313,14 +1309,14 @@ public class SeleniumUtils {
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
-    public void cambiarZOOM(int repeticiones, Keys codigo) {
+    public void cambiarZOOM(WebDriver driver,int repeticiones, Keys codigo) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
-                Actions actions = new Actions(testContext.driver);
+                Actions actions = new Actions(driver);
                 actions.keyDown(Keys.CONTROL).keyDown(codigo).keyUp(codigo).keyUp(Keys.CONTROL).perform();
-                writeLog("Presiona la tecla: " + codigo);
-                writeLog("Suelta la tecla: " + codigo);
+                LogsJB.info("Presiona la tecla: " + codigo);
+                LogsJB.info("Suelta la tecla: " + codigo);
                 threadslepp(100);
             }
         } catch (Exception e) {
@@ -1335,15 +1331,15 @@ public class SeleniumUtils {
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
-    public void cambiarZOOM(int repeticiones, int codigo) {
+    public void cambiarZOOM(WebDriver driver, int repeticiones, int codigo) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
                 char asciiValue = (char) codigo;
-                Actions actions = new Actions(testContext.driver);
+                Actions actions = new Actions(driver);
                 actions.keyDown(Keys.CONTROL).keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).keyUp(Keys.CONTROL).perform();
-                writeLog("Presiona la tecla: " + codigo);
-                writeLog("Suelta la tecla: " + codigo);
+                LogsJB.info("Presiona la tecla: " + codigo);
+                LogsJB.info("Suelta la tecla: " + codigo);
                 threadslepp(100);
             }
         } catch (Exception e) {
@@ -1361,9 +1357,9 @@ public class SeleniumUtils {
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
      *
      */
-    public void cambiarZOOMMenos(int repeticiones) {
+    public void cambiarZOOMMenos(WebDriver driver, int repeticiones) {
         try {
-            cambiarZOOM(repeticiones, Keys.SUBTRACT);
+            cambiarZOOM(driver,repeticiones, Keys.SUBTRACT);
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
@@ -1382,10 +1378,10 @@ public class SeleniumUtils {
             Robot robot = new Robot();
             int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
             int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height / 2;
-            writeLog("Altura de la pantalla " + alto * 2 + " ancho de la pantalla " + ancho * 2);
+            LogsJB.info("Altura de la pantalla " + alto * 2 + " ancho de la pantalla " + ancho * 2);
             robot.mouseMove(ancho, alto);
             robot.mouseWheel(cantidad);
-            writeLog("Se realizo el movimiento del scroll: ");
+            LogsJB.info("Se realizo el movimiento del scroll: ");
             threadslepp(100);
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
@@ -1399,9 +1395,9 @@ public class SeleniumUtils {
      *
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
      */
-    public void scrollMouseDown(int cantidadScrolls) {
+    public void scrollMouseDown(WebDriver driver, int cantidadScrolls) {
         try {
-            Actions actions = new Actions(testContext.driver);
+            Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
                 actions.sendKeys(Keys.PAGE_DOWN).build().perform();
             }
@@ -1417,9 +1413,9 @@ public class SeleniumUtils {
      *
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
      */
-    public void scrollMouseUp(int cantidadScrolls) {
+    public void scrollMouseUp(WebDriver driver,int cantidadScrolls) {
         try {
-            Actions actions = new Actions(testContext.driver);
+            Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
                 actions.sendKeys(Keys.PAGE_UP).build().perform();
             }
@@ -1445,21 +1441,17 @@ public class SeleniumUtils {
                 try {
                     int opcionint;
                     opcionint = Integer.parseInt(opcion);
-                    writeLog("Parcio la opcion a entero: " + opcionint);
+                    LogsJB.info("Parcio la opcion a entero: " + opcionint);
                     new Select(elemento).selectByIndex(opcionint - 1);
-                    String tiposociedad = obtenerTextoSeleccionadoSelect(elemento);
-                    this.takeScreenShotJB(testContext.getDriver(), comment + tiposociedad);
-                    writeLog("Encontro el elemento Select: " + element + " " +
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
                             "Procedera a seleccionar la opcion por medio del Index numerico");
                 } catch (NumberFormatException e) {
                     new Select(elemento).selectByVisibleText(opcion);
-                    String tiposociedad = obtenerTextoSeleccionadoSelect(elemento);
-                    this.takeScreenShotJB(testContext.getDriver(), comment + tiposociedad);
-                    writeLog("Encontro el elemento Select: " + element + " " +
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
                             "Procedera a seleccionar la opcion por medio del Texto Visible");
                 }
             } else {
-                writeLog("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
+                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
             }
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
@@ -1480,33 +1472,33 @@ public class SeleniumUtils {
             if (!Objects.isNull(elemento)) {
                 //Si encuentra el elemento ejecuta este codigo
                 try {
-                    writeLog("Encontro el elemento Select: " + element + " " +
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
                             "Procedera a seleccionar la opcion por medio del Index numerico " + opcion);
                     int opcionint;
                     opcionint = Integer.parseInt(opcion);
-                    writeLog("Parcio la opcion a entero: " + opcionint);
+                    LogsJB.info("Parcio la opcion a entero: " + opcionint);
                     new Select(elemento).selectByIndex(opcionint);
                     return true;
                 } catch (NumberFormatException e) {
                     try {
-                        writeLog("Encontro el elemento Select: " + element + " " +
+                        LogsJB.info("Encontro el elemento Select: " + element + " " +
                                 "Procedera a seleccionar la opcion por medio del Texto Visible: " + opcion);
                         new Select(elemento).selectByVisibleText(opcion);
                         return true;
                     } catch (Exception m) {
-                        writeLog("Encontro el elemento Select: " + element + " " +
+                        LogsJB.info("Encontro el elemento Select: " + element + " " +
                                 "Procedera a seleccionar la opcion por medio del Value: " + opcion);
                         new Select(elemento).selectByValue(opcion);
                         return true;
                     }
                 } catch (Exception ex) {
-                    writeLog("Encontro el elemento Select: " + element + " " +
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
                             "Procedera a seleccionar la opcion por medio del Value: " + opcion);
                     new Select(elemento).selectByValue(opcion);
                     return true;
                 }
             } else {
-                writeLog("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
+                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
             }
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
@@ -1818,11 +1810,11 @@ public class SeleniumUtils {
      * @param element Atributo del elemento a buscar
      * @return Retorna el elemento, si no lo encuentra retorna Null
      */
-    public WebElement obtenerWebElementx2(SearchContext driver, String element) {
+    public static WebElement obtenerWebElementx2(SearchContext driver, String element) {
         int i = 0;
         WebElement temp = null;
         while (Objects.isNull(temp) && i < 2) {
-            temp = getElementIfExist(driver, element);
+            temp = SeleniumUtils.getElementIfExist(driver, element);
             i++;
         }
         return temp;
@@ -1850,7 +1842,7 @@ public class SeleniumUtils {
      * @param element Filtro de Atributo del elemento a buscar
      * @return Retorna el elemento, si no lo encuentra retorna Null
      */
-    public WebElement getElementIfExist(SearchContext driver, By element) {
+    public static WebElement getElementIfExist(SearchContext driver, By element) {
         int i = 0;
         WebElement temp = null;
         temp = getElementIfExist(driver, getIdentificadorBy(element));
@@ -1915,11 +1907,11 @@ public class SeleniumUtils {
      */
     public boolean deseleccionarElemento(WebDriver driver, WebElement element) {
         if (!Objects.isNull(element)) {
-            writeLog("La opcion está seleccionada: " + element.isSelected());
-            writeLog("Color: " + element.getCssValue("background-color"));
+            LogsJB.info("La opcion está seleccionada: " + element.isSelected());
+            LogsJB.info("Color: " + element.getCssValue("background-color"));
             String color = element.getCssValue("background-color");
             if (element.isSelected() || StringUtils.containsIgnoreCase(color, "46, 152, 9")) {
-                writeLog("Deselecciona el elemento: " + element);
+                LogsJB.info("Deselecciona el elemento: " + element);
                 String tempelement = element.toString().split(" -> ")[1];
                 String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
                 String locator = data[0];
@@ -1945,11 +1937,11 @@ public class SeleniumUtils {
      */
     public boolean seleccionarElemento(WebDriver driver, WebElement element) {
         if (!Objects.isNull(element)) {
-            writeLog("La opcion está seleccionada: " + element.isSelected());
-            writeLog("Color: " + element.getCssValue("background-color"));
+            LogsJB.info("La opcion está seleccionada: " + element.isSelected());
+            LogsJB.info("Color: " + element.getCssValue("background-color"));
             String color = element.getCssValue("background-color");
             if (!element.isSelected() && StringUtils.containsIgnoreCase(color, "164, 9, 32")) {
-                writeLog("Selecciona el elemento: " + element);
+                LogsJB.info("Selecciona el elemento: " + element);
                 String tempelement = element.toString().split(" -> ")[1];
                 String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
                 String locator = data[0];
@@ -1960,7 +1952,7 @@ public class SeleniumUtils {
                 return true;
             }
         } else {
-            writeLog("Elemento proporcionado es nullo");
+            LogsJB.fatal("Elemento proporcionado es nullo");
             return false;
         }
     }
@@ -1984,13 +1976,13 @@ public class SeleniumUtils {
      * @param element Elemento al que se desea envíar el texto
      * @param valor   String que se desea envíar al elemento
      */
-    public void enviarTxtforKeyPress(SearchContext driver, String element, String valor) {
+    public static void enviarTxtforKeyPress(WebDriver driver1,SearchContext driver, String element, String valor) {
         //Pendiente eliminar el texto existente
-        WebElement campo = obtenerWebElementx2(driver, element);
+        WebElement campo = SeleniumUtils.obtenerWebElementx2(driver, element);
         assert campo != null;
-        String texto = getTextOfWebElement(campo);
-        writeLog("Texto que tiene el elemento: " + texto);
-        if (clicktoElementx2intents(driver, element)) {
+        String texto = SeleniumUtils.getTextOfWebElement(driver1, campo);
+        LogsJB.info("Texto que tiene el elemento: " + texto);
+        if (SeleniumUtils.clicktoElementx2intents(driver, element)) {
             //Elimina carácter por carácter
             for (char c : texto.toCharArray()) {
                 keyPress(KeyEvent.VK_BACK_SPACE);
@@ -2002,28 +1994,72 @@ public class SeleniumUtils {
         }
     }
 
-    public boolean clickToElement(WebElement element) {
+    public boolean clickToElement(WebDriver driver,WebElement element) {
         try {
             if (Objects.isNull(element)) {
                 LogsJB.fatal("El elemento es nulo. No se puede hacer clic.");
                 return false;
             }
             try {
-                posicionarmeEn(testContext.getDriver(), element);
+                SeleniumUtils.posicionarmeEn(driver, element);
                 element.click();
-                writeLog("Hizo clic en el elemento directamente.");
+                LogsJB.info("Hizo clic en el elemento directamente.");
                 return true;
             } catch (WebDriverException e) {
-                LogsJB.fatal("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
-                JavascriptExecutor js = (JavascriptExecutor) testContext.getDriver();
+                LogsJB.error("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
+                JavascriptExecutor js = (JavascriptExecutor) driver;
                 js.executeScript("arguments[0].click();", element);
-                writeLog("Hizo clic en el elemento por medio de JavaScript.");
+                LogsJB.info("Hizo clic en el elemento por medio de JavaScript.");
                 return true;
             }
         } catch (Exception e) {
             LogsJB.fatal("Excepción capturada al intentar hacer clic en el elemento: " + element.toString());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             return false;
+        }
+    }
+
+    public static String getTextOfWebElement(WebDriver driver, WebElement element) {
+        if (Objects.isNull(element)) {
+            return "";
+        }
+        String text = null;
+        try {
+            SeleniumUtils.posicionarmeEn(driver, element);
+            text = element.getText();
+            if (stringIsNullOrEmpty(text)) {
+                text = element.getAttribute("innerText");
+            }
+            if (stringIsNullOrEmpty(text)) {
+                text = element.getAttribute("value");
+            }
+            if (stringIsNullOrEmpty(text)) {
+                // Intentar obtener el texto utilizando JavaScript en caso de que las formas estándar fallen
+                text = SeleniumUtils.getTextUsingJavaScript(driver,element);
+            }
+        } catch (WebDriverException e) {
+            LogsJB.fatal("El elemento ya no existe en el contexto actual ");
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+        }
+        if (stringIsNullOrEmpty(text)) {
+            LogsJB.fatal(SeleniumUtils.convertir_fecha() + " No se pudo obtener el texto del elemento, comuniquese con los administradores ");
+        }
+        return stringIsNullOrEmpty(text) ? "" : text;
+    }
+
+    /***
+     *
+     * @param driver
+     * @param element
+     * @return
+     */
+    private static String getTextUsingJavaScript(WebDriver driver, WebElement element) {
+        try {
+            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver; // Asegúrate de tener una instancia válida de WebDriver
+            return (String) jsExecutor.executeScript("return arguments[0].textContent", element);
+        } catch (Exception e) {
+            LogsJB.fatal("Error al intentar obtener el texto mediante JavaScript: " + ExceptionUtils.getStackTrace(e));
+            return "";
         }
     }
 
@@ -2035,7 +2071,7 @@ public class SeleniumUtils {
     public void currentFrame(WebDriver driver) {
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
         String currentFrame = (String) jsExecutor.executeScript("return self.name");
-        writeLog("Frame: " + currentFrame);
+        LogsJB.info("Frame: " + currentFrame);
     }
 
     /**
@@ -2070,11 +2106,4 @@ public class SeleniumUtils {
         driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
     }
 
-    public ArrayList<String> SepararCadena(String cadena) {
-        ArrayList<String> nuevaLista = new ArrayList<String>();
-        for (int i = 0; i < cadena.length(); i++) {
-            nuevaLista.add(String.valueOf(cadena.charAt(i)));
-        }
-        return nuevaLista;
-    }
 }
