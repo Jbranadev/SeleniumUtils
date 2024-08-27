@@ -568,7 +568,7 @@ public class SeleniumUtils {
                         return driver.findElement(By.className(term));
                 }
             }
-            writeLog("No fue posible refrescar la referencia al elemento");
+            LogsJB.info("No fue posible refrescar la referencia al elemento");
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
             return null;
         } catch (Exception e) {
@@ -705,7 +705,7 @@ public class SeleniumUtils {
 //         String text=driver.switchTo().alert().getText();
 //         writeLog(text);
 //            driver.switchTo().alert().accept();
-            writeLog(text);
+            LogsJB.info(text);
             alert.accept();
         } catch (java.util.NoSuchElementException e) {
             // Manejar la falta de alerta específica si es necesario
@@ -1638,14 +1638,14 @@ public class SeleniumUtils {
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
-    public void cambiarZOOM(int repeticiones, Keys codigo) {
+    public void cambiarZOOM(WebDriver driver,int repeticiones, Keys codigo) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
-                Actions actions = new Actions(testContext.driver);
+                Actions actions = new Actions(driver);
                 actions.keyDown(Keys.CONTROL).keyDown(codigo).keyUp(codigo).keyUp(Keys.CONTROL).perform();
-                writeLog("Presiona la tecla: " + codigo);
-                writeLog("Suelta la tecla: " + codigo);
+                LogsJB.info("Presiona la tecla: " + codigo);
+                LogsJB.info("Suelta la tecla: " + codigo);
                 threadslepp(100);
             }
         } catch (Exception e) {
@@ -1667,8 +1667,8 @@ public class SeleniumUtils {
                 char asciiValue = (char) codigo;
                 Actions actions = new Actions(driver);
                 actions.keyDown(Keys.CONTROL).keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).keyUp(Keys.CONTROL).perform();
-                writeLog("Presiona la tecla: " + codigo);
-                writeLog("Suelta la tecla: " + codigo);
+                LogsJB.info("Presiona la tecla: " + codigo);
+                LogsJB.info("Suelta la tecla: " + codigo);
                 threadslepp(100);
             }
         } catch (Exception e) {
@@ -1686,9 +1686,9 @@ public class SeleniumUtils {
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
      *
      */
-    public void cambiarZOOMMenos(int repeticiones) {
+    public void cambiarZOOMMenos(WebDriver driver, int repeticiones) {
         try {
-            cambiarZOOM(repeticiones, Keys.SUBTRACT);
+            cambiarZOOM(driver,repeticiones, Keys.SUBTRACT);
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
@@ -1707,10 +1707,10 @@ public class SeleniumUtils {
             Robot robot = new Robot();
             int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
             int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height / 2;
-            writeLog("Altura de la pantalla " + alto * 2 + " ancho de la pantalla " + ancho * 2);
+            LogsJB.info("Altura de la pantalla " + alto * 2 + " ancho de la pantalla " + ancho * 2);
             robot.mouseMove(ancho, alto);
             robot.mouseWheel(cantidad);
-            writeLog("Se realizo el movimiento del scroll: ");
+            LogsJB.info("Se realizo el movimiento del scroll: ");
             threadslepp(100);
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
@@ -1770,21 +1770,17 @@ public class SeleniumUtils {
                 try {
                     int opcionint;
                     opcionint = Integer.parseInt(opcion);
-                    writeLog("Parcio la opcion a entero: " + opcionint);
+                    LogsJB.info("Parcio la opcion a entero: " + opcionint);
                     new Select(elemento).selectByIndex(opcionint - 1);
-                    String tiposociedad = obtenerTextoSeleccionadoSelect(elemento);
-                    this.takeScreenShotJB(testContext.getDriver(), comment + tiposociedad);
-                    writeLog("Encontro el elemento Select: " + element + " " +
+LogsJB.info("Encontro el elemento Select: " + element + " " +
                             "Procedera a seleccionar la opcion por medio del Index numerico");
                 } catch (NumberFormatException e) {
                     new Select(elemento).selectByVisibleText(opcion);
-                    String tiposociedad = obtenerTextoSeleccionadoSelect(elemento);
-                    this.takeScreenShotJB(testContext.getDriver(), comment + tiposociedad);
-                    writeLog("Encontro el elemento Select: " + element + " " +
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
                             "Procedera a seleccionar la opcion por medio del Texto Visible");
                 }
             } else {
-                writeLog("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
+                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
             }
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
@@ -1805,33 +1801,33 @@ public class SeleniumUtils {
             if (!Objects.isNull(elemento)) {
                 //Si encuentra el elemento ejecuta este codigo
                 try {
-                    writeLog("Encontro el elemento Select: " + element + " " +
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
                             "Procedera a seleccionar la opcion por medio del Index numerico " + opcion);
                     int opcionint;
                     opcionint = Integer.parseInt(opcion);
-                    writeLog("Parcio la opcion a entero: " + opcionint);
+                    LogsJB.info("Parcio la opcion a entero: " + opcionint);
                     new Select(elemento).selectByIndex(opcionint);
                     return true;
                 } catch (NumberFormatException e) {
                     try {
-                        writeLog("Encontro el elemento Select: " + element + " " +
+                        LogsJB.info("Encontro el elemento Select: " + element + " " +
                                 "Procedera a seleccionar la opcion por medio del Texto Visible: " + opcion);
                         new Select(elemento).selectByVisibleText(opcion);
                         return true;
                     } catch (Exception m) {
-                        writeLog("Encontro el elemento Select: " + element + " " +
+                        LogsJB.info("Encontro el elemento Select: " + element + " " +
                                 "Procedera a seleccionar la opcion por medio del Value: " + opcion);
                         new Select(elemento).selectByValue(opcion);
                         return true;
                     }
                 } catch (Exception ex) {
-                    writeLog("Encontro el elemento Select: " + element + " " +
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
                             "Procedera a seleccionar la opcion por medio del Value: " + opcion);
                     new Select(elemento).selectByValue(opcion);
                     return true;
                 }
             } else {
-                writeLog("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
+                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
             }
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
