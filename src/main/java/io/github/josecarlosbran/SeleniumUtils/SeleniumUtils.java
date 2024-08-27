@@ -1369,7 +1369,7 @@ public class SeleniumUtils {
      * @return Retorna la lista de elementos que cumplen con los criterios de busqueda, si no encuentra ningun elemento retorna una lista
      * vacía
      */
-    public List<WebElement> getElementsIfExist(SearchContext driver, String element) {
+    public static List<WebElement> getElementsIfExist(SearchContext driver, String element) {
         //Para optimizar el tiempo de respuestá
         writeLog(convertir_fecha() + "* ");
         writeLog(convertir_fecha() + " Buscara si existen los elementos indicados para obtenerlos: " + element);
@@ -1594,7 +1594,7 @@ public class SeleniumUtils {
      * Obtiene la fecha actual en formato dd/MM/YYYY HH:MM:SS
      * @return Retorna una cadena de texto con la fecha obtenida
      */
-    public String convertir_fecha() {
+    public static String convertir_fecha() {
         String temp;
         DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         //convertir_fecha()
@@ -1606,7 +1606,7 @@ public class SeleniumUtils {
      * Presiona la tecla indicada en el condigo numerico indicado
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
-    public void keyPress(int codigo) {
+    public static void keyPress(int codigo) {
         try {
             char asciiValue = (char) codigo;
             Actions actions = new Actions(testContext.driver);
@@ -1660,12 +1660,12 @@ public class SeleniumUtils {
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
-    public void cambiarZOOM(int repeticiones, int codigo) {
+    public void cambiarZOOM(WebDriver driver, int repeticiones, int codigo) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
                 char asciiValue = (char) codigo;
-                Actions actions = new Actions(testContext.driver);
+                Actions actions = new Actions(driver);
                 actions.keyDown(Keys.CONTROL).keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).keyUp(Keys.CONTROL).perform();
                 writeLog("Presiona la tecla: " + codigo);
                 writeLog("Suelta la tecla: " + codigo);
@@ -1724,9 +1724,9 @@ public class SeleniumUtils {
      *
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
      */
-    public void scrollMouseDown(int cantidadScrolls) {
+    public void scrollMouseDown(WebDriver driver, int cantidadScrolls) {
         try {
-            Actions actions = new Actions(testContext.driver);
+            Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
                 actions.sendKeys(Keys.PAGE_DOWN).build().perform();
             }
@@ -1742,9 +1742,9 @@ public class SeleniumUtils {
      *
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
      */
-    public void scrollMouseUp(int cantidadScrolls) {
+    public void scrollMouseUp(WebDriver driver,int cantidadScrolls) {
         try {
-            Actions actions = new Actions(testContext.driver);
+            Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
                 actions.sendKeys(Keys.PAGE_UP).build().perform();
             }
@@ -2177,11 +2177,11 @@ public class SeleniumUtils {
      * @param element Atributo del elemento a buscar
      * @return Retorna el elemento, si no lo encuentra retorna Null
      */
-    public WebElement obtenerWebElementx2(SearchContext driver, String element) {
+    public static WebElement obtenerWebElementx2(SearchContext driver, String element) {
         int i = 0;
         WebElement temp = null;
         while (Objects.isNull(temp) && i < 2) {
-            temp = getElementIfExist(driver, element);
+            temp = SeleniumUtils.getElementIfExist(driver, element);
             i++;
         }
         return temp;
@@ -2209,7 +2209,7 @@ public class SeleniumUtils {
      * @param element Filtro de Atributo del elemento a buscar
      * @return Retorna el elemento, si no lo encuentra retorna Null
      */
-    public WebElement getElementIfExist(SearchContext driver, By element) {
+    public static WebElement getElementIfExist(SearchContext driver, By element) {
         int i = 0;
         WebElement temp = null;
         temp = getElementIfExist(driver, getIdentificadorBy(element));
@@ -2274,11 +2274,11 @@ public class SeleniumUtils {
      */
     public boolean deseleccionarElemento(WebDriver driver, WebElement element) {
         if (!Objects.isNull(element)) {
-            writeLog("La opcion está seleccionada: " + element.isSelected());
-            writeLog("Color: " + element.getCssValue("background-color"));
+            LogsJB.info("La opcion está seleccionada: " + element.isSelected());
+            LogsJB.info("Color: " + element.getCssValue("background-color"));
             String color = element.getCssValue("background-color");
             if (element.isSelected() || StringUtils.containsIgnoreCase(color, "46, 152, 9")) {
-                writeLog("Deselecciona el elemento: " + element);
+                LogsJB.info("Deselecciona el elemento: " + element);
                 String tempelement = element.toString().split(" -> ")[1];
                 String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
                 String locator = data[0];
@@ -2343,13 +2343,13 @@ public class SeleniumUtils {
      * @param element Elemento al que se desea envíar el texto
      * @param valor   String que se desea envíar al elemento
      */
-    public void enviarTxtforKeyPress(SearchContext driver, String element, String valor) {
+    public static void enviarTxtforKeyPress(WebDriver driver1,SearchContext driver, String element, String valor) {
         //Pendiente eliminar el texto existente
-        WebElement campo = obtenerWebElementx2(driver, element);
+        WebElement campo = SeleniumUtils.obtenerWebElementx2(driver, element);
         assert campo != null;
-        String texto = getTextOfWebElement(campo);
-        writeLog("Texto que tiene el elemento: " + texto);
-        if (clicktoElementx2intents(driver, element)) {
+        String texto = SeleniumUtils.getTextOfWebElement(driver1, campo);
+        LogsJB.info("Texto que tiene el elemento: " + texto);
+        if (SeleniumUtils.clicktoElementx2intents(driver, element)) {
             //Elimina carácter por carácter
             for (char c : texto.toCharArray()) {
                 keyPress(KeyEvent.VK_BACK_SPACE);
@@ -2368,7 +2368,7 @@ public class SeleniumUtils {
                 return false;
             }
             try {
-                posicionarmeEn(driver, element);
+                SeleniumUtils.posicionarmeEn(driver, element);
                 element.click();
                 LogsJB.info("Hizo clic en el elemento directamente.");
                 return true;
@@ -2386,13 +2386,13 @@ public class SeleniumUtils {
         }
     }
 
-    public String getTextOfWebElement(WebDriver driver, WebElement element) {
+    public static String getTextOfWebElement(WebDriver driver, WebElement element) {
         if (Objects.isNull(element)) {
             return "";
         }
         String text = null;
         try {
-            posicionarmeEn(driver, element);
+            SeleniumUtils.posicionarmeEn(driver, element);
             text = element.getText();
             if (stringIsNullOrEmpty(text)) {
                 text = element.getAttribute("innerText");
@@ -2402,19 +2402,25 @@ public class SeleniumUtils {
             }
             if (stringIsNullOrEmpty(text)) {
                 // Intentar obtener el texto utilizando JavaScript en caso de que las formas estándar fallen
-                text = getTextUsingJavaScript(driver,element);
+                text = SeleniumUtils.getTextUsingJavaScript(driver,element);
             }
         } catch (WebDriverException e) {
             LogsJB.fatal("El elemento ya no existe en el contexto actual ");
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
         }
         if (stringIsNullOrEmpty(text)) {
-            LogsJB.fatal(convertir_fecha() + " No se pudo obtener el texto del elemento, comuniquese con los administradores ");
+            LogsJB.fatal(SeleniumUtils.convertir_fecha() + " No se pudo obtener el texto del elemento, comuniquese con los administradores ");
         }
         return stringIsNullOrEmpty(text) ? "" : text;
     }
 
-    private String getTextUsingJavaScript(WebDriver driver, WebElement element) {
+    /***
+     *
+     * @param driver
+     * @param element
+     * @return
+     */
+    private static String getTextUsingJavaScript(WebDriver driver, WebElement element) {
         try {
             JavascriptExecutor jsExecutor = (JavascriptExecutor) driver; // Asegúrate de tener una instancia válida de WebDriver
             return (String) jsExecutor.executeScript("return arguments[0].textContent", element);
@@ -2467,11 +2473,4 @@ public class SeleniumUtils {
         driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
     }
 
-    public ArrayList<String> SepararCadena(String cadena) {
-        ArrayList<String> nuevaLista = new ArrayList<String>();
-        for (int i = 0; i < cadena.length(); i++) {
-            nuevaLista.add(String.valueOf(cadena.charAt(i)));
-        }
-        return nuevaLista;
-    }
 }
