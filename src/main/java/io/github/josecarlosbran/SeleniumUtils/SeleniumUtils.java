@@ -586,7 +586,7 @@ public class SeleniumUtils {
      * @param by identificador del cual obtendrá el atributo del elemento a buscar
      * @return atributo por medio del cual se filtrara el elemento a buscar
      */
-    private String getIdentificadorBy(By by) {
+    private static String getIdentificadorBy(By by) {
         String tempelement = by.toString();
         String[] data = tempelement.split(": ");
         String locator = data[0];
@@ -599,7 +599,7 @@ public class SeleniumUtils {
      * @param driver Driver que está manipulando el navegador
      * @param by     Identificador del tipo By
      */
-    public void waitImplicity(WebDriver driver, By by) {
+    public static void waitImplicity(WebDriver driver, By by) {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
             wait.until(driver1 -> {
@@ -929,7 +929,7 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @return Retorna el texto del elemento, si lo logra encontrar, de lo contrario retorna null
      */
-    public String getTextIfElementExist(SearchContext driver, String element) {
+    public static String getTextIfElementExist(SearchContext driver, String element) {
         //Para optimizar el tiempo de respuestá
         writeLog(convertir_fecha() + "* ");
         writeLog(convertir_fecha() + " Buscara si existe el elemento indicado para obtener el texto: " + element);
@@ -1156,7 +1156,7 @@ public class SeleniumUtils {
      * @param timerepetition Cada cuanto tiempo durante el tiempo de espera, intentar obtener nuevamente el elemento
      * @return Retorna el texto del elemento, si lo logra encontrar, de lo contrario retorna null
      */
-    public String getTextIfElementExist(SearchContext driver, String element, int timeduration, int timerepetition) {
+    public static String getTextIfElementExist(SearchContext driver, String element, int timeduration, int timerepetition) {
         //Para optimizar el tiempo de respuestá
         writeLog(convertir_fecha() + "* ");
         writeLog(convertir_fecha() + " Buscara si existe el elemento indicado: " + element);
@@ -1841,266 +1841,6 @@ public class SeleniumUtils {
     }
 
     /***
-     * Captura un error y lanza la exepcion con la descripcion del mismo si este existe.
-     * @param driver Driver que está manipulando el navegador
-     * @param element Elemento el cual tiene la descripcion del error
-     * @param salidaerror Si hay que presionar un boton para cerrar la advertencia, null si no queremos cerrarla
-     * @param comment Comentario que queremos que coloque antes de la descripcion del error capturado en el documento de evidencia de pruebas
-     */
-    public void capturarError(WebDriver driver, String element, String salidaerror, String comment) {
-        try {
-            String mesajeerror = obtenerTextWebElementx2(driver, element);
-            if (!Objects.isNull(mesajeerror)) {
-                writeLog("Se encontro un mensaje de Error");
-                writeLog("*");
-                writeLog("*");
-                writeLog("Mensaje de Error Capturado: " + mesajeerror);
-                takeScreenShotError(driver, comment + mesajeerror);
-                writeLog("*");
-                writeLog("*");
-                if (!Objects.isNull(salidaerror)) {
-                    writeLog("si se especifico un elemento para presionar y salir del msj de error");
-                    if (clicktoElementx2intents(driver, salidaerror)) {
-                        writeLog("hace click en el elemento");
-                        Assert.fail(comment + mesajeerror);
-                    } else {
-                        Assert.fail(comment + mesajeerror);
-                    }
-                } else {
-                    Assert.fail(comment + mesajeerror);
-                }
-            } else {
-                writeLog("No Existe Mensaje de Error!!!");
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al buscar la existencia de un error: " + element + " " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al buscar la existencia de un error: " + element);
-        }
-    }
-
-    /***
-     * Verifica si el test fue exitoso por medio de la respuestá dada al procesar la transaccion
-     * @param driver Driver que está manipulando el navegador
-     * @param element Elemento que deseamos buscar para saber si el test fue exitoso
-     * @param comment Comentario que queremos sea colocado al tomar la captura del test al ser procesado
-     */
-    public String testIsSuccessful(WebDriver driver, String element, String comment) {
-        String response = null;
-        try {
-            String mesajeerror = getTextIfElementExist(driver, element);
-            if (!Objects.isNull(mesajeerror)) {
-                writeLog("Mensaje obtenido del elemento para verificar si se ejecuto la transacción correctamente");
-                writeLog(mesajeerror);
-                if (mesajeerror.contains("E000") || mesajeerror.contains("000") || mesajeerror.contains("Transacción procesada")) {
-                    writeLog("Transaccion procesada correctamente");
-                    writeLog("*");
-                    writeLog("*");
-                    writeLog(mesajeerror);
-                    response = "E000";
-                    takeScreenShotSuccessful(driver, comment + mesajeerror);
-                    writeLog("*");
-                    writeLog("*");
-                    return response;
-                } else if (mesajeerror.contains("WRG:")) {
-                    //Capturo un mensaje de advertencia
-                    writeLog("Advertencia");
-                    writeLog("*");
-                    writeLog("*");
-                    writeLog(mesajeerror);
-                    response = "WRG";
-                    takeScreenShotWarning(driver, comment + mesajeerror);
-                    writeLog("*");
-                    writeLog("*");
-                    return response;
-                } else if (mesajeerror.contains("Err") || mesajeerror.contains("ERR:") || mesajeerror.contains("999")) {
-                    //Capturo un mensaje de error
-                    writeLog("Se ha capturado el siguiente error");
-                    writeLog("*");
-                    writeLog("*");
-                    writeLog(mesajeerror);
-                    response = "ERR";
-                    takeScreenShotError(driver, comment + mesajeerror);
-                    writeLog("*");
-                    writeLog("*");
-                    return response;
-                }
-            } else {
-                writeLog("No Encontro el texto del elemento indicado, por lo que no se pudo verificar si la transaccion fue exitosa!!!");
-                response = "ERR";
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element);
-            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element + " " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al verificar si el test fue exitoso: " + element);
-        }
-        return response;
-    }
-
-    /***
-     * Verifica si el test fue exitoso por medio de la respuestá dada al procesar la transaccion
-     * @param driver Driver que está manipulando el navegador
-     * @param element Elemento que deseamos buscar para saber si el test fue exitoso
-     */
-    public String testIsSuccessful(WebDriver driver, String element) {
-        String response = null;
-        try {
-            String mesajeerror = obtenerTextWebElementx2(driver, element);
-            if (!Objects.isNull(mesajeerror)) {
-                writeLog("Mensaje obtenido del elemento para verificar si se ejecuto la transacción correctamente");
-                writeLog(mesajeerror);
-                if (mesajeerror.contains("E000") || mesajeerror.contains("000") || mesajeerror.contains("Transacción procesada")) {
-                    writeLog("Transaccion procesada correctamente");
-                    writeLog("*");
-                    writeLog("*");
-                    writeLog(mesajeerror);
-                    response = "E000";
-                    writeLog("*");
-                    writeLog("*");
-                    return response;
-                } else if (mesajeerror.contains("WRG:")) {
-                    //Capturo un mensaje de advertencia
-                    writeLog("Advertencia");
-                    writeLog("*");
-                    writeLog("*");
-                    writeLog(mesajeerror);
-                    response = "WRG";
-                    writeLog("*");
-                    writeLog("*");
-                    return response;
-                } else if (mesajeerror.contains("Err") || mesajeerror.contains("ERR:") || mesajeerror.contains("999")) {
-                    //Capturo un mensaje de error
-                    writeLog("Se ha capturado el siguiente error");
-                    writeLog("*");
-                    writeLog("*");
-                    writeLog(mesajeerror);
-                    response = "ERR";
-                    writeLog("*");
-                    writeLog("*");
-                    return response;
-                }
-            } else {
-                writeLog("No Encontro el texto del elemento indicado, por lo que no se pudo verificar si la transaccion fue exitosa!!!");
-                response = null;
-                return response;
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element);
-            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element + " " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al verificar si el test fue exitoso: " + element);
-        }
-        return response;
-    }
-
-    /**
-     * Función que realiza una prueba para verificar si la captura de pantalla de un elemento web es exitosa
-     *
-     * @param driver  El Webdriver utilizado para la interacción con el navegador
-     * @param element La expresión que identifica el elemento web para el cual se realizará la prueba. puede ser un
-     *                identificador de elemento, como un ID, nombre, clase, etc.
-     */
-    public void testIsSuccessfulScrenshot(WebDriver driver, String element) {
-        try {
-            String mesajeerror = obtenerTextWebElementx2(driver, element);
-            if (!Objects.isNull(mesajeerror)) {
-                writeLog("Mensaje obtenido del elemento para verificar si se ejecuto la transacción correctamente");
-                writeLog(mesajeerror);
-                if (mesajeerror.contains("E000") || mesajeerror.contains("000") || mesajeerror.contains("Transacción procesada")) {
-                    writeLog("Transaccion procesada correctamente");
-                    writeLog("*");
-                    writeLog("*");
-                    writeLog(mesajeerror);
-                    setElementscreenshott(driver, "div#FormAlign div");
-                    this.takeScreenShotJB(driver, "Transacción Procesada Correctamente: " + mesajeerror);
-                    writeLog("*");
-                    writeLog("*");
-                } else if (mesajeerror.contains("WRG:")) {
-                    //Capturo un mensaje de advertencia
-                    writeLog("Advertencia");
-                    writeLog("*");
-                    writeLog("*");
-                    setElementscreenshott(driver, "div#FormAlign div");
-                    //Tomamos la captura de pantalla para finalizar el test
-                    takeScreenShotWarning(driver, "Se a capturado la siguiente advertencia: " + mesajeerror);
-                    writeLog("*");
-                    writeLog("*");
-                } else if (mesajeerror.contains("Err") || mesajeerror.contains("ERR:") || mesajeerror.contains("999")) {
-                    //Capturo un mensaje de error
-                    writeLog("Se ha capturado el siguiente error");
-                    writeLog("*");
-                    writeLog("*");
-                    setElementscreenshott(driver, "div#FormAlign div");
-                    //Tomamos la captura de pantalla para finalizar el test
-                    takeScreenShotError(driver, "Se a capturado el siguiente error: " + mesajeerror);
-                    writeLog("*");
-                    writeLog("*");
-                    Assert.fail(mesajeerror);
-                }
-            } else {
-                writeLog("No Encontro el texto del elemento indicado, por lo que no se pudo verificar si la transaccion fue exitosa!!!");
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element);
-            LogsJB.fatal("Error inesperado al verificar si el test fue exitoso: " + element + " " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al verificar si el test fue exitoso: " + element);
-        }
-    }
-
-    /***
-     * Verifica si el sitio web está disponible
-     * @param driver Driver que está manipulando el navegador
-     * @param timeduration Tiempo en el cual se estára validando si el servicio está disponible
-     * @param timerepetition Tiempo de repeticion de la solicitud
-     */
-    public void serviceAvalaible(WebDriver driver, int timeduration, int timerepetition) {
-        writeLog("Este es un comentario antes del test");
-        String element = "/html/body/p";
-        String comment = "El servicio está caído, comunicarse con el equipo de integración: ";
-        String mesajeerror = obtenerTextWebElementx2(driver, element, timeduration, timerepetition);
-        if (!Objects.isNull(mesajeerror)) {
-            if (StringUtils.equalsIgnoreCase(mesajeerror, "HTTP Error 503. The service is unavailable.") || StringUtils.containsIgnoreCase(mesajeerror, "HTTP Error 503")) {
-                writeLog("Se encontro un mensaje de Error");
-                writeLog("*");
-                writeLog("*");
-                writeLog("Mensaje de Error Capturado: " + mesajeerror);
-                takeScreenShotError(driver, comment + mesajeerror);
-                writeLog("*");
-                writeLog("*");
-                Assert.fail(comment + mesajeerror);
-            }
-        } else {
-            writeLog("*");
-            writeLog("El servicio si está habilitado");
-            writeLog("*");
-        }
-    }
-
-    public void capturar500ServerError(WebDriver driver, int timeduration, int timerepetition) {
-        String element = "/html/body/div[2]/div/fieldset/h2";
-        String comment = "Ha sucedido un error en el servidor, comunicarse con el equipo de integración ";
-        String mesajeerror = obtenerTextWebElementx2(driver, element, timeduration, timerepetition);
-        if (!Objects.isNull(mesajeerror)) {
-            if (StringUtils.equalsIgnoreCase(mesajeerror, "500 - Internal server error.") || StringUtils.containsIgnoreCase(mesajeerror, "Internal server error")) {
-                writeLog("Se encontro un mensaje de Error");
-                writeLog("*");
-                writeLog("*");
-                writeLog("Mensaje de Error Capturado: " + mesajeerror);
-                takeScreenShotError(driver, comment + mesajeerror);
-                writeLog("*");
-                writeLog("*");
-                Assert.fail(comment + mesajeerror);
-            }
-        } else {
-            writeLog("*");
-            writeLog("El servicio si está habilitado");
-            writeLog("*");
-        }
-    }
-
-    /***
      * Obtener el valor booleano de un numero
      * @param numero numero que se evaluara
      * @return si el numero es mayor o igual a uno, retorna true, de lo contrario, retorna false.
@@ -2127,11 +1867,11 @@ public class SeleniumUtils {
         return movetoframeforwebelement(driver, frame);
     }
 
-    public boolean movetoframeforwebelement(WebDriver driver, WebElement frame) {
+    public static boolean movetoframeforwebelement(WebDriver driver, WebElement frame) {
         if (!Objects.isNull(frame)) {
             driver.switchTo().frame(frame);
             threadslepp(200);
-            writeLog("El Iframe Obtenido no es nulo, es: " + frame);
+            LogsJB.info("El Iframe Obtenido no es nulo, es: " + frame);
             return true;
         }
         return false;
@@ -2143,11 +1883,11 @@ public class SeleniumUtils {
      * @param element Atributo del elemento a buscar
      * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
      */
-    public String obtenerTextWebElementx2(SearchContext driver, String element) {
+    public static String obtenerTextWebElementx2(SearchContext driver, String element) {
         int i = 0;
         String texto = null;
         while (Objects.isNull(texto) && i < 2) {
-            texto = getTextIfElementExist(driver, element);
+            texto = SeleniumUtils.getTextIfElementExist(driver, element);
             i++;
         }
         return texto;
@@ -2161,11 +1901,11 @@ public class SeleniumUtils {
      * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
      * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
      */
-    public String obtenerTextWebElementx2(SearchContext driver, String element, int timeduration, int timerepetition) {
+    public static String obtenerTextWebElementx2(SearchContext driver, String element, int timeduration, int timerepetition) {
         int i = 0;
         String texto = null;
         while (Objects.isNull(texto) && i < 2) {
-            texto = getTextIfElementExist(driver, element, timeduration, timerepetition);
+            texto = SeleniumUtils.getTextIfElementExist(driver, element, timeduration, timerepetition);
             i++;
         }
         return texto;
@@ -2193,7 +1933,7 @@ public class SeleniumUtils {
      * @param element Filtro de Atributo del elemento a buscar
      * @return Retorna el elemento, si no lo encuentra retorna Null
      */
-    public WebElement obtenerWebElementx2(SearchContext driver, By element) {
+    public static WebElement obtenerWebElementx2(SearchContext driver, By element) {
         int i = 0;
         WebElement temp = null;
         while (Objects.isNull(temp) && i < 2) {
@@ -2223,7 +1963,7 @@ public class SeleniumUtils {
      * @return Retorna la lista de elementos que cumplen con los criterios de busqueda, si no encuentra ningun elemento retorna una lista
      * vacía
      */
-    public List<WebElement> obtenerWebElementsx2(SearchContext driver, String element) {
+    public static List<WebElement> obtenerWebElementsx2(SearchContext driver, String element) {
         int i = 0;
         List<WebElement> temp = null;
         while (Objects.isNull(temp) && i < 2) {
@@ -2240,11 +1980,11 @@ public class SeleniumUtils {
      * @return Retorna la lista de elementos que cumplen con los criterios de busqueda, si no encuentra ningun elemento retorna una lista
      * vacía
      */
-    public List<WebElement> obtenerWebElementsx2(SearchContext driver, By element) {
+    public static List<WebElement> obtenerWebElementsx2(SearchContext driver, By element) {
         int i = 0;
         List<WebElement> temp = new ArrayList<>();
         while (temp.isEmpty() && i < 2) {
-            temp = getElementsIfExist(driver, getIdentificadorBy(element));
+            temp = SeleniumUtils.getElementsIfExist(driver, SeleniumUtils.getIdentificadorBy(element));
             i++;
         }
         return temp;
@@ -2257,10 +1997,10 @@ public class SeleniumUtils {
      * @return Retorna la lista de elementos que cumplen con los criterios de busqueda, si no encuentra ningun elemento retorna una lista
      * vacía
      */
-    public List<WebElement> getElementsIfExist(SearchContext driver, By element) {
+    public static List<WebElement> getElementsIfExist(SearchContext driver, By element) {
         int i = 0;
         List<WebElement> temp = new ArrayList<>();
-        temp = getElementsIfExist(driver, getIdentificadorBy(element));
+        temp = SeleniumUtils.getElementsIfExist(driver, SeleniumUtils.getIdentificadorBy(element));
         return temp;
     }
 
@@ -2272,7 +2012,7 @@ public class SeleniumUtils {
      * @return True si el elemento está desseleccionado o si logra desseleccionarlo,
      * si el elemento proporcionado es null, retorna False
      */
-    public boolean deseleccionarElemento(WebDriver driver, WebElement element) {
+    public static boolean deseleccionarElemento(WebDriver driver, WebElement element) {
         if (!Objects.isNull(element)) {
             LogsJB.info("La opcion está seleccionada: " + element.isSelected());
             LogsJB.info("Color: " + element.getCssValue("background-color"));
@@ -2289,7 +2029,7 @@ public class SeleniumUtils {
                 return true;
             }
         } else {
-            writeLog("Elemento proporcionado es nullo");
+            LogsJB.error("Elemento proporcionado es nullo");
             return false;
         }
     }
@@ -2302,7 +2042,7 @@ public class SeleniumUtils {
      * @return True si el elemento está seleccionado o si logra seleccionarlo, si el elemento proporcionado
      * es null retorna False
      */
-    public boolean seleccionarElemento(WebDriver driver, WebElement element) {
+    public static boolean seleccionarElemento(WebDriver driver, WebElement element) {
         if (!Objects.isNull(element)) {
             LogsJB.info("La opcion está seleccionada: " + element.isSelected());
             LogsJB.info("Color: " + element.getCssValue("background-color"));
@@ -2329,7 +2069,7 @@ public class SeleniumUtils {
      * @param temp Elemento Select del cual queremos saber cual es la primera Opcion Seleccionada
      * @return Retorna el texto de la opción seleccionada o una cadena vacía
      */
-    public String obtenerTextoSeleccionadoSelect(WebElement temp) {
+    public static String obtenerTextoSeleccionadoSelect(WebElement temp) {
         Select proceso = new Select(temp);
         String retorno;
         retorno = getTextOfWebElement(proceso.getFirstSelectedOption());
@@ -2408,10 +2148,10 @@ public class SeleniumUtils {
             LogsJB.fatal("El elemento ya no existe en el contexto actual ");
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
         }
-        if (stringIsNullOrEmpty(text)) {
+        if (SeleniumUtils.stringIsNullOrEmpty(text)) {
             LogsJB.fatal(SeleniumUtils.convertir_fecha() + " No se pudo obtener el texto del elemento, comuniquese con los administradores ");
         }
-        return stringIsNullOrEmpty(text) ? "" : text;
+        return SeleniumUtils.stringIsNullOrEmpty(text) ? "" : text;
     }
 
     /***
@@ -2435,7 +2175,7 @@ public class SeleniumUtils {
      *
      * @param driver WebDriver es el que se estáblecera el marco actual
      */
-    public void currentFrame(WebDriver driver) {
+    public static void currentFrame(WebDriver driver) {
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
         String currentFrame = (String) jsExecutor.executeScript("return self.name");
         LogsJB.info("Frame: " + currentFrame);
@@ -2447,20 +2187,9 @@ public class SeleniumUtils {
      * @param driver WebDriver es el que cambiará el contexto al marco especificado
      * @param frame  Identificador del marco al que se desea cambiar
      */
-    public void switchFrame(WebDriver driver, String frame) {
-        WebElement iframe = obtenerWebElementx2(driver, "#" + frame);
+    public static void switchFrame(WebDriver driver, String frame) {
+        WebElement iframe = SeleniumUtils.obtenerWebElementx2(driver, "#" + frame);
         driver.switchTo().frame(iframe);
-    }
-
-    /**
-     * Función para la carga de inicio de la BERediseño utilizando el WebDriver proporcionado.
-     * Esto podria incluir la navegación a la URL de la pagina de inicio de la aplicación
-     *
-     * @param driver WebDriver se utiliza para navegar a la pagina inicio
-     */
-    public void loadHome(WebDriver driver) {
-        By byBandera = By.id("blockingDiv");
-        waitImplicity(driver, byBandera);
     }
 
     /**
@@ -2469,7 +2198,7 @@ public class SeleniumUtils {
      * @param driver maneja los tiempos de espera para la carga de elementos
      * @param segs   indica los segundos del tiempo de espera.
      */
-    public void waitCall(WebDriver driver, int segs) {
+    public static void waitCall(WebDriver driver, int segs) {
         driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
     }
 
