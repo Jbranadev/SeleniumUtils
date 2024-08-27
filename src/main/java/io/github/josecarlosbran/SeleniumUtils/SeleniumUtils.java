@@ -1,4 +1,4 @@
-package io.github.josecarlosbran;
+package io.github.josecarlosbran.SeleniumUtils;
 
 import com.josebran.LogsJB.LogsJB;
 import lombok.AccessLevel;
@@ -228,7 +228,7 @@ public class SeleniumUtils {
      * @param driver Driver que está manipulando el navegador
      * @param searchContext contexto en el que se desea buscar el elemento
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
-     * @return Retorna True si el elemento Existe
+     * @return Retorna True si el elemento Existe, caso contrario retorna False
      */
     public static Boolean elementExist(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
@@ -307,7 +307,8 @@ public class SeleniumUtils {
      * @param driver Driver que está manipulando el navegador
      * @param searchContext contexto en el que se desea buscar el elemento
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
-     * @return Retorna True si logra limpiar el elemento
+     * @return Retorna True si logra limpiar el elemento, False si no logra limpiar el elemento o sucede un error en la ejecución de esta
+     * instrucción.
      */
     public static Boolean clearElementIfExist(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
@@ -417,10 +418,10 @@ public class SeleniumUtils {
         if (SeleniumUtils.isanvalidValue(previousTab)) {
             //Loop through until we find a new window handle
             for (String windowHandle : driver.getWindowHandles()) {
-                writeLog("Previus Tab: " + previousTab);
-                writeLog("Windows Handle: " + windowHandle);
+                LogsJB.debug("Previus Tab: " + previousTab);
+                LogsJB.debug("Windows Handle: " + windowHandle);
                 if (previousTab.contentEquals(windowHandle)) {
-                    writeLog("Se movera a la primera Tab");
+                    LogsJB.info("Se movera el driver a la pestaña solicitada");
                     driver.switchTo().window(windowHandle);
                     break;
                 }
@@ -464,7 +465,7 @@ public class SeleniumUtils {
                     System.out.println("El valor de zoomActual no es numérico: " + zoomActual);
                 }
             }
-            File scrFile = getImageScrennshotIE(driver, elementScreenshot);
+            File scrFile = SeleniumUtils.getImageScreeenshotWebElement(driver, elementScreenshot);
             if (Objects.isNull(scrFile)) {
                 TakesScreenshot scrShot = ((TakesScreenshot) driver);
                 // Restáurar el zoom a 100% si fue ajustado
@@ -481,16 +482,17 @@ public class SeleniumUtils {
         }
     }
 
-    /**
-     * Función para la captura de pantalla actual utilizando Internet Explorer y la guarda un archivo
-     *
-     * @param driver WebDriver representa la sesión de internet Explorer
-     * @return Retorna a un objeto File que representa la captura de pantalla de la pagina web
+
+    /***
+     * Toma la captura de pantalla sobre el elemento proporcionado como parametro
+     * @param driver Driver que manipula el navegador
+     * @param elementScreenshot Elemento sobre el cual se desea tomar la captura de pantalla
+     * @return Retorna un objeto File que representa la captura de pantalla del elemento, si no logra tomar la captura de pantalla retorna null
      */
-    private File getImageScrennshotIE(WebDriver driver, WebElement elementScreenshot) {
+    private static File getImageScreeenshotWebElement(WebDriver driver, WebElement elementScreenshot) {
         try {
             if (!Objects.isNull(elementScreenshot)) {
-                String tempelement = RefreshReferenceToElement(driver, elementScreenshot).toString().split(" -> ")[1];
+                String tempelement = SeleniumUtils.RefreshReferenceToElement(driver, elementScreenshot).toString().split(" -> ")[1];
                 String[] data = tempelement.split(": ");
                 String locator = data[0];
                 String term = data[1];
@@ -518,7 +520,7 @@ public class SeleniumUtils {
                         return driver.findElement(By.className(term)).getScreenshotAs(OutputType.FILE);
                 }
             }
-            writeLog("No pudo tomar la captura de IE retorna null");
+            LogsJB.warning("No pudo tomar la captura de pantalla a traves del elemento indicado, retorna null");
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
             return null;
         } catch (Exception e) {
@@ -535,7 +537,7 @@ public class SeleniumUtils {
      * @param elemento Elemento a refrescar
      * @return null si no logra refrescar el elemento, caso contrario la referencia al elemento
      */
-    private WebElement RefreshReferenceToElement(WebDriver driver, WebElement elemento) {
+    private static WebElement RefreshReferenceToElement(WebDriver driver, WebElement elemento) {
         try {
             if (!Objects.isNull(elemento)) {
                 String tempelement = elemento.toString().split(" -> ")[1];
@@ -718,351 +720,7 @@ public class SeleniumUtils {
         }
     }
 
-    /***
-     * Verifica si un elemento existe en el contexto actual
-     * @param driver Driver que está manipulando el navegador
-     * @param element Atributo del elemento, por medio del cual se realizara la busqueda
-     * @return Retorna True si el elemento Existe
-     */
-    public Boolean elementExist(SearchContext driver, String element) {
-        //Para optimizar el tiempo de respuestá
-        writeLog(convertir_fecha() + "* ");
-        writeLog(convertir_fecha() + " Buscara si existe el elemento indicado: " + element);
-        writeLog(convertir_fecha() + "* ");
-        int time = 3500;
-        //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        if (this.testContext.getNavegador().equalsIgnoreCase("IE")) {
-            time = 10000;
-            addseconds.add(Calendar.MILLISECOND, time);
-        } else {
-            if (StringUtils.containsIgnoreCase(testContext.getCanal(), "Banca") || StringUtils.containsIgnoreCase(testContext.getCanal(), "App")) {
-                time = 3000;
-                addseconds.add(Calendar.MILLISECOND, time);
-            } else {
-                time = 500;
-                addseconds.add(Calendar.MILLISECOND, time);
-            }
-        }
-        fecha = addseconds.getTime();
-        writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " + time + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
-        Wait<WebDriver> wait = getFluentWait(testContext.getDriver(), time, 100);
-        //Declaración de Variables auxiliares para que no se bloqueen los hilos
-        String elementid = element;
-        String elementclasname = element;
-        String elementcss = element;
-        String elementtagname = element;
-        String elementlinkt = element;
-        String elementpartial = element;
-        String elementxpath = element;
-        String elementname = element;
-        Wait<WebDriver> waitid = wait;
-        Wait<WebDriver> waitclassname = wait;
-        Wait<WebDriver> waitcss = wait;
-        Wait<WebDriver> waittagname = wait;
-        Wait<WebDriver> waitlinkt = wait;
-        Wait<WebDriver> waitpartial = wait;
-        Wait<WebDriver> waitxpath = wait;
-        Wait<WebDriver> waitname = wait;
-        //Declaración de Hilos
-        searchId buscarId = new searchId(this.testContext, waitid, elementid);
-        searchClassName buscarClassName = new searchClassName(this.testContext, waitclassname, elementclasname);
-        searchCSSSelector buscarCSSSelector = new searchCSSSelector(this.testContext, waitcss, elementcss);
-        searchTagName buscarTagName = new searchTagName(this.testContext, waittagname, elementtagname);
-        searchLinkText buscarLinkText = new searchLinkText(this.testContext, waitlinkt, elementlinkt);
-        searchPartialLinkText buscarPartialLinkText = new searchPartialLinkText(this.testContext, waitpartial, elementpartial);
-        searchXPath buscarXpath = new searchXPath(this.testContext, waitxpath, elementxpath);
-        searchName buscarName = new searchName(this.testContext, waitname, elementname);
-        //Declaración de Variables de control
-        Boolean existclassname = false;
-        Boolean existcssselector = false;
-        Boolean existtagname = false;
-        Boolean existlinktext = false;
-        Boolean existpartiallinktext = false;
-        Boolean existxpath = false;
-        Boolean existid = false;
-        Boolean existname = false;
-        //Ajusta los procesos para que estos no limpien el elemento indicado
-        buscarId.setClearElement(true);
-        buscarId.setSendKeys(true);
-        buscarId.setObtenerText(true);
-        buscarId.setClick(true);
-        buscarXpath.setClearElement(true);
-        buscarXpath.setSendKeys(true);
-        buscarXpath.setObtenerText(true);
-        buscarXpath.setClick(true);
-        buscarClassName.setClearElement(true);
-        buscarClassName.setSendKeys(true);
-        buscarClassName.setObtenerText(true);
-        buscarClassName.setClick(true);
-        buscarCSSSelector.setClearElement(true);
-        buscarCSSSelector.setSendKeys(true);
-        buscarCSSSelector.setObtenerText(true);
-        buscarCSSSelector.setClick(true);
-        buscarLinkText.setClearElement(true);
-        buscarLinkText.setSendKeys(true);
-        buscarLinkText.setObtenerText(true);
-        buscarLinkText.setClick(true);
-        buscarPartialLinkText.setClearElement(true);
-        buscarPartialLinkText.setSendKeys(true);
-        buscarPartialLinkText.setObtenerText(true);
-        buscarPartialLinkText.setClick(true);
-        buscarName.setClearElement(true);
-        buscarName.setSendKeys(true);
-        buscarName.setObtenerText(true);
-        buscarName.setClick(true);
-        buscarId.setSearchContext(driver);
-        buscarXpath.setSearchContext(driver);
-        buscarClassName.setSearchContext(driver);
-        buscarCSSSelector.setSearchContext(driver);
-        buscarLinkText.setSearchContext(driver);
-        buscarPartialLinkText.setSearchContext(driver);
-        buscarName.setSearchContext(driver);
-        buscarTagName.setSearchContext(driver);
-        //Comienza a correr los procesos paralelos
-        //Comienzan los subprocesos a funcionar
-        buscarId.execute();
-        buscarXpath.execute();
-        buscarClassName.execute();
-        buscarCSSSelector.execute();
-        buscarTagName.execute();
-        buscarLinkText.execute();
-        buscarPartialLinkText.execute();
-        buscarName.execute();
-        //Esperará saber si existe el elemento en alguno de los tipos
-        while ((!existid) && (!existname) && (!existclassname) && (!existcssselector) && (!existtagname) && (!existlinktext) && (!existpartiallinktext) && (!existxpath) && !(fecha2.after(fecha))) {
-            fecha2 = Calendar.getInstance().getTime();
-            //Actualiza la existencia
-            existid = buscarId.getElementExist();
-            existclassname = buscarClassName.getElementExist();
-            existxpath = buscarXpath.getElementExist();
-            existcssselector = buscarCSSSelector.getElementExist();
-            existtagname = buscarTagName.getElementExist();
-            existlinktext = buscarLinkText.getElementExist();
-            existpartiallinktext = buscarPartialLinkText.getElementExist();
-            existname = buscarName.getElementExist();
-        }
-        writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " +
-                time +
-                " mili segundos: " + fecha);
-        writeLog(convertir_fecha() + " Fecha contra la que se comparo si transcurrieron los " +
-                time +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
-            writeLog(convertir_fecha() + " No Existe el elemento especificado: " + element);
-        } else {
-            writeLog(convertir_fecha() + " Logro encontrar el elemento especificado: " + element);
-            return true;
-        }
-        //Retorna Falso si el elemento no Existe
-        return false;
-    }
-
-    /***
-     * Limpia el elemento especificado, si existe en el contexto actual.
-     * @param driver Driver que está manipulando el navegador
-     * @param element Atributo del elemento, por medio del cual se realizara la busquedad
-     * @return Retorna True si logra limpiar el elemento
-     */
-    public Boolean clearElementIfExist(SearchContext driver, String element) {
-        //Para optimizar el tiempo de respuestá
-        writeLog(convertir_fecha() + "* ");
-        writeLog(convertir_fecha() + " Buscara si existe el elemento indicado: " + element);
-        writeLog(convertir_fecha() + "* ");
-        int time = 3500;
-        //Obtiene la espera fluida
-        //Crea las variables de control que no permite que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        if (this.testContext.getNavegador().equalsIgnoreCase("IE")) {
-            time = 10000;
-            addseconds.add(Calendar.MILLISECOND, time);
-        } else {
-            if (StringUtils.containsIgnoreCase(testContext.getCanal(), "Banca") || StringUtils.containsIgnoreCase(testContext.getCanal(), "App")) {
-                time = 3000;
-                addseconds.add(Calendar.MILLISECOND, time);
-            } else {
-                time = 500;
-                addseconds.add(Calendar.MILLISECOND, time);
-            }
-        }
-        fecha = addseconds.getTime();
-        writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " + time + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
-        Wait<WebDriver> wait = getFluentWait(testContext.getDriver(), time, 100);
-        //Declaración de Variables auxiliares para que no se bloqueen los hilos
-        String elementid = element;
-        String elementclasname = element;
-        String elementcss = element;
-        String elementtagname = element;
-        String elementlinkt = element;
-        String elementpartial = element;
-        String elementxpath = element;
-        String elementname = element;
-        Wait<WebDriver> waitname = wait;
-        Wait<WebDriver> waitid = wait;
-        Wait<WebDriver> waitclassname = wait;
-        Wait<WebDriver> waitcss = wait;
-        Wait<WebDriver> waittagname = wait;
-        Wait<WebDriver> waitlinkt = wait;
-        Wait<WebDriver> waitpartial = wait;
-        Wait<WebDriver> waitxpath = wait;
-        //Declaración de Hilos
-        searchId buscarId = new searchId(this.testContext, waitid, elementid);
-        searchClassName buscarClassName = new searchClassName(this.testContext, waitclassname, elementclasname);
-        searchCSSSelector buscarCSSSelector = new searchCSSSelector(this.testContext, waitcss, elementcss);
-        searchTagName buscarTagName = new searchTagName(this.testContext, waittagname, elementtagname);
-        searchLinkText buscarLinkText = new searchLinkText(this.testContext, waitlinkt, elementlinkt);
-        searchPartialLinkText buscarPartialLinkText = new searchPartialLinkText(this.testContext, waitpartial, elementpartial);
-        searchXPath buscarXpath = new searchXPath(this.testContext, waitxpath, elementxpath);
-        searchName buscarName = new searchName(this.testContext, waitname, elementname);
-        //Ajusta los procesos para que estos no limpien el elemento indicado
-        buscarId.setSendKeys(true);
-        buscarId.setObtenerText(true);
-        buscarXpath.setSendKeys(true);
-        buscarXpath.setObtenerText(true);
-        buscarClassName.setSendKeys(true);
-        buscarClassName.setObtenerText(true);
-        buscarCSSSelector.setSendKeys(true);
-        buscarCSSSelector.setObtenerText(true);
-        buscarLinkText.setSendKeys(true);
-        buscarLinkText.setObtenerText(true);
-        buscarPartialLinkText.setSendKeys(true);
-        buscarPartialLinkText.setObtenerText(true);
-        buscarName.setSendKeys(true);
-        buscarName.setObtenerText(true);
-        //Declaración de Variables de control
-        Boolean existclassname = false;
-        Boolean existcssselector = false;
-        Boolean existtagname = false;
-        Boolean existlinktext = false;
-        Boolean existpartiallinktext = false;
-        Boolean existxpath = false;
-        Boolean existid = false;
-        Boolean existname = false;
-        buscarId.setSearchContext(driver);
-        buscarXpath.setSearchContext(driver);
-        buscarClassName.setSearchContext(driver);
-        buscarCSSSelector.setSearchContext(driver);
-        buscarLinkText.setSearchContext(driver);
-        buscarPartialLinkText.setSearchContext(driver);
-        buscarName.setSearchContext(driver);
-        buscarTagName.setSearchContext(driver);
-        //Comienza a correr los procesos paralelos
-        if (this.testContext.getNavegador().equalsIgnoreCase("IE")) {
-            buscarCSSSelector.execute();
-            buscarTagName.execute();
-            buscarXpath.execute();
-            buscarId.execute();
-            buscarLinkText.execute();
-            buscarName.execute();
-        } else {
-            buscarCSSSelector.execute();
-            buscarTagName.execute();
-            buscarXpath.execute();
-            buscarId.execute();
-            buscarName.execute();
-            buscarClassName.execute();
-            buscarLinkText.execute();
-            buscarPartialLinkText.execute();
-        }
-        //Esperará saber si existe el elemento en alguno de los tipos
-        while ((!existid) && (!existname) && (!existclassname) && (!existcssselector) && (!existtagname) && (!existlinktext) && (!existpartiallinktext) && (!existxpath) && !(fecha2.after(fecha))) {
-            fecha2 = Calendar.getInstance().getTime();
-            //Actualiza la existencia
-            existid = buscarId.getElementExist();
-            if (existid) {
-                //Mata los subprocesos a funcionar
-                while (!buscarId.isClearElement()) {
-                    threadslepp(50);
-                }
-                writeLog(convertir_fecha() + " Logro encontrar y limpiar el elemento especificado: " + element);
-                return true;
-            }
-            existclassname = buscarClassName.getElementExist();
-            if (existclassname) {
-                //Mata los subprocesos a funcionar
-                while (!buscarClassName.isClearElement()) {
-                    threadslepp(50);
-                }
-                writeLog(convertir_fecha() + " Logro encontrar y limpiar el elemento especificado: " + element);
-                return true;
-            }
-            existxpath = buscarXpath.getElementExist();
-            if (existxpath) {
-                //Mata los subprocesos a funcionar
-                while (!buscarXpath.isClearElement()) {
-                    threadslepp(50);
-                }
-                writeLog(convertir_fecha() + " Logro encontrar y limpiar el elemento especificado: " + element);
-                return true;
-            }
-            existcssselector = buscarCSSSelector.getElementExist();
-            if (existcssselector) {
-                //Mata los subprocesos a funcionar
-                while (!buscarCSSSelector.isClearElement()) {
-                    threadslepp(50);
-                }
-                writeLog(convertir_fecha() + " Logro encontrar y limpiar el elemento especificado: " + element);
-                return true;
-            }
-            existtagname = buscarTagName.getElementExist();
-            if (existtagname) {
-                //Mata los subprocesos a funcionar
-                while (!buscarTagName.isClearElement()) {
-                    threadslepp(50);
-                }
-                writeLog(convertir_fecha() + " Logro encontrar y limpiar el elemento especificado: " + element);
-                return true;
-            }
-            existlinktext = buscarLinkText.getElementExist();
-            if (existlinktext) {
-                //Mata los subprocesos a funcionar
-                while (!buscarLinkText.isClearElement()) {
-                    threadslepp(50);
-                }
-                writeLog(convertir_fecha() + " Logro encontrar y limpiar el elemento especificado: " + element);
-                return true;
-            }
-            existpartiallinktext = buscarPartialLinkText.getElementExist();
-            if (existpartiallinktext) {
-                //Mata los subprocesos a funcionar
-                while (!buscarPartialLinkText.isClearElement()) {
-                    threadslepp(50);
-                }
-                writeLog(convertir_fecha() + " Logro encontrar y limpiar el elemento especificado: " + element);
-                return true;
-            }
-            existname = buscarName.getElementExist();
-            if (existname) {
-                //Mata los subprocesos a funcionar
-                while (!buscarName.isClearElement()) {
-                    threadslepp(50);
-                }
-                writeLog(convertir_fecha() + " Logro encontrar y limpiar el elemento especificado: " + element);
-                return true;
-            }
-        }
-        writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " +
-                time +
-                " mili segundos: " + fecha);
-        writeLog(convertir_fecha() + " Fecha contra la que se comparo si transcurrieron los " +
-                time +
-                " mili segundos: " + fecha2);
-        if ((fecha2.after(fecha))) {
-            writeLog(convertir_fecha() + " No pudo limpiar el elemento especificado, ya que no existe: " + element);
-        } else {
-            writeLog(convertir_fecha() + " Logro encontrar y limpiar el elemento especificado: " + element);
-            return true;
-        }
-        //Retorna Falso si el elemento no Existe
-        return false;
-    }
-
+    
     /**
      * Envía un texto al elemento indicado, si este existe en el contexto actual.
      *
@@ -1071,33 +729,20 @@ public class SeleniumUtils {
      * @param Texto   Texto a envíar al elemento indicado
      * @return Retorna True si encontro el elemento y pudo setear el texto.
      */
-    private Boolean sendKeysIfElementExist(SearchContext driver, String element, CharSequence... Texto) {
+    public static Boolean sendKeysIfElementExist(WebDriver driver, SearchContext searchContext, String element, CharSequence... Texto) {
         //Para optimizar el tiempo de respuestá
-        writeLog(convertir_fecha() + "* ");
-        writeLog(convertir_fecha() + " Buscara si existe el elemento indicado: " + element);
-        writeLog(convertir_fecha() + "* ");
-        int time = 3500;
-        //Obtiene la espera fluida
+        LogsJB.debug("* ");
+        LogsJB.debug(" Si existe el elemento indicado, lo limpiara: " + element);
+        LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
         java.util.Date fecha = Calendar.getInstance().getTime();
         Calendar addseconds = Calendar.getInstance();
         addseconds.setTime(fecha);
-        if (this.testContext.getNavegador().equalsIgnoreCase("IE")) {
-            time = 10000;
-            addseconds.add(Calendar.MILLISECOND, time);
-        } else {
-            if (StringUtils.containsIgnoreCase(testContext.getCanal(), "Banca") || StringUtils.containsIgnoreCase(testContext.getCanal(), "App")) {
-                time = 3000;
-                addseconds.add(Calendar.MILLISECOND, time);
-            } else {
-                time = 500;
-                addseconds.add(Calendar.MILLISECOND, time);
-            }
-        }
+        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
         fecha = addseconds.getTime();
-        writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " + time + " mili segundos: " + fecha);
+        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
         java.util.Date fecha2 = Calendar.getInstance().getTime();
-        Wait<WebDriver> wait = getFluentWait(testContext.getDriver(), time, 100);
+        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de Variables auxiliares para que no se bloqueen los hilos
         String elementid = element;
         String elementclasname = element;
@@ -1312,7 +957,7 @@ public class SeleniumUtils {
         fecha = addseconds.getTime();
         writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " + time + " mili segundos: " + fecha);
         java.util.Date fecha2 = Calendar.getInstance().getTime();
-        Wait<WebDriver> wait = getFluentWait(testContext.getDriver(), time, 100);
+        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaracion de Variables auxiliares para que no se bloqueen los hilos
         String elementid = element;
         String elementclasname = element;
@@ -1752,7 +1397,7 @@ public class SeleniumUtils {
         fecha = addseconds.getTime();
         writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " + time + " mili segundos: " + fecha);
         java.util.Date fecha2 = Calendar.getInstance().getTime();
-        Wait<WebDriver> wait = getFluentWait(testContext.getDriver(), time, 100);
+        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de Variables auxiliares para que no se bloqueen los hilos
         String elementid = element;
         String elementclasname = element;
