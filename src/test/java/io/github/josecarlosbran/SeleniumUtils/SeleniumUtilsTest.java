@@ -49,17 +49,11 @@ public class SeleniumUtilsTest {
     @Test(testName = "Should Thread Sleep", description = "Debería dejar el hilo dormido por un momento")
     public void threadSleep() {
         logParrafo("Se debe de tener un tiempo dormido");
-
         long startTime = System.currentTimeMillis(); // Hora de inicio
         SeleniumUtils.threadslepp(5000);//Dormir el hilo
         long endTime = System.currentTimeMillis(); // Hora de fin
-
         long duration = endTime - startTime; // Calcular duración
-
         // Verifica que la duración está dentro de un rango aceptable (por ejemplo, +/- 100 ms)
-        Assert.assertTrue(duration >= 5000 && duration <= 5100,"El método no durmió el hilo el tiempo esperado");
+        Assert.assertTrue(duration >= 5000 && duration <= 5100, "El método no durmió el hilo el tiempo esperado");
     }
-
-
-
 }

@@ -819,7 +819,6 @@ public class SeleniumUtils {
         }
     }
 
-
     /***
      * Hace clíck en el elemento indicado, si este existe en el contexto actual
      * @param driver Driver que está manipulando el navegador
@@ -828,9 +827,9 @@ public class SeleniumUtils {
      */
     public static Boolean clickElementIfExist(SearchContext driver, String element) {
         //Para optimizar el tiempo de respuestá
-        utilities.writeLog(convertir_fecha() + "* ");
-        utilities.writeLog(convertir_fecha() + " Buscara si existe el elemento indicado: " + element);
-        utilities.writeLog(convertir_fecha() + "* ");
+        utilities.writeLog("* ");
+        utilities.writeLog(" Buscara si existe el elemento indicado: " + element);
+        utilities.writeLog("* ");
         int time = 3500;
         //Obtiene la espera fluida
         //Crea las variables de control que no permite que sobre pase los 7,000 milisegundos la busqueda del elemento
@@ -850,7 +849,7 @@ public class SeleniumUtils {
             }
         }
         fecha = addseconds.getTime();
-        utilities.writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " + time + " mili segundos: " + fecha);
+        utilities.writeLog(" Fecha contra la que se comparara si transcurren los " + time + " mili segundos: " + fecha);
         java.util.Date fecha2 = Calendar.getInstance().getTime();
         Wait<WebDriver> wait = getFluentWait(testContext.getDriver(), time, 100);
         //Declaración de Variables auxiliares para que no se bloqueen los hilos
@@ -946,7 +945,7 @@ public class SeleniumUtils {
                 while (!buscarId.isClick()) {
                     threadslepp(50);
                 }
-                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                utilities.writeLog(" Logro encontrar y hacer click en el elemento especificado: " + element);
                 return true;
             }
             existclassname = buscarClassName.getElementExist();
@@ -955,7 +954,7 @@ public class SeleniumUtils {
                 while (!buscarClassName.isClick()) {
                     threadslepp(50);
                 }
-                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                utilities.writeLog(" Logro encontrar y hacer click en el elemento especificado: " + element);
                 return true;
             }
             existxpath = buscarXpath.getElementExist();
@@ -964,7 +963,7 @@ public class SeleniumUtils {
                 while (!buscarXpath.isClick()) {
                     threadslepp(50);
                 }
-                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                utilities.writeLog(" Logro encontrar y hacer click en el elemento especificado: " + element);
                 return true;
             }
             existcssselector = buscarCSSSelector.getElementExist();
@@ -973,7 +972,7 @@ public class SeleniumUtils {
                 while (!buscarCSSSelector.isClick()) {
                     threadslepp(50);
                 }
-                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado css: " + element);
+                utilities.writeLog(" Logro encontrar y hacer click en el elemento especificado css: " + element);
                 return true;
             }
             existtagname = buscarTagName.getElementExist();
@@ -982,7 +981,7 @@ public class SeleniumUtils {
                 while (!buscarTagName.isClick()) {
                     threadslepp(50);
                 }
-                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado css: " + element);
+                utilities.writeLog(" Logro encontrar y hacer click en el elemento especificado css: " + element);
                 return true;
             }
             existlinktext = buscarLinkText.getElementExist();
@@ -991,7 +990,7 @@ public class SeleniumUtils {
                 while (!buscarLinkText.isClick()) {
                     threadslepp(50);
                 }
-                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                utilities.writeLog(" Logro encontrar y hacer click en el elemento especificado: " + element);
                 return true;
             }
             existpartiallinktext = buscarPartialLinkText.getElementExist();
@@ -1000,7 +999,7 @@ public class SeleniumUtils {
                 while (!buscarPartialLinkText.isClick()) {
                     threadslepp(50);
                 }
-                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                utilities.writeLog(" Logro encontrar y hacer click en el elemento especificado: " + element);
                 return true;
             }
             existname = buscarName.getElementExist();
@@ -1009,7 +1008,7 @@ public class SeleniumUtils {
                 while (!buscarName.isClick()) {
                     threadslepp(50);
                 }
-                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                utilities.writeLog(" Logro encontrar y hacer click en el elemento especificado: " + element);
                 return true;
             }
         }
@@ -1032,22 +1031,21 @@ public class SeleniumUtils {
                     return true;
             } while (buscarClassName.isAlive() || buscarId.isAlive() || buscarName.isAlive() || buscarCSSSelector.isAlive() || buscarXpath.isAlive() || buscarLinkText.isAlive() || buscarPartialLinkText.isAlive() || buscarTagName.isAlive());
         }
-        utilities.writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " +
+        utilities.writeLog(" Fecha contra la que se comparara si transcurren los " +
                 time +
                 " mili segundos: " + fecha);
-        utilities.writeLog(convertir_fecha() + " Fecha contra la que se comparo si transcurrieron los " +
+        utilities.writeLog(" Fecha contra la que se comparo si transcurrieron los " +
                 time +
                 " mili segundos: " + fecha2);
         //Retorna Falso si el elemento no Existe
         if ((fecha2.after(fecha))) {
-            utilities.writeLog(convertir_fecha() + " No pudo hacer click en el elemento especificado, ya que no existe: " + element);
+            utilities.writeLog(" No pudo hacer click en el elemento especificado, ya que no existe: " + element);
             return false;
         } else {
-            utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+            utilities.writeLog(" Logro encontrar y hacer click en el elemento especificado: " + element);
             return true;
         }
     }
-
 
     /**
      * Trata de hacer click en el elemento especificado 2 veces
@@ -1065,81 +1063,6 @@ public class SeleniumUtils {
             i++;
         }
         return false;
-    }
-
-
-
-    /***
-     * Mueve el navegador a la tab que esta recibiendo como parametro
-     * @param driver Driver que esta manipulando el navegador
-     * @param previousTab Previous Tab al que nos queremos mover
-     */
-    public void movetoPreviousTab(WebDriver driver, String previousTab) {
-        if (SeleniumUtils.isanvalidValue(previousTab)) {
-            //Loop through until we find a new window handle
-            for (String windowHandle : driver.getWindowHandles()) {
-                LogsJB.debug("Previus Tab: " + previousTab);
-                LogsJB.debug("Windows Handle: " + windowHandle);
-                if (previousTab.contentEquals(windowHandle)) {
-                    LogsJB.info("Se movera el driver a la pestaña solicitada");
-                    driver.switchTo().window(windowHandle);
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Función para guardar la captura de pantalla de la página web y la guarda en un archivo
-     *
-     * @param driver WebDriver que representa la sesión del navegador
-     * @return Retorna a un objeto File que representa la captura de pantalla de la pagina web
-     */
-    private File getImageScrennshot(WebDriver driver, WebElement elementScreenshot) {
-        if (!Objects.isNull(elementScreenshot)) {
-            WebElement element = RefreshReferenceToElement(driver, elementScreenshot);
-            // Desplazarse hasta el elemento
-            Actions actions = new Actions(driver);
-            actions.moveToElement(element);
-            actions.perform();
-            // Tomar la altura del elemento después de desplazarse
-            int elementHeight = element.getSize().getHeight();
-            // Calcular porcentaje de Zoom necesario
-            double windowHeight = driver.manage().window().getSize().getHeight();
-            double zoomPercentage = 1.0;
-            if (windowHeight < elementHeight) {
-                zoomPercentage = Math.min(1.0, windowHeight / elementHeight); // Limitar zoom a máximo 100%
-            } else {
-                zoomPercentage = Math.min(1.0, elementHeight / windowHeight); // Limitar zoom a máximo 100%
-            }
-            zoomPercentage = zoomPercentage < 0.5 ? 1 : zoomPercentage;
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            String zoomActual = js.executeScript("return document.body.style.zoom").toString();
-            // Aplicar el zoom usando JavaScript
-            if (!stringIsNullOrEmpty(zoomActual)) {
-                try {
-                    double zoomActualValue = Double.parseDouble(zoomActual.replace("%", ""));
-                    double newZoomValue = (zoomActualValue < 100.0) ? (zoomActualValue - 15.0) : 100.0;
-                    js.executeScript("document.body.style.zoom = '" + newZoomValue + "%'");
-                } catch (NumberFormatException e) {
-                    System.out.println("El valor de zoomActual no es numérico: " + zoomActual);
-                }
-            }
-            File scrFile = SeleniumUtils.getImageScreeenshotWebElement(driver, elementScreenshot);
-            if (Objects.isNull(scrFile)) {
-                TakesScreenshot scrShot = ((TakesScreenshot) driver);
-                // Restáurar el zoom a 100% si fue ajustado
-                js.executeScript("document.body.style.zoom = '100%';");
-                return scrShot.getScreenshotAs(OutputType.FILE);
-            } else {
-                // Restáurar el zoom a 100% si fue ajustado
-                js.executeScript("document.body.style.zoom = '100%';");
-                return scrFile;
-            }
-        } else {
-            TakesScreenshot scrShot = ((TakesScreenshot) driver);
-            return scrShot.getScreenshotAs(OutputType.FILE);
-        }
     }
 
     /**
@@ -1171,115 +1094,14 @@ public class SeleniumUtils {
         } catch (TimeoutException ignored) {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
-            LogsJB.fatal(convertir_fecha() + "*");
-            LogsJB.fatal(convertir_fecha() + " " + e);
-            LogsJB.fatal(convertir_fecha() + " Tipo de Excepción : " + e.getClass());
-            LogsJB.fatal(convertir_fecha() + " Causa de la Excepción : " + e.getCause());
-            LogsJB.fatal(convertir_fecha() + " Mensaje de la Excepción : " + e.getMessage());
-            LogsJB.fatal(convertir_fecha() + "*");
+            LogsJB.fatal("*");
+            LogsJB.fatal(" " + e);
+            LogsJB.fatal(" Tipo de Excepción : " + e.getClass());
+            LogsJB.fatal(" Causa de la Excepción : " + e.getCause());
+            LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
+            LogsJB.fatal("*");
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
-        }
-    }
-
-    /**
-     * Espera implícita de 5 segundos o menos si el elemento desaparece del DOM, luego de los 5 segundos lanzara excepción
-     *
-     * @param driver Variable que manipula el navegador
-     * @param by     Identificador del tipo By
-     */
-    public void waitImplicityForElementNotExist(WebDriver driver, By by) {
-        try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
-        } catch (TimeoutException ignored) {
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
-            LogsJB.fatal(convertir_fecha() + "*");
-            LogsJB.fatal(convertir_fecha() + " " + e);
-            LogsJB.fatal(convertir_fecha() + " Tipo de Excepción : " + e.getClass());
-            LogsJB.fatal(convertir_fecha() + " Causa de la Excepción : " + e.getCause());
-            LogsJB.fatal(convertir_fecha() + " Mensaje de la Excepción : " + e.getMessage());
-            LogsJB.fatal(convertir_fecha() + "*");
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
-        }
-    }
-
-    /**
-     * Espera implícita de 30 segundos, luego de los 30 segundos lanzara excepción
-     *
-     * @param wait Wait espera predeterminada
-     * @param by   Identificador del tipo By
-     */
-    public void waitImplicity(WebDriverWait wait, By by) {
-        try {
-            wait.until(driver -> {
-                return driver.findElement(by).isDisplayed() || driver.findElement(by).isEnabled();
-            });
-        } catch (TimeoutException ignored) {
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
-            LogsJB.fatal(convertir_fecha() + "*");
-            LogsJB.fatal(convertir_fecha() + " " + e);
-            LogsJB.fatal(convertir_fecha() + " Tipo de Excepción : " + e.getClass());
-            LogsJB.fatal(convertir_fecha() + " Causa de la Excepción : " + e.getCause());
-            LogsJB.fatal(convertir_fecha() + " Mensaje de la Excepción : " + e.getMessage());
-            LogsJB.fatal(convertir_fecha() + "*");
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
-        }
-    }
-
-    /***
-     * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
-     * @param driver Web Driver que manipula el navegador
-     * @param aceptar Variable booleana que acepta o declina el cuadro de dialogo
-     * Debido a la naturaleza del manejo interno de accept por parte de javascript, la funcion DEBE DE LLAMARSE JUSTO ANTES DE DAR CLICK PARA DISPARAR EL CUADRO DE DIALOGO
-     */
-    public void acceptConfirm(WebDriver driver, boolean aceptar) {
-        try {
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            js.executeScript("window.confirm=function(){return " + aceptar + "}");
-        } catch (WebDriverException e) {
-            LogsJB.fatal("Error WebDriver al interactuar con la alerta: " + e.getMessage());
-            // Puedes agregar más manejo de excepciones específicas según sea necesario
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
-        }
-    }
-
-    /***
-     * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
-     * @param driver Web Driver que manipula el navegador
-     */
-    public void acceptAlert(WebDriver driver) {
-        //WebElement currentFrame = driver.switchTo().activeElement();
-        // Obtener el WebElement del frame actual usando JavaScript
-        /*WebElement currentFrame = (WebElement) ((JavascriptExecutor) driver).executeScript(
-                "return window.frameElement;"
-        );*/
-        try {
-            //Wait for the alert to be displayed and store it in a variable
-            Wait wait = getFluentWait(driver, 5000, 100);
-            Alert alert = (Alert) wait.until(ExpectedConditions.alertIsPresent());
-            //Alert alert = driver.switchTo().alert();
-            String text = alert.getText();
-//         String text=driver.switchTo().alert().getText();
-//         writeLog(text);
-//            driver.switchTo().alert().accept();
-            LogsJB.info(text);
-            alert.accept();
-        } catch (java.util.NoSuchElementException e) {
-            // Manejar la falta de alerta específica si es necesario
-            LogsJB.fatal("No se encontró ninguna alerta presente.");
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-            jsExecutor.executeScript("window.alert = function() {};");
-        } catch (WebDriverException e) {
-            LogsJB.fatal("Error WebDriver al interactuar con la alerta: " + e.getMessage());
-            // Puedes agregar más manejo de excepciones específicas según sea necesario
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
         }
     }
 
@@ -1292,9 +1114,9 @@ public class SeleniumUtils {
      */
     public static List<WebElement> getElementsIfExist(SearchContext driver, String element) {
         //Para optimizar el tiempo de respuestá
-        writeLog(convertir_fecha() + "* ");
-        writeLog(convertir_fecha() + " Buscara si existen los elementos indicados para obtenerlos: " + element);
-        writeLog(convertir_fecha() + "* ");
+        writeLog("* ");
+        writeLog(" Buscara si existen los elementos indicados para obtenerlos: " + element);
+        writeLog("* ");
         //Declaración de Variable a Retornar
         List<WebElement> elementos = new ArrayList<>();
         int time = 3500;
@@ -1316,7 +1138,7 @@ public class SeleniumUtils {
             }
         }
         fecha = addseconds.getTime();
-        writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " + time + " mili segundos: " + fecha);
+        writeLog(" Fecha contra la que se comparara si transcurren los " + time + " mili segundos: " + fecha);
         java.util.Date fecha2 = Calendar.getInstance().getTime();
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de Variables auxiliares para que no se bloqueen los hilos
@@ -1424,7 +1246,7 @@ public class SeleniumUtils {
                     elementos = buscarId.getElementos();
                     threadslepp(50);
                 }
-                writeLog(convertir_fecha() + " Logro encontrar y obtener los Elementos: " + elementos);
+                writeLog(" Logro encontrar y obtener los Elementos: " + elementos);
                 return elementos;
             }
             existclassname = buscarClassName.getElementExist();
@@ -1434,7 +1256,7 @@ public class SeleniumUtils {
                     elementos = buscarClassName.getElementos();
                     threadslepp(50);
                 }
-                writeLog(convertir_fecha() + " Logro encontrar y obtener los Elementos: " + elementos);
+                writeLog(" Logro encontrar y obtener los Elementos: " + elementos);
                 return elementos;
             }
             existxpath = buscarXpath.getElementExist();
@@ -1444,7 +1266,7 @@ public class SeleniumUtils {
                     elementos = buscarXpath.getElementos();
                     threadslepp(50);
                 }
-                writeLog(convertir_fecha() + " Logro encontrar y obtener los Elementos: " + elementos);
+                writeLog(" Logro encontrar y obtener los Elementos: " + elementos);
                 return elementos;
             }
             existcssselector = buscarCSSSelector.getElementExist();
@@ -1454,7 +1276,7 @@ public class SeleniumUtils {
                     elementos = buscarCSSSelector.getElementos();
                     threadslepp(50);
                 }
-                writeLog(convertir_fecha() + " Logro encontrar y obtener los Elementos: " + elementos);
+                writeLog(" Logro encontrar y obtener los Elementos: " + elementos);
                 return elementos;
             }
             existtagname = buscarTagName.getElementExist();
@@ -1464,7 +1286,7 @@ public class SeleniumUtils {
                     elementos = buscarTagName.getElementos();
                     threadslepp(50);
                 }
-                writeLog(convertir_fecha() + " Logro encontrar y obtener los Elementos: " + elementos);
+                writeLog(" Logro encontrar y obtener los Elementos: " + elementos);
                 return elementos;
             }
             existlinktext = buscarLinkText.getElementExist();
@@ -1474,7 +1296,7 @@ public class SeleniumUtils {
                     elementos = buscarLinkText.getElementos();
                     threadslepp(50);
                 }
-                writeLog(convertir_fecha() + " Logro encontrar y obtener los Elementos: " + elementos);
+                writeLog(" Logro encontrar y obtener los Elementos: " + elementos);
                 return elementos;
             }
             existpartiallinktext = buscarPartialLinkText.getElementExist();
@@ -1484,7 +1306,7 @@ public class SeleniumUtils {
                     elementos = buscarPartialLinkText.getElementos();
                     threadslepp(50);
                 }
-                writeLog(convertir_fecha() + " Logro encontrar y obtener los Elementos: " + elementos);
+                writeLog(" Logro encontrar y obtener los Elementos: " + elementos);
                 return elementos;
             }
             existname = buscarName.getElementExist();
@@ -1494,18 +1316,18 @@ public class SeleniumUtils {
                     elementos = buscarName.getElementos();
                     threadslepp(50);
                 }
-                writeLog(convertir_fecha() + " Logro encontrar y obtener los Elementos: " + elementos);
+                writeLog(" Logro encontrar y obtener los Elementos: " + elementos);
                 return elementos;
             }
         }
-        writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " +
+        writeLog(" Fecha contra la que se comparara si transcurren los " +
                 time +
                 " mili segundos: " + fecha);
-        writeLog(convertir_fecha() + " Fecha contra la que se comparo si transcurrieron los " +
+        writeLog(" Fecha contra la que se comparo si transcurrieron los " +
                 time +
                 " mili segundos: " + fecha2);
         if ((fecha2.after(fecha)) || elementos.isEmpty()) {
-            writeLog(convertir_fecha() + " No pudo obtener los elementos especificados, ya que no existen: " + elementos);
+            writeLog(" No pudo obtener los elementos especificados, ya que no existen: " + elementos);
         }
         //Retorna null si el elemento no Existe
         return elementos;
@@ -1537,251 +1359,6 @@ public class SeleniumUtils {
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
         }
-    }
-
-    /***
-     * Presiona la tecla indicada en el condigo numerico indicado
-     * @param codigo Codigo numerico de la tecla que queremos presionar
-     */
-    public void keyPress(Keys codigo) {
-        try {
-            Actions actions = new Actions(testContext.driver);
-            actions.sendKeys(codigo).perform();
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
-        }
-    }
-
-    /***
-     * Presiona la tecla indicada en el condigo numerico indicado
-     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
-     * @param codigo Codigo numerico de la tecla que queremos presionar
-     */
-    public void cambiarZOOM(WebDriver driver,int repeticiones, Keys codigo) {
-        try {
-            for (int i = 0; i < repeticiones; i++) {
-                threadslepp(100);
-                Actions actions = new Actions(driver);
-                actions.keyDown(Keys.CONTROL).keyDown(codigo).keyUp(codigo).keyUp(Keys.CONTROL).perform();
-                LogsJB.info("Presiona la tecla: " + codigo);
-                LogsJB.info("Suelta la tecla: " + codigo);
-                threadslepp(100);
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
-        }
-    }
-
-    /***
-     * Presiona la tecla indicada en el condigo numerico indicado
-     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
-     * @param codigo Codigo numerico de la tecla que queremos presionar
-     */
-    public void cambiarZOOM(WebDriver driver, int repeticiones, int codigo) {
-        try {
-            for (int i = 0; i < repeticiones; i++) {
-                threadslepp(100);
-                char asciiValue = (char) codigo;
-                Actions actions = new Actions(driver);
-                actions.keyDown(Keys.CONTROL).keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).keyUp(Keys.CONTROL).perform();
-                LogsJB.info("Presiona la tecla: " + codigo);
-                LogsJB.info("Suelta la tecla: " + codigo);
-                threadslepp(100);
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
-        }
-    }
-
-    /***
-
-
-     /***
-     * Presiona la tecla indicada en el condigo numerico indicado
-     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
-     *
-     */
-    public void cambiarZOOMMenos(WebDriver driver, int repeticiones) {
-        try {
-            cambiarZOOM(driver,repeticiones, Keys.SUBTRACT);
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
-        }
-    }
-
-    /**
-     * Mueve el escrol del mouse
-     *
-     * @param cantidad Si el numero es positivo, el desplazamiento es hacía abajo en la pantalla, si el numero es negativo
-     *                 el desplazamiento es hacía arriba.
-     */
-    public void scrollMouse(int cantidad) {
-        try {
-            Robot robot = new Robot();
-            int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
-            int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height / 2;
-            LogsJB.info("Altura de la pantalla " + alto * 2 + " ancho de la pantalla " + ancho * 2);
-            robot.mouseMove(ancho, alto);
-            robot.mouseWheel(cantidad);
-            LogsJB.info("Se realizo el movimiento del scroll: ");
-            threadslepp(100);
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al intentar realizar el scroll: ");
-        }
-    }
-
-    /**
-     * Mueve el escrol del mouse
-     *
-     * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
-     */
-    public void scrollMouseDown(WebDriver driver, int cantidadScrolls) {
-        try {
-            Actions actions = new Actions(driver);
-            for (int i = 0; i < cantidadScrolls; i++) {
-                actions.sendKeys(Keys.PAGE_DOWN).build().perform();
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al intentar realizar el scroll: ");
-        }
-    }
-
-    /**
-     * Mueve el escrol del mouse
-     *
-     * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
-     */
-    public void scrollMouseUp(WebDriver driver,int cantidadScrolls) {
-        try {
-            Actions actions = new Actions(driver);
-            for (int i = 0; i < cantidadScrolls; i++) {
-                actions.sendKeys(Keys.PAGE_UP).build().perform();
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al intentar realizar el scroll: ");
-        }
-    }
-
-    /***
-     *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
-     * @param driver Driver que está manipulando el navegador
-     * @param element Atributo del elemento, por medio del cual se realizara la busquedad
-     * @param opcion Opcion del elemento que queremos seleccionar
-     * @param comment Comentario que sera colocago sobre la imagen capturada si el Elemento indicado existe
-     */
-    public void selectOption(SearchContext driver, String element, String opcion, String comment) {
-        try {
-            WebElement elemento = obtenerWebElementx2(driver, element);
-            if (!Objects.isNull(elemento)) {
-                //Si encuentra el elemento ejecuta este codigo
-                try {
-                    int opcionint;
-                    opcionint = Integer.parseInt(opcion);
-                    LogsJB.info("Parcio la opcion a entero: " + opcionint);
-                    new Select(elemento).selectByIndex(opcionint - 1);
-                    LogsJB.info("Encontro el elemento Select: " + element + " " +
-                            "Procedera a seleccionar la opcion por medio del Index numerico");
-                } catch (NumberFormatException e) {
-                    new Select(elemento).selectByVisibleText(opcion);
-                    LogsJB.info("Encontro el elemento Select: " + element + " " +
-                            "Procedera a seleccionar la opcion por medio del Texto Visible");
-                }
-            } else {
-                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al seleccionar el elemento: " + element);
-        }
-    }
-
-    /***
-     *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
-     * @param driver Driver que está manipulando el navegador
-     * @param element Atributo del elemento, por medio del cual se realizara la busquedad
-     * @param opcion Opcion del elemento que queremos seleccionar
-     */
-    public boolean selectOption(SearchContext driver, String element, String opcion) {
-        WebElement elemento = obtenerWebElementx2(driver, element);
-        try {
-            if (!Objects.isNull(elemento)) {
-                //Si encuentra el elemento ejecuta este codigo
-                try {
-                    LogsJB.info("Encontro el elemento Select: " + element + " " +
-                            "Procedera a seleccionar la opcion por medio del Index numerico " + opcion);
-                    int opcionint;
-                    opcionint = Integer.parseInt(opcion);
-                    LogsJB.info("Parcio la opcion a entero: " + opcionint);
-                    new Select(elemento).selectByIndex(opcionint);
-                    return true;
-                } catch (NumberFormatException e) {
-                    try {
-                        LogsJB.info("Encontro el elemento Select: " + element + " " +
-                                "Procedera a seleccionar la opcion por medio del Texto Visible: " + opcion);
-                        new Select(elemento).selectByVisibleText(opcion);
-                        return true;
-                    } catch (Exception m) {
-                        LogsJB.info("Encontro el elemento Select: " + element + " " +
-                                "Procedera a seleccionar la opcion por medio del Value: " + opcion);
-                        new Select(elemento).selectByValue(opcion);
-                        return true;
-                    }
-                } catch (Exception ex) {
-                    LogsJB.info("Encontro el elemento Select: " + element + " " +
-                            "Procedera a seleccionar la opcion por medio del Value: " + opcion);
-                    new Select(elemento).selectByValue(opcion);
-                    return true;
-                }
-            } else {
-                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-        }
-        return false;
-    }
-
-    /***
-     * Obtener el valor booleano de un numero
-     * @param numero numero que se evaluara
-     * @return si el numero es mayor o igual a uno, retorna true, de lo contrario, retorna false.
-     */
-    public boolean getBooleanfromInt(int numero) {
-        return numero >= 1;
-    }
-
-    /***
-     * Mueve el driver el frame con el ID indicado si este existe en el contexto actual
-     * @param driver driver que está controlando el navegador
-     * @param frameIDorName Id del frame al que se desea mover el driver
-     * @return Si el frame existe y se mueve al mismo, retorna true, de lo contrario retorna false
-     */
-    public boolean movetoframeIDorName(WebDriver driver, String frameIDorName) {
-        //Se traslada al frame de la transaccion
-        threadslepp(500);
-        WebElement frame = null;
-        int i = 0;
-        while (Objects.isNull(frame) && i < 2) {
-            frame = obtenerWebElementx2(driver, frameIDorName);
-            i++;
-        }
-        return movetoframeforwebelement(driver, frame);
     }
 
     public static boolean movetoframeforwebelement(WebDriver driver, WebElement frame) {
@@ -1966,7 +1543,7 @@ public class SeleniumUtils {
      * @param element Elemento al que se desea envíar el texto
      * @param valor   String que se desea envíar al elemento
      */
-    public static void enviarTxtforKeyPress(WebDriver driver1,SearchContext driver, String element, String valor) {
+    public static void enviarTxtforKeyPress(WebDriver driver1, SearchContext driver, String element, String valor) {
         //Pendiente eliminar el texto existente
         WebElement campo = SeleniumUtils.obtenerWebElementx2(driver, element);
         assert campo != null;
@@ -1983,34 +1560,6 @@ public class SeleniumUtils {
             }
         }
     }
-
-    public boolean clickToElement(WebDriver driver,WebElement element) {
-        try {
-            if (Objects.isNull(element)) {
-                LogsJB.fatal("El elemento es nulo. No se puede hacer clic.");
-                return false;
-            }
-            try {
-                SeleniumUtils.posicionarmeEn(driver, element);
-                element.click();
-                LogsJB.info("Hizo clic en el elemento directamente.");
-                return true;
-            } catch (WebDriverException e) {
-                LogsJB.error("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
-                JavascriptExecutor js = (JavascriptExecutor) driver;
-                js.executeScript("arguments[0].click();", element);
-                LogsJB.info("Hizo clic en el elemento por medio de JavaScript.");
-                return true;
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Excepción capturada al intentar hacer clic en el elemento: " + element.toString());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            return false;
-        }
-    }
-
-
-
 
     /**
      * Función donde obtiene y estáblece el marco actual (frame)
@@ -2044,4 +1593,447 @@ public class SeleniumUtils {
         driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
     }
 
+    /***
+     * Mueve el navegador a la tab que esta recibiendo como parametro
+     * @param driver Driver que esta manipulando el navegador
+     * @param previousTab Previous Tab al que nos queremos mover
+     */
+    public void movetoPreviousTab(WebDriver driver, String previousTab) {
+        if (SeleniumUtils.isanvalidValue(previousTab)) {
+            //Loop through until we find a new window handle
+            for (String windowHandle : driver.getWindowHandles()) {
+                LogsJB.debug("Previus Tab: " + previousTab);
+                LogsJB.debug("Windows Handle: " + windowHandle);
+                if (previousTab.contentEquals(windowHandle)) {
+                    LogsJB.info("Se movera el driver a la pestaña solicitada");
+                    driver.switchTo().window(windowHandle);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Función para guardar la captura de pantalla de la página web y la guarda en un archivo
+     *
+     * @param driver WebDriver que representa la sesión del navegador
+     * @return Retorna a un objeto File que representa la captura de pantalla de la pagina web
+     */
+    private File getImageScrennshot(WebDriver driver, WebElement elementScreenshot) {
+        if (!Objects.isNull(elementScreenshot)) {
+            WebElement element = RefreshReferenceToElement(driver, elementScreenshot);
+            // Desplazarse hasta el elemento
+            Actions actions = new Actions(driver);
+            actions.moveToElement(element);
+            actions.perform();
+            // Tomar la altura del elemento después de desplazarse
+            int elementHeight = element.getSize().getHeight();
+            // Calcular porcentaje de Zoom necesario
+            double windowHeight = driver.manage().window().getSize().getHeight();
+            double zoomPercentage = 1.0;
+            if (windowHeight < elementHeight) {
+                zoomPercentage = Math.min(1.0, windowHeight / elementHeight); // Limitar zoom a máximo 100%
+            } else {
+                zoomPercentage = Math.min(1.0, elementHeight / windowHeight); // Limitar zoom a máximo 100%
+            }
+            zoomPercentage = zoomPercentage < 0.5 ? 1 : zoomPercentage;
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            String zoomActual = js.executeScript("return document.body.style.zoom").toString();
+            // Aplicar el zoom usando JavaScript
+            if (!stringIsNullOrEmpty(zoomActual)) {
+                try {
+                    double zoomActualValue = Double.parseDouble(zoomActual.replace("%", ""));
+                    double newZoomValue = (zoomActualValue < 100.0) ? (zoomActualValue - 15.0) : 100.0;
+                    js.executeScript("document.body.style.zoom = '" + newZoomValue + "%'");
+                } catch (NumberFormatException e) {
+                    System.out.println("El valor de zoomActual no es numérico: " + zoomActual);
+                }
+            }
+            File scrFile = SeleniumUtils.getImageScreeenshotWebElement(driver, elementScreenshot);
+            if (Objects.isNull(scrFile)) {
+                TakesScreenshot scrShot = ((TakesScreenshot) driver);
+                // Restáurar el zoom a 100% si fue ajustado
+                js.executeScript("document.body.style.zoom = '100%';");
+                return scrShot.getScreenshotAs(OutputType.FILE);
+            } else {
+                // Restáurar el zoom a 100% si fue ajustado
+                js.executeScript("document.body.style.zoom = '100%';");
+                return scrFile;
+            }
+        } else {
+            TakesScreenshot scrShot = ((TakesScreenshot) driver);
+            return scrShot.getScreenshotAs(OutputType.FILE);
+        }
+    }
+
+    /**
+     * Espera implícita de 5 segundos o menos si el elemento desaparece del DOM, luego de los 5 segundos lanzara excepción
+     *
+     * @param driver Variable que manipula el navegador
+     * @param by     Identificador del tipo By
+     */
+    public void waitImplicityForElementNotExist(WebDriver driver, By by) {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
+        } catch (TimeoutException ignored) {
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
+            LogsJB.fatal("*");
+            LogsJB.fatal(" " + e);
+            LogsJB.fatal(" Tipo de Excepción : " + e.getClass());
+            LogsJB.fatal(" Causa de la Excepción : " + e.getCause());
+            LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
+            LogsJB.fatal("*");
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
+        }
+    }
+
+    /**
+     * Espera implícita de 30 segundos, luego de los 30 segundos lanzara excepción
+     *
+     * @param wait Wait espera predeterminada
+     * @param by   Identificador del tipo By
+     */
+    public void waitImplicity(WebDriverWait wait, By by) {
+        try {
+            wait.until(driver -> {
+                return driver.findElement(by).isDisplayed() || driver.findElement(by).isEnabled();
+            });
+        } catch (TimeoutException ignored) {
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
+            LogsJB.fatal("*");
+            LogsJB.fatal(" " + e);
+            LogsJB.fatal(" Tipo de Excepción : " + e.getClass());
+            LogsJB.fatal(" Causa de la Excepción : " + e.getCause());
+            LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
+            LogsJB.fatal("*");
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
+        }
+    }
+
+    /***
+     * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
+     * @param driver Web Driver que manipula el navegador
+     * @param aceptar Variable booleana que acepta o declina el cuadro de dialogo
+     * Debido a la naturaleza del manejo interno de accept por parte de javascript, la funcion DEBE DE LLAMARSE JUSTO ANTES DE DAR CLICK PARA DISPARAR EL CUADRO DE DIALOGO
+     */
+    public void acceptConfirm(WebDriver driver, boolean aceptar) {
+        try {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("window.confirm=function(){return " + aceptar + "}");
+        } catch (WebDriverException e) {
+            LogsJB.fatal("Error WebDriver al interactuar con la alerta: " + e.getMessage());
+            // Puedes agregar más manejo de excepciones específicas según sea necesario
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
+        }
+    }
+
+    /***
+     * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
+     * @param driver Web Driver que manipula el navegador
+     */
+    public void acceptAlert(WebDriver driver) {
+        //WebElement currentFrame = driver.switchTo().activeElement();
+        // Obtener el WebElement del frame actual usando JavaScript
+        /*WebElement currentFrame = (WebElement) ((JavascriptExecutor) driver).executeScript(
+                "return window.frameElement;"
+        );*/
+        try {
+            //Wait for the alert to be displayed and store it in a variable
+            Wait wait = getFluentWait(driver, 5000, 100);
+            Alert alert = (Alert) wait.until(ExpectedConditions.alertIsPresent());
+            //Alert alert = driver.switchTo().alert();
+            String text = alert.getText();
+//         String text=driver.switchTo().alert().getText();
+//         writeLog(text);
+//            driver.switchTo().alert().accept();
+            LogsJB.info(text);
+            alert.accept();
+        } catch (java.util.NoSuchElementException e) {
+            // Manejar la falta de alerta específica si es necesario
+            LogsJB.fatal("No se encontró ninguna alerta presente.");
+            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+            jsExecutor.executeScript("window.alert = function() {};");
+        } catch (WebDriverException e) {
+            LogsJB.fatal("Error WebDriver al interactuar con la alerta: " + e.getMessage());
+            // Puedes agregar más manejo de excepciones específicas según sea necesario
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
+        }
+    }
+
+    /***
+     * Presiona la tecla indicada en el condigo numerico indicado
+     * @param codigo Codigo numerico de la tecla que queremos presionar
+     */
+    public void keyPress(Keys codigo) {
+        try {
+            Actions actions = new Actions(testContext.driver);
+            actions.sendKeys(codigo).perform();
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al presionar una tecla: ");
+        }
+    }
+
+    /***
+     * Presiona la tecla indicada en el condigo numerico indicado
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
+     * @param codigo Codigo numerico de la tecla que queremos presionar
+     */
+    public void cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo) {
+        try {
+            for (int i = 0; i < repeticiones; i++) {
+                threadslepp(100);
+                Actions actions = new Actions(driver);
+                actions.keyDown(Keys.CONTROL).keyDown(codigo).keyUp(codigo).keyUp(Keys.CONTROL).perform();
+                LogsJB.info("Presiona la tecla: " + codigo);
+                LogsJB.info("Suelta la tecla: " + codigo);
+                threadslepp(100);
+            }
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al presionar una tecla: ");
+        }
+    }
+
+    /***
+     * Presiona la tecla indicada en el condigo numerico indicado
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
+     * @param codigo Codigo numerico de la tecla que queremos presionar
+     */
+    public void cambiarZOOM(WebDriver driver, int repeticiones, int codigo) {
+        try {
+            for (int i = 0; i < repeticiones; i++) {
+                threadslepp(100);
+                char asciiValue = (char) codigo;
+                Actions actions = new Actions(driver);
+                actions.keyDown(Keys.CONTROL).keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).keyUp(Keys.CONTROL).perform();
+                LogsJB.info("Presiona la tecla: " + codigo);
+                LogsJB.info("Suelta la tecla: " + codigo);
+                threadslepp(100);
+            }
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al presionar una tecla: ");
+        }
+    }
+
+    /***
+
+
+     /***
+     * Presiona la tecla indicada en el condigo numerico indicado
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
+     *
+     */
+    public void cambiarZOOMMenos(WebDriver driver, int repeticiones) {
+        try {
+            cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al presionar una tecla: ");
+        }
+    }
+
+    /**
+     * Mueve el escrol del mouse
+     *
+     * @param cantidad Si el numero es positivo, el desplazamiento es hacía abajo en la pantalla, si el numero es negativo
+     *                 el desplazamiento es hacía arriba.
+     */
+    public void scrollMouse(int cantidad) {
+        try {
+            Robot robot = new Robot();
+            int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
+            int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height / 2;
+            LogsJB.info("Altura de la pantalla " + alto * 2 + " ancho de la pantalla " + ancho * 2);
+            robot.mouseMove(ancho, alto);
+            robot.mouseWheel(cantidad);
+            LogsJB.info("Se realizo el movimiento del scroll: ");
+            threadslepp(100);
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al intentar realizar el scroll: ");
+        }
+    }
+
+    /**
+     * Mueve el escrol del mouse
+     *
+     * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
+     */
+    public void scrollMouseDown(WebDriver driver, int cantidadScrolls) {
+        try {
+            Actions actions = new Actions(driver);
+            for (int i = 0; i < cantidadScrolls; i++) {
+                actions.sendKeys(Keys.PAGE_DOWN).build().perform();
+            }
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al intentar realizar el scroll: ");
+        }
+    }
+
+    /**
+     * Mueve el escrol del mouse
+     *
+     * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
+     */
+    public void scrollMouseUp(WebDriver driver, int cantidadScrolls) {
+        try {
+            Actions actions = new Actions(driver);
+            for (int i = 0; i < cantidadScrolls; i++) {
+                actions.sendKeys(Keys.PAGE_UP).build().perform();
+            }
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al intentar realizar el scroll: ");
+        }
+    }
+
+    /***
+     *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
+     * @param driver Driver que está manipulando el navegador
+     * @param element Atributo del elemento, por medio del cual se realizara la busquedad
+     * @param opcion Opcion del elemento que queremos seleccionar
+     * @param comment Comentario que sera colocago sobre la imagen capturada si el Elemento indicado existe
+     */
+    public void selectOption(SearchContext driver, String element, String opcion, String comment) {
+        try {
+            WebElement elemento = obtenerWebElementx2(driver, element);
+            if (!Objects.isNull(elemento)) {
+                //Si encuentra el elemento ejecuta este codigo
+                try {
+                    int opcionint;
+                    opcionint = Integer.parseInt(opcion);
+                    LogsJB.info("Parcio la opcion a entero: " + opcionint);
+                    new Select(elemento).selectByIndex(opcionint - 1);
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
+                            "Procedera a seleccionar la opcion por medio del Index numerico");
+                } catch (NumberFormatException e) {
+                    new Select(elemento).selectByVisibleText(opcion);
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
+                            "Procedera a seleccionar la opcion por medio del Texto Visible");
+                }
+            } else {
+                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
+            }
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al seleccionar el elemento: " + element);
+        }
+    }
+
+    /***
+     *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
+     * @param driver Driver que está manipulando el navegador
+     * @param element Atributo del elemento, por medio del cual se realizara la busquedad
+     * @param opcion Opcion del elemento que queremos seleccionar
+     */
+    public boolean selectOption(SearchContext driver, String element, String opcion) {
+        WebElement elemento = obtenerWebElementx2(driver, element);
+        try {
+            if (!Objects.isNull(elemento)) {
+                //Si encuentra el elemento ejecuta este codigo
+                try {
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
+                            "Procedera a seleccionar la opcion por medio del Index numerico " + opcion);
+                    int opcionint;
+                    opcionint = Integer.parseInt(opcion);
+                    LogsJB.info("Parcio la opcion a entero: " + opcionint);
+                    new Select(elemento).selectByIndex(opcionint);
+                    return true;
+                } catch (NumberFormatException e) {
+                    try {
+                        LogsJB.info("Encontro el elemento Select: " + element + " " +
+                                "Procedera a seleccionar la opcion por medio del Texto Visible: " + opcion);
+                        new Select(elemento).selectByVisibleText(opcion);
+                        return true;
+                    } catch (Exception m) {
+                        LogsJB.info("Encontro el elemento Select: " + element + " " +
+                                "Procedera a seleccionar la opcion por medio del Value: " + opcion);
+                        new Select(elemento).selectByValue(opcion);
+                        return true;
+                    }
+                } catch (Exception ex) {
+                    LogsJB.info("Encontro el elemento Select: " + element + " " +
+                            "Procedera a seleccionar la opcion por medio del Value: " + opcion);
+                    new Select(elemento).selectByValue(opcion);
+                    return true;
+                }
+            } else {
+                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
+            }
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+        }
+        return false;
+    }
+
+    /***
+     * Obtener el valor booleano de un numero
+     * @param numero numero que se evaluara
+     * @return si el numero es mayor o igual a uno, retorna true, de lo contrario, retorna false.
+     */
+    public boolean getBooleanfromInt(int numero) {
+        return numero >= 1;
+    }
+
+    /***
+     * Mueve el driver el frame con el ID indicado si este existe en el contexto actual
+     * @param driver driver que está controlando el navegador
+     * @param frameIDorName Id del frame al que se desea mover el driver
+     * @return Si el frame existe y se mueve al mismo, retorna true, de lo contrario retorna false
+     */
+    public boolean movetoframeIDorName(WebDriver driver, String frameIDorName) {
+        //Se traslada al frame de la transaccion
+        threadslepp(500);
+        WebElement frame = null;
+        int i = 0;
+        while (Objects.isNull(frame) && i < 2) {
+            frame = obtenerWebElementx2(driver, frameIDorName);
+            i++;
+        }
+        return movetoframeforwebelement(driver, frame);
+    }
+
+    public boolean clickToElement(WebDriver driver, WebElement element) {
+        try {
+            if (Objects.isNull(element)) {
+                LogsJB.fatal("El elemento es nulo. No se puede hacer clic.");
+                return false;
+            }
+            try {
+                SeleniumUtils.posicionarmeEn(driver, element);
+                element.click();
+                LogsJB.info("Hizo clic en el elemento directamente.");
+                return true;
+            } catch (WebDriverException e) {
+                LogsJB.error("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
+                JavascriptExecutor js = (JavascriptExecutor) driver;
+                js.executeScript("arguments[0].click();", element);
+                LogsJB.info("Hizo clic en el elemento por medio de JavaScript.");
+                return true;
+            }
+        } catch (Exception e) {
+            LogsJB.fatal("Excepción capturada al intentar hacer clic en el elemento: " + element.toString());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            return false;
+        }
+    }
 }

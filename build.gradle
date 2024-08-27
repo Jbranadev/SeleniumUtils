@@ -19,7 +19,6 @@ dependencies {
     testImplementation 'com.github.sdrss:reportng:2.7.0'
 
 
-
     //Dependencia para no escribir getters y setters
     implementation 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
