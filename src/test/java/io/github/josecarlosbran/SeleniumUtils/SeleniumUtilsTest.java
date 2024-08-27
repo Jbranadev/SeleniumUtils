@@ -7,8 +7,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.nio.file.Paths;
-
 import static io.github.josecarlosbran.UtilidadesTest.Utilities.logParrafo;
 
 public class SeleniumUtilsTest {
@@ -32,26 +30,19 @@ public class SeleniumUtilsTest {
                         "valide el identificador del elemento");
     }
 
-
     @Test(testName = "SendKeys Element Search Google"
             , description = "Limpia el elemento de busqueda de Google",
-    dependsOnMethods = "elementExist")
-    public void sendKeysToElement(){
-
+            dependsOnMethods = "elementExist")
+    public void sendKeysToElement() {
     }
-
-
 
     @Test(testName = "Clear Element Search Google"
             , description = "Limpia el elemento de busqueda de Google",
             dependsOnMethods = "sendKeysToElement")
-    public void clearElement(){
+    public void clearElement() {
         logParrafo("Limpia el elemento de busqueda de Google");
         Assert.assertTrue(SeleniumUtils.clearElementIfExist(driver, driver, "textarea[name='q']"),
                 "No fue posible limpiar el elemento 'textarea[name='q']' en la pagina," +
                         "valide el identificador del elemento");
     }
-
-
-
 }
