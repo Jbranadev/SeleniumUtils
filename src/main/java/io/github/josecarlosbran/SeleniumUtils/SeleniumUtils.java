@@ -2019,49 +2019,8 @@ public class SeleniumUtils {
         }
     }
 
-    public static String getTextOfWebElement(WebDriver driver, WebElement element) {
-        if (Objects.isNull(element)) {
-            return "";
-        }
-        String text = null;
-        try {
-            SeleniumUtils.posicionarmeEn(driver, element);
-            text = element.getText();
-            if (stringIsNullOrEmpty(text)) {
-                text = element.getAttribute("innerText");
-            }
-            if (stringIsNullOrEmpty(text)) {
-                text = element.getAttribute("value");
-            }
-            if (stringIsNullOrEmpty(text)) {
-                // Intentar obtener el texto utilizando JavaScript en caso de que las formas estándar fallen
-                text = SeleniumUtils.getTextUsingJavaScript(driver,element);
-            }
-        } catch (WebDriverException e) {
-            LogsJB.fatal("El elemento ya no existe en el contexto actual ");
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-        }
-        if (stringIsNullOrEmpty(text)) {
-            LogsJB.fatal(SeleniumUtils.convertir_fecha() + " No se pudo obtener el texto del elemento, comuniquese con los administradores ");
-        }
-        return stringIsNullOrEmpty(text) ? "" : text;
-    }
 
-    /***
-     *
-     * @param driver
-     * @param element
-     * @return
-     */
-    private static String getTextUsingJavaScript(WebDriver driver, WebElement element) {
-        try {
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver; // Asegúrate de tener una instancia válida de WebDriver
-            return (String) jsExecutor.executeScript("return arguments[0].textContent", element);
-        } catch (Exception e) {
-            LogsJB.fatal("Error al intentar obtener el texto mediante JavaScript: " + ExceptionUtils.getStackTrace(e));
-            return "";
-        }
-    }
+
 
     /**
      * Función donde obtiene y estáblece el marco actual (frame)
