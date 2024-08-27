@@ -819,6 +819,256 @@ public class SeleniumUtils {
         }
     }
 
+
+    /***
+     * Hace clíck en el elemento indicado, si este existe en el contexto actual
+     * @param driver Driver que está manipulando el navegador
+     * @param element Atributo del elemento, por medio del cual se realizara la busqueda
+     * @return Retorna True si encontro el elemento y pudo hacer clíck en él
+     */
+    public static Boolean clickElementIfExist(SearchContext driver, String element) {
+        //Para optimizar el tiempo de respuestá
+        utilities.writeLog(convertir_fecha() + "* ");
+        utilities.writeLog(convertir_fecha() + " Buscara si existe el elemento indicado: " + element);
+        utilities.writeLog(convertir_fecha() + "* ");
+        int time = 3500;
+        //Obtiene la espera fluida
+        //Crea las variables de control que no permite que sobre pase los 7,000 milisegundos la busqueda del elemento
+        java.util.Date fecha = Calendar.getInstance().getTime();
+        Calendar addseconds = Calendar.getInstance();
+        addseconds.setTime(fecha);
+        if (this.testContext.getNavegador().equalsIgnoreCase("IE")) {
+            time = 10000;
+            addseconds.add(Calendar.MILLISECOND, time);
+        } else {
+            if (StringUtils.containsIgnoreCase(testContext.getCanal(), "Banca") || StringUtils.containsIgnoreCase(testContext.getCanal(), "App")) {
+                time = 3000;
+                addseconds.add(Calendar.MILLISECOND, time);
+            } else {
+                time = 500;
+                addseconds.add(Calendar.MILLISECOND, time);
+            }
+        }
+        fecha = addseconds.getTime();
+        utilities.writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " + time + " mili segundos: " + fecha);
+        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        Wait<WebDriver> wait = getFluentWait(testContext.getDriver(), time, 100);
+        //Declaración de Variables auxiliares para que no se bloqueen los hilos
+        String elementid = element;
+        String elementclasname = element;
+        String elementcss = element;
+        String elementtagname = element;
+        String elementlinkt = element;
+        String elementpartial = element;
+        String elementname = element;
+        String elementxpath = element;
+        Wait<WebDriver> waitname = wait;
+        Wait<WebDriver> waitid = wait;
+        Wait<WebDriver> waitclassname = wait;
+        Wait<WebDriver> waitcss = wait;
+        Wait<WebDriver> waittagname = wait;
+        Wait<WebDriver> waitlinkt = wait;
+        Wait<WebDriver> waitpartial = wait;
+        Wait<WebDriver> waitxpath = wait;
+        //Declaración de Hilos
+        searchId buscarId = new searchId(this.testContext, waitid, elementid);
+        searchClassName buscarClassName = new searchClassName(this.testContext, waitclassname, elementclasname);
+        searchCSSSelector buscarCSSSelector = new searchCSSSelector(this.testContext, waitcss, elementcss);
+        searchTagName buscarTagName = new searchTagName(this.testContext, waittagname, elementtagname);
+        searchLinkText buscarLinkText = new searchLinkText(this.testContext, waitlinkt, elementlinkt);
+        searchPartialLinkText buscarPartialLinkText = new searchPartialLinkText(this.testContext, waitpartial, elementpartial);
+        searchXPath buscarXpath = new searchXPath(this.testContext, waitxpath, elementxpath);
+        searchName buscarName = new searchName(this.testContext, waitname, elementname);
+        //Declaración de Variables de control
+        Boolean existclassname = false;
+        Boolean existcssselector = false;
+        Boolean existtagname = false;
+        Boolean existlinktext = false;
+        Boolean existpartiallinktext = false;
+        Boolean existxpath = false;
+        Boolean existid = false;
+        Boolean existname = false;
+        //Ajusta los procesos para que estos no limpien el elemento indicado
+        buscarId.setClearElement(true);
+        buscarId.setSendKeys(true);
+        buscarId.setObtenerText(true);
+        buscarXpath.setClearElement(true);
+        buscarXpath.setSendKeys(true);
+        buscarXpath.setObtenerText(true);
+        buscarClassName.setClearElement(true);
+        buscarClassName.setSendKeys(true);
+        buscarClassName.setObtenerText(true);
+        buscarCSSSelector.setClearElement(true);
+        buscarCSSSelector.setSendKeys(true);
+        buscarCSSSelector.setObtenerText(true);
+        buscarLinkText.setClearElement(true);
+        buscarLinkText.setSendKeys(true);
+        buscarLinkText.setObtenerText(true);
+        buscarPartialLinkText.setClearElement(true);
+        buscarPartialLinkText.setSendKeys(true);
+        buscarPartialLinkText.setObtenerText(true);
+        buscarName.setClearElement(true);
+        buscarName.setSendKeys(true);
+        buscarName.setObtenerText(true);
+        buscarId.setSearchContext(driver);
+        buscarXpath.setSearchContext(driver);
+        buscarClassName.setSearchContext(driver);
+        buscarCSSSelector.setSearchContext(driver);
+        buscarLinkText.setSearchContext(driver);
+        buscarPartialLinkText.setSearchContext(driver);
+        buscarName.setSearchContext(driver);
+        buscarTagName.setSearchContext(driver);
+        //Comienza a correr los procesos paralelos
+        if (this.testContext.getNavegador().equalsIgnoreCase("IE")) {
+            buscarCSSSelector.execute();
+            buscarTagName.execute();
+            buscarXpath.execute();
+            buscarId.execute();
+            buscarLinkText.execute();
+            buscarName.execute();
+        } else {
+            buscarCSSSelector.execute();
+            buscarTagName.execute();
+            buscarXpath.execute();
+            buscarId.execute();
+            buscarName.execute();
+            buscarClassName.execute();
+            buscarLinkText.execute();
+            buscarPartialLinkText.execute();
+        }
+        //Esperará saber si existe el elemento en alguno de los tipos
+        while ((!existid) && (!existname) && (!existclassname) && (!existcssselector) && (!existtagname) && (!existlinktext) && (!existpartiallinktext) && (!existxpath) && !(fecha2.after(fecha))) {
+            fecha2 = Calendar.getInstance().getTime();
+            //Actualiza la existencia
+            existid = buscarId.getElementExist();
+            if (buscarId.getElementExist()) {
+                //Mata los subprocesos a funcionar
+                while (!buscarId.isClick()) {
+                    threadslepp(50);
+                }
+                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                return true;
+            }
+            existclassname = buscarClassName.getElementExist();
+            if (buscarClassName.getElementExist()) {
+                //Mata los subprocesos a funcionar
+                while (!buscarClassName.isClick()) {
+                    threadslepp(50);
+                }
+                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                return true;
+            }
+            existxpath = buscarXpath.getElementExist();
+            if (buscarXpath.getElementExist()) {
+                //Mata los subprocesos a funcionar
+                while (!buscarXpath.isClick()) {
+                    threadslepp(50);
+                }
+                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                return true;
+            }
+            existcssselector = buscarCSSSelector.getElementExist();
+            if (buscarCSSSelector.getElementExist()) {
+                //Mata los subprocesos a funcionar
+                while (!buscarCSSSelector.isClick()) {
+                    threadslepp(50);
+                }
+                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado css: " + element);
+                return true;
+            }
+            existtagname = buscarTagName.getElementExist();
+            if (buscarTagName.getElementExist()) {
+                //Mata los subprocesos a funcionar
+                while (!buscarTagName.isClick()) {
+                    threadslepp(50);
+                }
+                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado css: " + element);
+                return true;
+            }
+            existlinktext = buscarLinkText.getElementExist();
+            if (buscarLinkText.getElementExist()) {
+                //Mata los subprocesos a funcionar
+                while (!buscarLinkText.isClick()) {
+                    threadslepp(50);
+                }
+                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                return true;
+            }
+            existpartiallinktext = buscarPartialLinkText.getElementExist();
+            if (buscarPartialLinkText.getElementExist()) {
+                //Mata los subprocesos a funcionar
+                while (!buscarPartialLinkText.isClick()) {
+                    threadslepp(50);
+                }
+                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                return true;
+            }
+            existname = buscarName.getElementExist();
+            if (buscarName.getElementExist()) {
+                //Mata los subprocesos a funcionar
+                while (!buscarName.isClick()) {
+                    threadslepp(50);
+                }
+                utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+                return true;
+            }
+        }
+        if (this.testContext.getNavegador().equalsIgnoreCase("IE")) {
+            do {
+                threadslepp(50);
+                if (buscarClassName.isClick())
+                    return true;
+                if (buscarId.isClick())
+                    return true;
+                if (buscarName.isClick())
+                    return true;
+                if (buscarCSSSelector.isClick())
+                    return true;
+                if (buscarXpath.isClick())
+                    return true;
+                if (buscarLinkText.isClick())
+                    return true;
+                if (buscarPartialLinkText.isClick())
+                    return true;
+            } while (buscarClassName.isAlive() || buscarId.isAlive() || buscarName.isAlive() || buscarCSSSelector.isAlive() || buscarXpath.isAlive() || buscarLinkText.isAlive() || buscarPartialLinkText.isAlive() || buscarTagName.isAlive());
+        }
+        utilities.writeLog(convertir_fecha() + " Fecha contra la que se comparara si transcurren los " +
+                time +
+                " mili segundos: " + fecha);
+        utilities.writeLog(convertir_fecha() + " Fecha contra la que se comparo si transcurrieron los " +
+                time +
+                " mili segundos: " + fecha2);
+        //Retorna Falso si el elemento no Existe
+        if ((fecha2.after(fecha))) {
+            utilities.writeLog(convertir_fecha() + " No pudo hacer click en el elemento especificado, ya que no existe: " + element);
+            return false;
+        } else {
+            utilities.writeLog(convertir_fecha() + " Logro encontrar y hacer click en el elemento especificado: " + element);
+            return true;
+        }
+    }
+
+
+    /**
+     * Trata de hacer click en el elemento especificado 2 veces
+     *
+     * @param driver  driver que manipula el navegador
+     * @param element elemento que se desea hacer click
+     * @return True si logra hacer click en el elemento, de lo contrario false
+     */
+    public static Boolean clicktoElementx2intents(SearchContext driver, String element) {
+        int i = 0;
+        while (i < 2) {
+            if (SeleniumUtils.clickElementIfExist(driver, element)) {
+                return true;
+            }
+            i++;
+        }
+        return false;
+    }
+
+
+
     /***
      * Mueve el navegador a la tab que esta recibiendo como parametro
      * @param driver Driver que esta manipulando el navegador
