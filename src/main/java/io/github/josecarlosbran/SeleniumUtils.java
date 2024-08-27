@@ -2659,11 +2659,11 @@ public class SeleniumUtils {
      */
     public boolean seleccionarElemento(WebDriver driver, WebElement element) {
         if (!Objects.isNull(element)) {
-            writeLog("La opcion está seleccionada: " + element.isSelected());
-            writeLog("Color: " + element.getCssValue("background-color"));
+            LogsJB.info("La opcion está seleccionada: " + element.isSelected());
+            LogsJB.info("Color: " + element.getCssValue("background-color"));
             String color = element.getCssValue("background-color");
             if (!element.isSelected() && StringUtils.containsIgnoreCase(color, "164, 9, 32")) {
-                writeLog("Selecciona el elemento: " + element);
+                LogsJB.info("Selecciona el elemento: " + element);
                 String tempelement = element.toString().split(" -> ")[1];
                 String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
                 String locator = data[0];
@@ -2674,7 +2674,7 @@ public class SeleniumUtils {
                 return true;
             }
         } else {
-            writeLog("Elemento proporcionado es nullo");
+            LogsJB.fatal("Elemento proporcionado es nullo");
             return false;
         }
     }
@@ -2716,22 +2716,22 @@ public class SeleniumUtils {
         }
     }
 
-    public boolean clickToElement(WebElement element) {
+    public boolean clickToElement(WebDriver driver,WebElement element) {
         try {
             if (Objects.isNull(element)) {
                 LogsJB.fatal("El elemento es nulo. No se puede hacer clic.");
                 return false;
             }
             try {
-                posicionarmeEn(testContext.getDriver(), element);
+                posicionarmeEn(driver, element);
                 element.click();
-                writeLog("Hizo clic en el elemento directamente.");
+                LogsJB.info("Hizo clic en el elemento directamente.");
                 return true;
             } catch (WebDriverException e) {
-                LogsJB.fatal("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
-                JavascriptExecutor js = (JavascriptExecutor) testContext.getDriver();
+                LogsJB.error("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
+                JavascriptExecutor js = (JavascriptExecutor) driver;
                 js.executeScript("arguments[0].click();", element);
-                writeLog("Hizo clic en el elemento por medio de JavaScript.");
+                LogsJB.info("Hizo clic en el elemento por medio de JavaScript.");
                 return true;
             }
         } catch (Exception e) {
@@ -2741,13 +2741,13 @@ public class SeleniumUtils {
         }
     }
 
-    public String getTextOfWebElement(WebElement element) {
+    public String getTextOfWebElement(WebDriver driver, WebElement element) {
         if (Objects.isNull(element)) {
             return "";
         }
         String text = null;
         try {
-            posicionarmeEn(testContext.getDriver(), element);
+            posicionarmeEn(driver, element);
             text = element.getText();
             if (stringIsNullOrEmpty(text)) {
                 text = element.getAttribute("innerText");
@@ -2757,21 +2757,21 @@ public class SeleniumUtils {
             }
             if (stringIsNullOrEmpty(text)) {
                 // Intentar obtener el texto utilizando JavaScript en caso de que las formas estándar fallen
-                text = getTextUsingJavaScript(element);
+                text = getTextUsingJavaScript(driver,element);
             }
         } catch (WebDriverException e) {
             LogsJB.fatal("El elemento ya no existe en el contexto actual ");
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
         }
         if (stringIsNullOrEmpty(text)) {
-            writeLog(convertir_fecha() + " No se pudo obtener el texto del elemento, comuniquese con los administradores ");
+            LogsJB.fatal(convertir_fecha() + " No se pudo obtener el texto del elemento, comuniquese con los administradores ");
         }
         return stringIsNullOrEmpty(text) ? "" : text;
     }
 
-    private String getTextUsingJavaScript(WebElement element) {
+    private String getTextUsingJavaScript(WebDriver driver, WebElement element) {
         try {
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) testContext.getDriver(); // Asegúrate de tener una instancia válida de WebDriver
+            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver; // Asegúrate de tener una instancia válida de WebDriver
             return (String) jsExecutor.executeScript("return arguments[0].textContent", element);
         } catch (Exception e) {
             LogsJB.fatal("Error al intentar obtener el texto mediante JavaScript: " + ExceptionUtils.getStackTrace(e));
@@ -2787,7 +2787,7 @@ public class SeleniumUtils {
     public void currentFrame(WebDriver driver) {
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
         String currentFrame = (String) jsExecutor.executeScript("return self.name");
-        writeLog("Frame: " + currentFrame);
+        LogsJB.info("Frame: " + currentFrame);
     }
 
     /**
