@@ -5,6 +5,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Wait;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -186,7 +187,8 @@ public class SeleniumParallel {
                         LogsJB.info(" Limpiando el elemento por medio de " + identificador.toString());
                         boolean result = SeleniumUtils.cleanElement(driver, searchContext.findElement(identificador));
                         if (!result) {
-                            LogsJB.warning(" No pudo limpiar el elemento, comuniquese con los administradores ");
+                            LogsJB.warning(" No pudo limpiar el elemento, " +identificador.toString()+
+                                    " comuniquese con los administradores ");
                         }
                         return true;
                     }
@@ -203,4 +205,45 @@ public class SeleniumParallel {
         };
         return SeleniumUtils.getSeleniumEjecutor().submit(run);
     }
+
+
+    static Future<Boolean> sendKeysIfElementExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CharSequence... Texto) {
+        Callable<Boolean> run = () -> {
+            boolean exist = false;
+            try {
+                //Envia el texto al elemento
+                exist =wait.until(new Function<>() {
+                                public Boolean apply(WebDriver driver) {
+                                    if (!searchContext.findElement(identificador).isEnabled()) {
+                                        LogsJB.warning( " El elemento " +identificador.toString()+
+                                                " no se encuentra habilitado");
+                                        return true;
+                                    }
+                                    LogsJB.info( " Enviando Texto al elemento por medio de " +identificador.toString()+
+                                            " : " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
+                                    boolean result = SeleniumUtils.sendKeysToElement(driver, searchContext.findElement(identificador), Texto);
+                                    if (!result) {
+                                        LogsJB.warning( " No pudo enviar el texto a el elemento, " +identificador.toString()+
+                                                " comuniquese con los administradores ");
+                                    }
+                                    return true;
+                                }
+                            });
+
+
+
+
+            } catch (WebDriverException ignored) {
+            } catch (Exception e) {
+                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + identificador.toString());
+                LogsJB.fatal("*");
+                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
+                LogsJB.fatal("*");
+            } finally {
+                return exist;
+            }
+        };
+        return SeleniumUtils.getSeleniumEjecutor().submit(run);
+    }
+
 }
