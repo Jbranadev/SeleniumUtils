@@ -5,6 +5,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Wait;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -186,7 +187,8 @@ public class SeleniumParallel {
                         LogsJB.info(" Limpiando el elemento por medio de " + identificador.toString());
                         boolean result = SeleniumUtils.cleanElement(driver, searchContext.findElement(identificador));
                         if (!result) {
-                            LogsJB.warning(" No pudo limpiar el elemento, comuniquese con los administradores ");
+                            LogsJB.warning(" No pudo limpiar el elemento, " + identificador +
+                                    " comuniquese con los administradores ");
                         }
                         return true;
                     }
@@ -199,6 +201,88 @@ public class SeleniumParallel {
                 LogsJB.fatal("*");
             } finally {
                 return exist;
+            }
+        };
+        return SeleniumUtils.getSeleniumEjecutor().submit(run);
+    }
+
+    /***
+     * Envia el texto proporcionado como parametro al elemento si este existe en el contexto actual
+     * @param driver Driver que manipula el navegador
+     * @param wait Espera fluida que aplicara la función lambda
+     * @param searchContext Contexto en el que se buscara el elemento en cuestión
+     * @param identificador Identificador del elemento al que se le enviara el texto
+     * @param Texto Texto a enviar al elemento
+     * @return Retorna un Future<Boolean> con el resultado del envio de texto, true si envia el texto, false si
+     * no logra enviar el texto o sucede un error durante el envio
+     */
+    static Future<Boolean> sendKeysIfElementExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CharSequence... Texto) {
+        Callable<Boolean> run = () -> {
+            boolean exist = false;
+            try {
+                //Envia el texto al elemento
+                exist = wait.until(new Function<>() {
+                    public Boolean apply(WebDriver driver) {
+                        if (!searchContext.findElement(identificador).isEnabled()) {
+                            LogsJB.warning(" El elemento " + identificador.toString() +
+                                    " no se encuentra habilitado");
+                            return true;
+                        }
+                        LogsJB.info(" Enviando Texto al elemento por medio de " + identificador.toString() +
+                                " : " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
+                        boolean result = SeleniumUtils.sendKeysToElement(driver, searchContext.findElement(identificador), Texto);
+                        if (!result) {
+                            LogsJB.warning(" No pudo enviar el texto a el elemento, " + identificador +
+                                    " comuniquese con los administradores ");
+                        }
+                        return true;
+                    }
+                });
+            } catch (WebDriverException ignored) {
+            } catch (Exception e) {
+                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + identificador.toString());
+                LogsJB.fatal("*");
+                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
+                LogsJB.fatal("*");
+            } finally {
+                return exist;
+            }
+        };
+        return SeleniumUtils.getSeleniumEjecutor().submit(run);
+    }
+
+    /***
+     * Obtiene el texto del elemento si este existe en el contexto actual
+     * @param driver Driver que manipula el navegador
+     * @param wait Espera fluida que aplicara la función lambda
+     * @param searchContext Contexto en el que se buscara el elemento en cuestión
+     * @param identificador Identificador del elemento al que se le obtendra el texto
+     * @return Retorna un Future<String> con el texto del elemento, si el elemento no existe o sucede un error
+     * durante la obtención del texto, se retornara un String vacio
+     */
+    static Future<String> getTextIfElementExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador) {
+        Callable<String> run = () -> {
+            String result = "";
+            try {
+                //Obtiene el Texto del Elemento
+                result = wait.until(new Function<>() {
+                    public String apply(WebDriver driver) {
+                        if (!searchContext.findElement(identificador).isEnabled()) {
+                            LogsJB.warning(" El elemento no se encuentra habilitado para obtener su texto " + identificador.toString());
+                            return "";
+                        }
+                        LogsJB.info(" Obteniendo el Texto del elemento por medio de " + identificador.toString());
+                        return SeleniumUtils.getTextOfWebElement(driver, searchContext.findElement(identificador));
+                    }
+                });
+            } catch (WebDriverException ignored) {
+            } catch (Exception e) {
+                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + identificador.toString());
+                LogsJB.fatal("*");
+                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
+                LogsJB.fatal("*");
+            } finally {
+                return result;
             }
         };
         return SeleniumUtils.getSeleniumEjecutor().submit(run);
