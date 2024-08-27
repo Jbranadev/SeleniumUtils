@@ -1,4 +1,4 @@
-package io.github.josecarlosbran;
+package io.github.josecarlosbran.SeleniumUtils;
 
 /***
  * @author Jose Bran

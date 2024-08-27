@@ -11,8 +11,14 @@ repositories {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // Dependencia para TestNG
+    testImplementation 'org.testng:testng:7.10.2'
+
+    // Dependencia para ReporteTestNG
+    testImplementation 'com.github.sdrss:reportng:2.7.0'
+
+
 
     //Dependencia para no escribir getters y setters
     implementation 'org.projectlombok:lombok:1.18.32'
@@ -38,7 +44,7 @@ dependencies {
 }
 
 test {
-    useJUnitPlatform()
+    useTestNG()
 }
 
 

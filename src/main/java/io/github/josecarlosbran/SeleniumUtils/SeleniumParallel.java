@@ -1,4 +1,4 @@
-package io.github.josecarlosbran;
+package io.github.josecarlosbran.SeleniumUtils;
 
 import com.josebran.LogsJB.LogsJB;
 import org.apache.commons.lang3.exception.ExceptionUtils;
