@@ -132,7 +132,7 @@ public class SeleniumUtilsTest {
 
         WebElement nullElement = SeleniumUtils.getElementIfExist(driver,driver,By.xpath("//*[@id=\"xpathFalso\"]"));
 
-        boolean isDisabled = SeleniumUtils.elementIsDisabled(nullElement);
+        boolean isDisabled = SeleniumUtils.ElementoDeshabilitado(nullElement);
 
         // Verifica que el método retorne verdadero para un elemento nulo
         Assert.assertTrue(isDisabled, "El elemento nulo no fue reconocido como deshabilitado");
@@ -212,25 +212,25 @@ public class SeleniumUtilsTest {
     @Test(testName = "Is an Valid value", description = "Should return a boolean of a valid value")
     public void isAnValidValue(){
         String valor="Valor para ver si es valido o no";
-        Assert.assertTrue(SeleniumUtils.isanvalidValue(valor));
+        Assert.assertTrue(SeleniumUtils.esValorValido(valor));
     }
 
     @Test(testName = "Is not an Valid value", description = "Should return a boolean of a valid value")
     public void isNotAnValidValue(){
         String valor="";
-        Assert.assertFalse(SeleniumUtils.isanvalidValue(valor));
+        Assert.assertFalse(SeleniumUtils.esValorValido(valor));
     }
 
     @Test(testName = "Is an null or empty String", description = "Should return a boolean of a null or empty value")
     public void stringIsNullOrEmpty(){
         String valor="";
-        Assert.assertTrue(SeleniumUtils.stringIsNullOrEmpty(valor));
+        Assert.assertTrue(SeleniumUtils.cadenaNulaoVacia(valor));
     }
 
     @Test(testName = "Is an not null or empty String", description = "Should return a boolean of a null or empty value")
     public void stringIsNotNullOrEmpty(){
         String valor="Valor para evitar que sea nulo";
-        Assert.assertFalse(SeleniumUtils.stringIsNullOrEmpty(valor));
+        Assert.assertFalse(SeleniumUtils.cadenaNulaoVacia(valor));
     }
 
 
@@ -315,7 +315,7 @@ public class SeleniumUtilsTest {
         Boolean condicion=false;
 
         String elementoBusqueda="buscar";
-        condicion= SeleniumUtils.stringIsNullOrEmpty(SeleniumUtils.obtenerOfTextWebElementx2(driver,driver,elementoBusqueda,5,2));
+        condicion= SeleniumUtils.cadenaNulaoVacia(SeleniumUtils.obtenerOfTextWebElementx2(driver,driver,elementoBusqueda,5,2));
         Assert.assertTrue(condicion);
     }
 
@@ -324,7 +324,7 @@ public class SeleniumUtilsTest {
         Boolean condicion=false;
 
         String elementoBusqueda="buscar";
-        condicion= SeleniumUtils.stringIsNullOrEmpty(SeleniumUtils.obtenerOfTextWebElementx2(driver,driver,elementoBusqueda,5,2));
+        condicion= SeleniumUtils.cadenaNulaoVacia(SeleniumUtils.obtenerOfTextWebElementx2(driver,driver,elementoBusqueda,5,2));
         Assert.assertTrue(condicion);
     }
 
@@ -333,7 +333,7 @@ public class SeleniumUtilsTest {
         Boolean condicion=false;
         WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[3]/form/div[1]/div[1]/div[4]/center/input[2]");
         String respuesta=SeleniumUtils.getTextOfWebElement(driver,elemento);
-        condicion=SeleniumUtils.stringIsNullOrEmpty(respuesta);
+        condicion=SeleniumUtils.cadenaNulaoVacia(respuesta);
         Assert.assertTrue(!condicion);
     }
 
@@ -341,7 +341,7 @@ public class SeleniumUtilsTest {
     public void getTextNullOfWebElement(){
         WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,By.xpath("//*[@id=\"APjFqb\"]"));
         String respuesta=SeleniumUtils.getTextOfWebElement(driver,elemento);
-        Assert.assertTrue(SeleniumUtils.stringIsNullOrEmpty(respuesta));
+        Assert.assertTrue(SeleniumUtils.cadenaNulaoVacia(respuesta));
     }
 
     @Test(testName = "getTextOfWebElement",description = "Obtiene el texto de un elemento web",dependsOnMethods = "elementExist")
@@ -349,7 +349,7 @@ public class SeleniumUtilsTest {
         Boolean condicion=false;
         WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,By.xpath("//*[@id=\"APjFqb\"]"));
         String respuesta=SeleniumUtils.getTextUsingJavaScript(driver,elemento);
-        condicion=SeleniumUtils.stringIsNullOrEmpty(respuesta);
+        condicion=SeleniumUtils.cadenaNulaoVacia(respuesta);
         Assert.assertTrue(condicion);
     }
 
@@ -358,7 +358,7 @@ public class SeleniumUtilsTest {
         Boolean condicion=false;
         WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[3]/form/div[1]/div[1]/div[4]/center/input[2]");
         String respuesta=SeleniumUtils.getTextUsingJavaScript(driver,elemento);
-        Assert.assertTrue(SeleniumUtils.stringIsNullOrEmpty(respuesta));
+        Assert.assertTrue(SeleniumUtils.cadenaNulaoVacia(respuesta));
     }
 
     @Test(testName = "clickElementIfExistAcierto",description = "Should make click in the specified element",dependsOnMethods = "elementExist")
