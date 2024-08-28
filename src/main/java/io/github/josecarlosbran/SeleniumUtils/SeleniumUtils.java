@@ -77,21 +77,20 @@ public class SeleniumUtils {
      * @return Retorna una espera del tipo WebDriver, la cual es fluida, no causara una excepción si la operación realizada falla.
      */
     public static Wait<WebDriver> getFluentWait(WebDriver driver, int timeduration, int timerepetition) {
-        Wait<WebDriver> wait = new FluentWait<>(driver)
+        return new FluentWait<>(driver)
                 .withTimeout(Duration.ofMillis(timeduration))
                 .pollingEvery(Duration.ofMillis(timerepetition))
                 .ignoring(UnhandledAlertException.class)
-                .ignoring(java.lang.Exception.class)
+                .ignoring(Exception.class)
                 .ignoring(TimeoutException.class)
                 .ignoring(org.openqa.selenium.NoSuchElementException.class)
                 .ignoring(InvalidElementStateException.class)
                 .ignoring(JavascriptException.class)
                 .ignoring(StaleElementReferenceException.class)
                 .ignoring(org.openqa.selenium.remote.UnreachableBrowserException.class)
-                .ignoring(org.openqa.selenium.InvalidSelectorException.class)
-                .ignoring(org.openqa.selenium.WebDriverException.class)
+                .ignoring(InvalidSelectorException.class)
+                .ignoring(WebDriverException.class)
                 .ignoring(ElementClickInterceptedException.class);
-        return wait;
     }
 
     /***
@@ -99,7 +98,7 @@ public class SeleniumUtils {
      * @param element Elemento que se desea verificar si esta habilitado
      * @return Retorna True si el elemento esta habilitado, False si no esta habilitado o visible.
      */
-    public static boolean elementIsDisabled(WebElement element) {
+    public static boolean ElementoDeshabilitado(WebElement element) {
         try {
             if (Objects.isNull(element)) {
                 LogsJB.warning("El elemento es nulo. No se puede verificar la habilitación.");
@@ -223,8 +222,7 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
      * @return Retorna True si el elemento Existe, caso contrario retorna False
      */
-    public static Boolean
-    elementExist(WebDriver driver, SearchContext searchContext, String element) {
+    public static Boolean ElementoExistente(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Buscara si existe el elemento indicado: " + element);
@@ -304,7 +302,7 @@ public class SeleniumUtils {
      * @return Retorna True si logra limpiar el elemento, False si no logra limpiar el elemento o sucede un error en la ejecución de esta
      * instrucción.
      */
-    public static Boolean clearElementIfExist(WebDriver driver, SearchContext searchContext, String element) {
+    public static Boolean LimpiarElementoExistente(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Si existe el elemento indicado, lo limpiara: " + element);
@@ -382,8 +380,8 @@ public class SeleniumUtils {
      * @param value Valor que se desea verificar para determinar si es inválido
      * @return Verdadero si el valor es considerado, o Falso si el valor cumple con los citerios válidos
      */
-    public static boolean isanvalidValue(String value) {
-        if (!SeleniumUtils.stringIsNullOrEmpty(value)) {
+    public static boolean esValorValido(String value) {
+        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
             return !value.equalsIgnoreCase(SeleniumUtils.getInespecific());
         }
         return false;
@@ -394,7 +392,7 @@ public class SeleniumUtils {
      * @param cadena Cadena a Validar
      * @return Retorna True si la cadena envíada está vacía o nula, de lo contrario retorna false
      */
-    public static boolean stringIsNullOrEmpty(String cadena) {
+    public static boolean cadenaNulaoVacia(String cadena) {
         return Objects.isNull(cadena) || cadena.trim().isEmpty();
     }
 
@@ -505,28 +503,28 @@ public class SeleniumUtils {
             element.sendKeys(keysToSend);
             String text = SeleniumUtils.getTextOfWebElement(driver, element);
             String temp = Arrays.toString(keysToSend).substring(1, Arrays.toString(keysToSend).length() - 1);
-            if (!stringIsNullOrEmpty(text) || stringIsNullOrEmpty(temp)) {
+            if (!cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
                 result = true;
             }
-            if (stringIsNullOrEmpty(text) || stringIsNullOrEmpty(temp)) {
+            if (cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
                 ((JavascriptExecutor) driver)
                         .executeScript("arguments[0].setAttribute('value', '" + keysToSend + "')", element);
                 text = element.getAttribute("value");
-                if (!stringIsNullOrEmpty(text) || stringIsNullOrEmpty(temp)) {
+                if (!cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
                     result = true;
                 }
             }
             text = SeleniumUtils.getTextOfWebElement(driver, element);
-            if (stringIsNullOrEmpty(text) || stringIsNullOrEmpty(temp)) {
+            if (cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
                 ((JavascriptExecutor) driver)
                         .executeScript("arguments[0].setAttribute('innerText', '" + keysToSend + "')", element);
                 text = element.getAttribute("innerText");
-                if (!stringIsNullOrEmpty(text) || stringIsNullOrEmpty(temp)) {
+                if (!cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
                     result = true;
                 }
             }
             text = SeleniumUtils.getTextOfWebElement(driver, element);
-            if (stringIsNullOrEmpty(text)) {
+            if (cadenaNulaoVacia(text)) {
                 result = false;
             }
         } catch (Exception e) {
@@ -611,10 +609,10 @@ public class SeleniumUtils {
                 SeleniumUtils.getSearchTime() +
                 " mili segundos: " + fecha2);
         if (fecha2.after(fecha)) {
-            LogsJB.info(" No logro encontrar y setear el Texto: " + Texto.toString() +
+            LogsJB.info(" No logro encontrar y setear el Texto: " + Arrays.toString(Texto) +
                     " en el elemento especificado: " + element);
         } else {
-            LogsJB.info(" Logro encontrar y setear el Texto: " + Texto.toString() +
+            LogsJB.info(" Logro encontrar y setear el Texto: " + Arrays.toString(Texto) +
                     " en el elemento especificado: " + element);
             return true;
         }
@@ -774,13 +772,13 @@ public class SeleniumUtils {
         try {
             posicionarmeEn(driver, element);
             text = element.getText();
-            if (stringIsNullOrEmpty(text)) {
+            if (cadenaNulaoVacia(text)) {
                 text = element.getAttribute("innerText");
             }
-            if (stringIsNullOrEmpty(text)) {
+            if (cadenaNulaoVacia(text)) {
                 text = element.getAttribute("value");
             }
-            if (stringIsNullOrEmpty(text)) {
+            if (cadenaNulaoVacia(text)) {
                 // Intentar obtener el texto utilizando JavaScript en caso de que las formas estándar fallen
                 text = getTextUsingJavaScript(driver, element);
             }
@@ -788,10 +786,10 @@ public class SeleniumUtils {
             LogsJB.fatal("El elemento ya no existe en el contexto actual ");
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
         }
-        if (stringIsNullOrEmpty(text)) {
+        if (cadenaNulaoVacia(text)) {
             LogsJB.warning(" No se pudo obtener el texto del elemento, comuníquese con los administradores ");
         }
-        return stringIsNullOrEmpty(text) ? "" : text;
+        return cadenaNulaoVacia(text) ? "" : text;
     }
 
     /***
@@ -931,9 +929,7 @@ public class SeleniumUtils {
     public static void waitImplicity(WebDriver driver, By by) {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-            wait.until(driver1 -> {
-                return !elementIsDisabled(driver1.findElement(by));
-            });
+            wait.until(driver1 -> !ElementoDeshabilitado(driver1.findElement(by)));
         } catch (TimeoutException ignored) {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
@@ -1035,6 +1031,12 @@ public class SeleniumUtils {
         return elementos;
     }
 
+    /***
+     * Funcion que mueve al frame parametrizado
+     * @param driver Driver que maneja el explorador
+     * @param frame frame activo para interacción
+     * @return
+     */
     public static boolean movetoframeforwebelement(WebDriver driver, WebElement frame) {
         if (!Objects.isNull(frame)) {
             driver.switchTo().frame(frame);
@@ -1355,7 +1357,7 @@ public class SeleniumUtils {
      *
      * @param driver WebDriver es el que se estáblecera el marco actual
      */
-    public static void currentFrame(WebDriver driver) {
+    public static void FrameActivo(WebDriver driver) {
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
         String currentFrame = (String) jsExecutor.executeScript("return self.name");
         LogsJB.info("Frame: " + currentFrame);
@@ -1367,7 +1369,7 @@ public class SeleniumUtils {
      * @param driver WebDriver es el que cambiará el contexto al marco especificado
      * @param frame  Identificador del marco al que se desea cambiar
      */
-    public static void switchFrame(WebDriver driver, SearchContext searchcontext,String frame) {
+    public static void CambiarFrame(WebDriver driver, SearchContext searchcontext,String frame) {
         WebElement iframe = SeleniumUtils.obtenerWebElementx2(driver, searchcontext,"#" + frame);
         driver.switchTo().frame(iframe);
     }
@@ -1419,7 +1421,7 @@ public class SeleniumUtils {
      * @param previousTab Previous Tab al que nos queremos mover
      */
     public void movetoPreviousTab(WebDriver driver, String previousTab) {
-        if (SeleniumUtils.isanvalidValue(previousTab)) {
+        if (SeleniumUtils.esValorValido(previousTab)) {
             //Loop through until we find a new window handle
             for (String windowHandle : driver.getWindowHandles()) {
                 LogsJB.debug("Previus Tab: " + previousTab);
@@ -1460,7 +1462,7 @@ public class SeleniumUtils {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             String zoomActual = js.executeScript("return document.body.style.zoom").toString();
             // Aplicar el zoom usando JavaScript
-            if (!stringIsNullOrEmpty(zoomActual)) {
+            if (!cadenaNulaoVacia(zoomActual)) {
                 try {
                     double zoomActualValue = Double.parseDouble(zoomActual.replace("%", ""));
                     double newZoomValue = (zoomActualValue < 100.0) ? (zoomActualValue - 15.0) : 100.0;
@@ -1518,9 +1520,7 @@ public class SeleniumUtils {
      */
     public void waitImplicity(WebDriverWait wait, By by) {
         try {
-            wait.until(driver -> {
-                return driver.findElement(by).isDisplayed() || driver.findElement(by).isEnabled();
-            });
+            wait.until(driver -> driver.findElement(by).isDisplayed() || driver.findElement(by).isEnabled());
         } catch (TimeoutException ignored) {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);

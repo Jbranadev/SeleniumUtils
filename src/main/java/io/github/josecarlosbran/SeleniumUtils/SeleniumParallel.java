@@ -65,7 +65,7 @@ public class SeleniumParallel {
                 //Limpia el elemento
                 exist = wait.until(new Function<>() {
                     public Boolean apply(WebDriver driver) {
-                        if (SeleniumUtils.elementIsDisabled(searchContext.findElement(identificador))) {
+                        if (SeleniumUtils.ElementoDeshabilitado(searchContext.findElement(identificador))) {
                             LogsJB.warning(" El elemento no se encuentra habilitado para su limpieza " + identificador.toString());
                             return false;
                         }
@@ -189,7 +189,7 @@ public class SeleniumParallel {
                 //Hace Click sobre el elemento
                 exist = wait.until(new Function<>() {
                     public Boolean apply(WebDriver driver) {
-                        if (SeleniumUtils.elementIsDisabled(searchContext.findElement(identificador))) {
+                        if (SeleniumUtils.ElementoDeshabilitado(searchContext.findElement(identificador))) {
                             LogsJB.warning(" El elemento no se encuentra habilitado para hacer click en el " + identificador.toString());
                             return false;
                         }
