@@ -53,7 +53,7 @@ public class SeleniumUtils {
     }
 
     /***
-     * Presiona la tecla indicada en el condigo numerico indicado
+     * Presiona la tecla indicada en él condigo numerico indicado
      * @param driver Driver que manipula el navegador y realiza las acciones
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
@@ -95,7 +95,7 @@ public class SeleniumUtils {
     }
 
     /***
-     * Verifica si el elemento en cuestión esta habilitado
+     * Verifica si el elemento en cuestión está habilitado
      * @param element Elemento que se desea verificar si esta habilitado
      * @return Retorna True si el elemento esta habilitado, False si no esta habilitado o visible.
      */
@@ -121,7 +121,7 @@ public class SeleniumUtils {
     /**
      * Función que convierte un array de objetos en un ArrayList de cadenas
      *
-     * @param object  El Array de objetos que se desea convertit en cadenas
+     * @param object  El Array de objetos que se desea convertir en cadenas
      * @param acierto Variable booleana que decide si será un acierto(True) o un fallo (False)
      * @return Un ArrayList que contiene las representaciones en forma de cadena de los objetos
      */
@@ -146,14 +146,14 @@ public class SeleniumUtils {
 
     /***
      * Hace una pausa sobre el hilo en ejecución por el tiempo especificado
-     * @param milisegundos Tiempo en milisegundos que se detendra la ejecucion
+     * @param milisegundos Tiempo en milisegundos que se detendrá la ejecución
      */
     public static void threadslepp(int milisegundos) {
         try {
             Thread.sleep(milisegundos);
         } catch (Exception e) {
-            LogsJB.fatal("Se ha capturado un error en threadsleep");
-            LogsJB.fatal("Stacktrace de la excepcion capturada: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.fatal("Se ha capturado un error en thread sleep");
+            LogsJB.fatal("Stacktrace de la exception capturada: " + ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -193,7 +193,7 @@ public class SeleniumUtils {
     }
 
     /**
-     * Función que se utiliza para posicionarsee en un elemento, utilizando un controlador WebDriver
+     * Función que se utiliza para posicionarse en un elemento, utilizando un controlador WebDriver
      *
      * @param driver   WebDriver se utiliza para interactuar con el entorno
      * @param elemento WebElement el elemento al que se desea posicionarse
@@ -379,10 +379,10 @@ public class SeleniumUtils {
     }
 
     /**
-     * Función que se utiliza para verificar si un valor es invalido o no cumple ciertos criterios prefefinidos
+     * Función que se utiliza para verificar si un valor es inválido o no cumple ciertos criterios predefinidos
      *
-     * @param value Valor que se desea verificar para determianr si es inválido
-     * @return Verdadero si el valor es considerado, o Falso si el valor cumple con los citerios validos
+     * @param value Valor que se desea verificar para determinar si es inválido
+     * @return Verdadero si el valor es considerado, o Falso si el valor cumple con los citerios válidos
      */
     public static boolean isanvalidValue(String value) {
         if (!SeleniumUtils.stringIsNullOrEmpty(value)) {
@@ -437,7 +437,7 @@ public class SeleniumUtils {
                         return driver.findElement(By.className(term)).getScreenshotAs(OutputType.FILE);
                 }
             }
-            LogsJB.warning("No pudo tomar la captura de pantalla a traves del elemento indicado, retorna null");
+            LogsJB.warning("No pudo tomar la captura de pantalla del elemento indicado, retorna null");
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
             return null;
         } catch (Exception e) {
@@ -502,7 +502,6 @@ public class SeleniumUtils {
             if (Objects.isNull(element)) {
                 LogsJB.warning("El elemento es nulo. No se puede enviar el texto.");
                 result = false;
-                return result;
             }
             SeleniumUtils.posicionarmeEn(driver, element);
             element.sendKeys(keysToSend);
@@ -510,7 +509,6 @@ public class SeleniumUtils {
             String temp = Arrays.toString(keysToSend).substring(1, Arrays.toString(keysToSend).length() - 1);
             if (!stringIsNullOrEmpty(text) || stringIsNullOrEmpty(temp)) {
                 result = true;
-                return result;
             }
             if (stringIsNullOrEmpty(text) || stringIsNullOrEmpty(temp)) {
                 ((JavascriptExecutor) driver)
@@ -518,7 +516,6 @@ public class SeleniumUtils {
                 text = element.getAttribute("value");
                 if (!stringIsNullOrEmpty(text) || stringIsNullOrEmpty(temp)) {
                     result = true;
-                    return result;
                 }
             }
             text = SeleniumUtils.getTextOfWebElement(driver, element);
@@ -528,22 +525,20 @@ public class SeleniumUtils {
                 text = element.getAttribute("innerText");
                 if (!stringIsNullOrEmpty(text) || stringIsNullOrEmpty(temp)) {
                     result = true;
-                    return result;
                 }
             }
             text = SeleniumUtils.getTextOfWebElement(driver, element);
             if (stringIsNullOrEmpty(text)) {
                 result = false;
-                return result;
             }
         } catch (Exception e) {
-            LogsJB.fatal("Excepción capturada al intentar enviar el texto" + keysToSend +
+            LogsJB.fatal("Excepción capturada al intentar enviar el texto" + Arrays.toString(keysToSend) +
                     " al  elemento: " + element.toString());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             result = false;
+        }finally {
             return result;
         }
-        return result;
     }
 
     /**
@@ -644,7 +639,7 @@ public class SeleniumUtils {
      * Obtiene el texto del elemento indicado, si este existe en el contexto actual
      * @param driver Driver que está manipulando el navegador
      * @param searchContext Contexto en el que se desea buscar el elemento
-     * @param element Atributo del elemento, por medio del cual se realizara la busqueda y obtendra el Texto
+     * @param element Atributo del elemento, por medio del cual se realizara la busqueda y obtendrá el Texto
      * @param timeDuration Duración de la espera para la busqueda del elemento
      * @param timeRepetition Cada cuanto tiempo durante el tiempo de espera, intentar obtener nuevamente el elemento
      * @return Retorna el texto del elemento, si lo logra encontrar, de lo contrario retorna null
@@ -653,7 +648,7 @@ public class SeleniumUtils {
         String texto = null;
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
-        LogsJB.debug(" Obtendra el texto del elemento si este existe: " + element);
+        LogsJB.debug(" Obtendrá el texto del elemento si este existe: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
         java.util.Date fecha = Calendar.getInstance().getTime();
@@ -748,12 +743,12 @@ public class SeleniumUtils {
     }
 
     /****
-     * Realiza 2 veces la busquedad de el texto de un elemento
+     * Realiza 2 veces la busquedad del texto de un elemento
      * @param driver Driver que controla el navegador
      * @param searchContext Contexto de busquedad
      * @param element Atributo del elemento a buscar
      * @param timeduration Duración de la busquedad del texto del elemento especificado
-     * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
+     * @param timerepetition Tiempo de repetición para realizar la busquedad del elemento y obtener el texto
      * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
      */
     public static String obtenerOfTextWebElementx2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
@@ -767,7 +762,7 @@ public class SeleniumUtils {
     }
 
     /***
-     * Obtiene el texto del elemento proporcionado a traves del metodo convencional de selenium,
+     * Obtiene el texto del elemento proporcionado del metodo convencional de selenium,
      * si no lo logra por ese medio, lo hace por medio de atributos, si no lo logra de esa forma lo intenta por JavaScript
      * @param driver Driver que está manipulando el navegador
      * @param element Elemento del cual se desea obtener el texto
@@ -796,13 +791,13 @@ public class SeleniumUtils {
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
         }
         if (stringIsNullOrEmpty(text)) {
-            LogsJB.warning(" No se pudo obtener el texto del elemento, comuniquese con los administradores ");
+            LogsJB.warning(" No se pudo obtener el texto del elemento, comuníquese con los administradores ");
         }
         return stringIsNullOrEmpty(text) ? "" : text;
     }
 
     /***
-     * Obtiene el texto de un elemento web, a traves de Java Script
+     * Obtiene el texto de un elemento web por medio de Java Script
      * @param driver Driver que manipula el navegador actualmente
      * @param element Elemento del cual se desea obtener el texto
      * @return Retorna el texto del elemento, si no se puede obtener el texto, retorna una cadena vacía
@@ -818,16 +813,16 @@ public class SeleniumUtils {
     }
 
     /***
-     * Hace click en el elemento indicado, si este existe en el contexto actual
+     * Hace clic en el elemento indicado, si este existe en el contexto actual
      * @param driver Driver que está manipulando el navegador
      * @param searchContext Contexto en el que se desea buscar el elemento
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
-     * @return Retorna True si logra hacer click en el elemento, de lo contrario false
+     * @return Retorna True si logra hacer clic en el elemento, de lo contrario false
      */
     public static Boolean clickElementIfExist(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
-        LogsJB.debug(" Si existe el elemento indicado, hara click en el elemento: " + element);
+        LogsJB.debug(" Si existe el elemento indicado, hará click en el elemento: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
         java.util.Date fecha = Calendar.getInstance().getTime();
@@ -897,12 +892,12 @@ public class SeleniumUtils {
     }
 
     /**
-     * Trata de hacer click en el elemento especificado 2 veces, si no logra hacerlo a la primera
+     * Trata de hacer clic en el elemento especificado 2 veces, si no logra hacerlo a la primera
      *
      * @param driver        Driver que está manipulando el navegador
      * @param searchContext Contexto en el que se desea buscar el elemento
      * @param element       Atributo del elemento, por medio del cual se realizara la busqueda
-     * @return Retorna True si logra hacer click en el elemento, de lo contrario false
+     * @return Retorna True si logra hacer clic en el elemento, de lo contrario false
      */
     public static Boolean clicktoElementx2intents(WebDriver driver, SearchContext searchContext, String element) {
         int i = 0;
@@ -1040,21 +1035,6 @@ public class SeleniumUtils {
         }
         //Retorna null si el elemento no Existe
         return elementos;
-    }
-    /***
-     * Presiona la tecla indicada en el condigo numerico indicado
-     * @param codigo Codigo numerico de la tecla que queremos presionar
-     */
-    public static void keyPress(int codigo) {
-        try {
-            char asciiValue = (char) codigo;
-            Actions actions = new Actions(testContext.driver);
-            actions.keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).perform();
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
-        }
     }
 
     public static boolean movetoframeforwebelement(WebDriver driver, WebElement frame) {
@@ -1196,7 +1176,7 @@ public class SeleniumUtils {
 
     /***
      * Realiza 2 veces la busquedad de los elementos que cumplen con el criterio de busqueda especificado
-     * @param driver Dirver que está controlando el navegador
+     * @param driver Driver que está controlando el navegador
      * @param searchContext Contexto en el que se desea buscar el elemento
      * @param element Filtro de Atributo de los elementos a buscar
      * @return Retorna la lista de elementos que cumplen con los criterios de busqueda, si no encuentra ningun elemento retorna una lista
@@ -1220,15 +1200,14 @@ public class SeleniumUtils {
      * @return Retorna el elemento, si no lo encuentra retorna Null
      */
     public static WebElement getElementIfExist(WebDriver driver, SearchContext searchContext, By element) {
-        int i = 0;
-        WebElement temp = null;
+        WebElement temp;
         temp = getElementIfExist(driver, searchContext, getIdentificadorBy(element));
         return temp;
     }
 
     /***
      * Realiza 2 veces la busquedad de los elementos que cumplen con el criterio de busqueda especificado
-     * @param driver Dirver que está controlando el navegador
+     * @param driver Driver que está controlando el navegador
      * @param searchContext Contexto en el que se desea buscar el elemento
      * @param element Filtro de Atributo de los elementos a buscar
      * @return Retorna la lista de elementos que cumplen con los criterios de busqueda, si no encuentra ningun elemento retorna una lista
@@ -1246,7 +1225,7 @@ public class SeleniumUtils {
 
     /***
      * Realiza 2 veces la busquedad de los elementos que cumplen con el criterio de busqueda especificado
-     * @param driver Dirver que está controlando el navegador
+     * @param driver Driver que está controlando el navegador
      * @param searchContext Contexto en el que se desea buscar el elemento
      * @param element Filtro de Atributo de los elementos a buscar
      * @return Retorna la lista de elementos que cumplen con los criterios de busqueda, si no encuentra ningun elemento retorna una lista
@@ -1264,14 +1243,13 @@ public class SeleniumUtils {
 
     /***
      * Realiza 2 veces la busquedad de los elementos que cumplen con el criterio de busqueda especificado
-     * @param driver Dirver que está controlando el navegador
+     * @param driver Driver que está controlando el navegador
      * @param searchContext Contexto en el que se desea buscar el elemento
      * @param element Filtro de Atributo de los elementos a buscar
      * @return Retorna la lista de elementos que cumplen con los criterios de busqueda, si no encuentra ningun elemento retorna una lista
      * vacía
      */
     public static List<WebElement> getElementsIfExist(WebDriver driver, SearchContext searchContext, By element) {
-        int i = 0;
         List<WebElement> temp = new ArrayList<>();
         temp = SeleniumUtils.getElementsIfExist(driver, searchContext, SeleniumUtils.getIdentificadorBy(element));
         return temp;
@@ -1282,10 +1260,10 @@ public class SeleniumUtils {
      *
      * @param driver  Driver que está manipulando el navegador
      * @param element Elemento que se desea deseleccionar, tiene que ser tipo radio
-     * @return True si el elemento está desseleccionado o si logra desseleccionarlo,
+     * @return True si el elemento está desseleccionado o si logra de seleccionarlo,
      * si el elemento proporcionado es null, retorna False
      */
-    public static boolean deseleccionarElemento(WebDriver driver, WebElement element) {
+    public static boolean deseleccionarElemento(WebDriver driver, SearchContext searchContext,WebElement element) {
         if (!Objects.isNull(element)) {
             LogsJB.info("La opcion está seleccionada: " + element.isSelected());
             LogsJB.info("Color: " + element.getCssValue("background-color"));
@@ -1296,13 +1274,13 @@ public class SeleniumUtils {
                 String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
                 String locator = data[0];
                 String term = data[1];
-                clicktoElementx2intents(driver, term);
+                clicktoElementx2intents(driver, searchContext,term);
                 return true;
             } else {
                 return true;
             }
         } else {
-            LogsJB.error("Elemento proporcionado es nullo");
+            LogsJB.error("Elemento proporcionado es null");
             return false;
         }
     }
@@ -1310,12 +1288,12 @@ public class SeleniumUtils {
     /**
      * Selecciona el elemento si no está seleccionado
      *
-     * @param driver  Driver que está manippulando el navegador
+     * @param driver  Driver que está manipulando el navegador
      * @param element Elemento que se desea seleccionar, tiene que ser tipo radio
      * @return True si el elemento está seleccionado o si logra seleccionarlo, si el elemento proporcionado
      * es null retorna False
      */
-    public static boolean seleccionarElemento(WebDriver driver, WebElement element) {
+    public static boolean seleccionarElemento(WebDriver driver, SearchContext searchcontext,WebElement element) {
         if (!Objects.isNull(element)) {
             LogsJB.info("La opcion está seleccionada: " + element.isSelected());
             LogsJB.info("Color: " + element.getCssValue("background-color"));
@@ -1326,26 +1304,26 @@ public class SeleniumUtils {
                 String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
                 String locator = data[0];
                 String term = data[1];
-                clicktoElementx2intents(driver, term);
+                clicktoElementx2intents(driver, searchcontext,term);
                 return true;
             } else {
                 return true;
             }
         } else {
-            LogsJB.fatal("Elemento proporcionado es nullo");
+            LogsJB.fatal("Elemento proporcionado es null");
             return false;
         }
     }
 
     /***
      * Obtiene el texto de la opción seleccionada de un elemento Select
-     * @param temp Elemento Select del cual queremos saber cual es la primera Opcion Seleccionada
+     * @param temp Elemento Select del cual queremos saber cuál es la primera Opcion Seleccionada
      * @return Retorna el texto de la opción seleccionada o una cadena vacía
      */
-    public static String obtenerTextoSeleccionadoSelect(WebElement temp) {
+    public static String obtenerTextoSeleccionadoSelect(WebDriver driver,WebElement temp) {
         Select proceso = new Select(temp);
         String retorno;
-        retorno = getTextOfWebElement(proceso.getFirstSelectedOption());
+        retorno = getTextOfWebElement(driver,proceso.getFirstSelectedOption());
         return retorno;
     }
 
@@ -1356,20 +1334,20 @@ public class SeleniumUtils {
      * @param element Elemento al que se desea envíar el texto
      * @param valor   String que se desea envíar al elemento
      */
-    public static void enviarTxtforKeyPress(WebDriver driver1, SearchContext driver, String element, String valor) {
+    public static void enviarTxtforKeyPress(WebDriver driver, SearchContext searchcontext, String element, String valor) {
         //Pendiente eliminar el texto existente
-        WebElement campo = SeleniumUtils.obtenerWebElementx2(driver, element);
+        WebElement campo = SeleniumUtils.obtenerWebElementx2(driver, searchcontext, element);
         assert campo != null;
-        String texto = SeleniumUtils.getTextOfWebElement(driver1, campo);
+        String texto = SeleniumUtils.getTextOfWebElement(driver, campo);
         LogsJB.info("Texto que tiene el elemento: " + texto);
-        if (SeleniumUtils.clicktoElementx2intents(driver, element)) {
+        if (SeleniumUtils.clicktoElementx2intents(driver,searchcontext, element)) {
             //Elimina carácter por carácter
             for (char c : texto.toCharArray()) {
-                keyPress(KeyEvent.VK_BACK_SPACE);
+                keyPress(driver, KeyEvent.VK_BACK_SPACE);
             }
             //Escribe carácter por carácter
             for (char c : valor.toCharArray()) {
-                keyPress(c);
+                keyPress(driver,c);
             }
         }
     }
@@ -1391,8 +1369,8 @@ public class SeleniumUtils {
      * @param driver WebDriver es el que cambiará el contexto al marco especificado
      * @param frame  Identificador del marco al que se desea cambiar
      */
-    public static void switchFrame(WebDriver driver, String frame) {
-        WebElement iframe = SeleniumUtils.obtenerWebElementx2(driver, "#" + frame);
+    public static void switchFrame(WebDriver driver, SearchContext searchcontext,String frame) {
+        WebElement iframe = SeleniumUtils.obtenerWebElementx2(driver, searchcontext,"#" + frame);
         driver.switchTo().frame(iframe);
     }
 
@@ -1407,9 +1385,9 @@ public class SeleniumUtils {
     }
 
     /***
-     * Hace click en el elemento proporcionado por el metodo estandar de selenium, si no puede hacer clic, intenta hacer clic por medio de JavaScript
+     * Hace clic en el elemento proporcionado por el metodo estandar de selenium, si no puede hacer clic, intenta hacer clic por medio de JavaScript
      * @param driver Driver que está controlando el navegador
-     * @param element Elemento al que se desea hacer click
+     * @param element Elemento al que se desea hacer clic
      * @return Retorna True si logra hacer clic en el elemento, de lo contrario retorna False
      */
     public static boolean clickToElement(WebDriver driver, WebElement element) {
@@ -1438,8 +1416,8 @@ public class SeleniumUtils {
     }
 
     /***
-     * Mueve el navegador a la tab que esta recibiendo como parametro
-     * @param driver Driver que esta manipulando el navegador
+     * Mueve el navegador a la tab que está recibiendo como parametro
+     * @param driver Driver que está manipulando el navegador
      * @param previousTab Previous Tab al que nos queremos mover
      */
     public void movetoPreviousTab(WebDriver driver, String previousTab) {
@@ -1496,11 +1474,11 @@ public class SeleniumUtils {
             File scrFile = SeleniumUtils.getImageScreeenshotWebElement(driver, elementScreenshot);
             if (Objects.isNull(scrFile)) {
                 TakesScreenshot scrShot = ((TakesScreenshot) driver);
-                // Restáurar el zoom a 100% si fue ajustado
+                // Restáurar el Zoom a 100% si fue ajustado
                 js.executeScript("document.body.style.zoom = '100%';");
                 return scrShot.getScreenshotAs(OutputType.FILE);
             } else {
-                // Restáurar el zoom a 100% si fue ajustado
+                // Restáurar el Zoom a 100% si fue ajustado
                 js.executeScript("document.body.style.zoom = '100%';");
                 return scrFile;
             }
@@ -1562,8 +1540,8 @@ public class SeleniumUtils {
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
      * @param driver Web Driver que manipula el navegador
-     * @param aceptar Variable booleana que acepta o declina el cuadro de dialogo
-     * Debido a la naturaleza del manejo interno de accept por parte de javascript, la funcion DEBE DE LLAMARSE JUSTO ANTES DE DAR CLICK PARA DISPARAR EL CUADRO DE DIALOGO
+     * @param aceptar Variable booleana que acepta o declina el cuadro de diálogo
+     * Debido a la naturaleza del manejo interno de accept por parte de javascript, la funcion DEBE DE LLAMARSE JUSTO ANTES DE DAR CLIC PARA DISPARAR EL CUADRO DE DIÁLOGO
      */
     public void acceptConfirm(WebDriver driver, boolean aceptar) {
         try {
@@ -1582,20 +1560,10 @@ public class SeleniumUtils {
      * @param driver Web Driver que manipula el navegador
      */
     public void acceptAlert(WebDriver driver) {
-        //WebElement currentFrame = driver.switchTo().activeElement();
-        // Obtener el WebElement del frame actual usando JavaScript
-        /*WebElement currentFrame = (WebElement) ((JavascriptExecutor) driver).executeScript(
-                "return window.frameElement;"
-        );*/
         try {
-            //Wait for the alert to be displayed and store it in a variable
             Wait wait = getFluentWait(driver, 5000, 100);
             Alert alert = (Alert) wait.until(ExpectedConditions.alertIsPresent());
-            //Alert alert = driver.switchTo().alert();
             String text = alert.getText();
-//         String text=driver.switchTo().alert().getText();
-//         writeLog(text);
-//            driver.switchTo().alert().accept();
             LogsJB.info(text);
             alert.accept();
         } catch (java.util.NoSuchElementException e) {
@@ -1612,23 +1580,8 @@ public class SeleniumUtils {
     }
 
     /***
-     * Presiona la tecla indicada en el condigo numerico indicado
-     * @param codigo Codigo numerico de la tecla que queremos presionar
-     */
-    public void keyPress(Keys codigo) {
-        try {
-            Actions actions = new Actions(testContext.driver);
-            actions.sendKeys(codigo).perform();
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
-        }
-    }
-
-    /***
-     * Presiona la tecla indicada en el condigo numerico indicado
-     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
+     * Presiona la tecla indicada en él condigo numerico indicado
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
     public void cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo) {
@@ -1649,8 +1602,8 @@ public class SeleniumUtils {
     }
 
     /***
-     * Presiona la tecla indicada en el condigo numerico indicado
-     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
+     * Presiona la tecla indicada en él condigo numerico indicado
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
     public void cambiarZOOM(WebDriver driver, int repeticiones, int codigo) {
@@ -1675,8 +1628,8 @@ public class SeleniumUtils {
 
 
      /***
-     * Presiona la tecla indicada en el condigo numerico indicado
-     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de zoom
+     * Presiona la tecla indicada en él condigo numerico indicado
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      *
      */
     public void cambiarZOOMMenos(WebDriver driver, int repeticiones) {
@@ -1692,8 +1645,8 @@ public class SeleniumUtils {
     /**
      * Mueve el escrol del mouse
      *
-     * @param cantidad Si el numero es positivo, el desplazamiento es hacía abajo en la pantalla, si el numero es negativo
-     *                 el desplazamiento es hacía arriba.
+     * @param cantidad Si el número es positivo, el desplazamiento es hacia abajo en la pantalla, si el número es negativo
+     *                 el desplazamiento es hacia arriba.
      */
     public void scrollMouse(int cantidad) {
         try {
@@ -1753,11 +1706,11 @@ public class SeleniumUtils {
      * @param driver Driver que está manipulando el navegador
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @param opcion Opcion del elemento que queremos seleccionar
-     * @param comment Comentario que sera colocago sobre la imagen capturada si el Elemento indicado existe
+     * @param comment Comentario que será colocado sobre la imagen capturada si el Elemento indicado existe
      */
-    public void selectOption(SearchContext driver, String element, String opcion, String comment) {
+    public void selectOption(WebDriver driver,SearchContext searchcontext, String element, String opcion, String comment) {
         try {
-            WebElement elemento = obtenerWebElementx2(driver, element);
+            WebElement elemento = obtenerWebElementx2(driver,searchcontext, element);
             if (!Objects.isNull(elemento)) {
                 //Si encuentra el elemento ejecuta este codigo
                 try {
@@ -1788,8 +1741,8 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @param opcion Opcion del elemento que queremos seleccionar
      */
-    public boolean selectOption(SearchContext driver, String element, String opcion) {
-        WebElement elemento = obtenerWebElementx2(driver, element);
+    public boolean selectOption(WebDriver driver,SearchContext searchcontext, String element, String opcion) {
+        WebElement elemento = obtenerWebElementx2(driver,searchcontext, element);
         try {
             if (!Objects.isNull(elemento)) {
                 //Si encuentra el elemento ejecuta este codigo
@@ -1830,9 +1783,9 @@ public class SeleniumUtils {
     }
 
     /***
-     * Obtener el valor booleano de un numero
+     * Obtener el valor booleano de un número
      * @param numero numero que se evaluara
-     * @return si el numero es mayor o igual a uno, retorna true, de lo contrario, retorna false.
+     * @return si el número es mayor o igual a uno, retorna true, de lo contrario, retorna false.
      */
     public boolean getBooleanfromInt(int numero) {
         return numero >= 1;
@@ -1844,13 +1797,13 @@ public class SeleniumUtils {
      * @param frameIDorName Id del frame al que se desea mover el driver
      * @return Si el frame existe y se mueve al mismo, retorna true, de lo contrario retorna false
      */
-    public boolean movetoframeIDorName(WebDriver driver, String frameIDorName) {
+    public boolean movetoframeIDorName(WebDriver driver, SearchContext searchcontext,String frameIDorName) {
         //Se traslada al frame de la transaccion
         threadslepp(500);
         WebElement frame = null;
         int i = 0;
         while (Objects.isNull(frame) && i < 2) {
-            frame = obtenerWebElementx2(driver, frameIDorName);
+            frame = obtenerWebElementx2(driver, searchcontext,frameIDorName);
             i++;
         }
         return movetoframeforwebelement(driver, frame);
