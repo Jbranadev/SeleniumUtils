@@ -122,7 +122,6 @@ public class SeleniumUtils {
      * Función que convierte un array de objetos en un ArrayList de cadenas
      *
      * @param object  El Array de objetos que se desea convertir en cadenas
-     * @param acierto Variable booleana que decide si será un acierto(True) o un fallo (False)
      * @return Un ArrayList que contiene las representaciones en forma de cadena de los objetos
      */
     public static ArrayList<String> convertObjectToArrayString(Object[] object) {
@@ -224,7 +223,8 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
      * @return Retorna True si el elemento Existe, caso contrario retorna False
      */
-    public static Boolean elementExist(WebDriver driver, SearchContext searchContext, String element) {
+    public static Boolean
+    elementExist(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Buscara si existe el elemento indicado: " + element);
@@ -800,7 +800,7 @@ public class SeleniumUtils {
      * @param element Elemento del cual se desea obtener el texto
      * @return Retorna el texto del elemento, si no se puede obtener el texto, retorna una cadena vacía
      */
-    private static String getTextUsingJavaScript(WebDriver driver, WebElement element) {
+    public static String getTextUsingJavaScript(WebDriver driver, WebElement element) {
         try {
             JavascriptExecutor jsExecutor = (JavascriptExecutor) driver; // Asegúrate de tener una instancia válida de WebDriver
             return (String) jsExecutor.executeScript("return arguments[0].textContent", element);
@@ -915,7 +915,7 @@ public class SeleniumUtils {
      * @param by identificador del cual obtendrá el atributo del elemento a buscar
      * @return atributo por medio del cual se filtrara el elemento a buscar
      */
-    private static String getIdentificadorBy(By by) {
+    public static String getIdentificadorBy(By by) {
         String tempelement = by.toString();
         String[] data = tempelement.split(": ");
         String locator = data[0];
@@ -1539,7 +1539,7 @@ public class SeleniumUtils {
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
      * @param driver Web Driver que manipula el navegador
      * @param aceptar Variable booleana que acepta o declina el cuadro de diálogo
-     * Debido a la naturaleza del manejo interno de accept por parte de javascript, la funcion DEBE DE LLAMARSE JUSTO ANTES DE DAR CLIC PARA DISPARAR EL CUADRO DE DIÁLOGO
+     * Debido a la naturaleza del manejo interno de accept por parte de javascript, la funcion DEBE DE LLAMARSE JUSTO ANTES DE DAR CLIC PARA DISPARAR EL CUADRO DE DIALOGO
      */
     public void acceptConfirm(WebDriver driver, boolean aceptar) {
         try {
@@ -1582,7 +1582,7 @@ public class SeleniumUtils {
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
-    public void cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo) {
+    public static void cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
@@ -1604,7 +1604,7 @@ public class SeleniumUtils {
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
-    public void cambiarZOOM(WebDriver driver, int repeticiones, int codigo) {
+    public static void cambiarZOOM(WebDriver driver, int repeticiones, int codigo) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
@@ -1785,7 +1785,7 @@ public class SeleniumUtils {
      * @param numero numero que se evaluara
      * @return si el número es mayor o igual a uno, retorna true, de lo contrario, retorna false.
      */
-    public boolean getBooleanfromInt(int numero) {
+    public static boolean getBooleanfromInt(int numero) {
         return numero >= 1;
     }
 
