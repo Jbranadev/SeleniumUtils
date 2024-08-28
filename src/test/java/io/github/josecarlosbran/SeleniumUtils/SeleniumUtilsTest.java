@@ -25,7 +25,7 @@ public class SeleniumUtilsTest {
         logParrafo("Irá a la pagina principal de Google");
         driver.get("https://www.google.com");
         logParrafo("Verifica que el elemento 'textarea[name='q']' exista en la pagina");
-        Assert.assertTrue(SeleniumUtils.elementExist(driver, driver, "textarea[name='q']"),
+        Assert.assertTrue(SeleniumUtils.ElementoExistente(driver, driver, "textarea[name='q']"),
                 "No fue posible encontrar el elemento 'textarea[name='q']' en la pagina," +
                         "valide el identificador del elemento");
     }
@@ -41,7 +41,7 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "sendKeysToElement")
     public void clearElement() {
         logParrafo("Limpia el elemento de busqueda de Google");
-        Assert.assertTrue(SeleniumUtils.clearElementIfExist(driver, driver, "textarea[name='q']"),
+        Assert.assertTrue(SeleniumUtils.LimpiarElementoExistente(driver, driver, "textarea[name='q']"),
                 "No fue posible limpiar el elemento 'textarea[name='q']' en la pagina," +
                         "valide el identificador del elemento");
     }
