@@ -303,20 +303,20 @@ public class SeleniumParallel {
             boolean exist = false;
             try {
                 //Hace Click sobre el elemento
-                exist= wait.until(new Function<>() {
-                        public Boolean apply(WebDriver driver) {
-                            if (SeleniumUtils.elementIsDisabled(searchContext.findElement(identificador))) {
-                                LogsJB.warning(" El elemento no se encuentra habilitado para hacer click en el " + identificador.toString());
-                                return false;
-                            }
-                            LogsJB.info( " Hace click en el elemento por medio de "+identificador.toString());
-                            boolean result = SeleniumUtils.clickToElement(driver, searchContext.findElement(identificador));
-                            if (!result) {
-                                LogsJB.warning( " No pudo hacer click en el elemento, comuniquese con los administradores ");
-                            }
-                            return true;
+                exist = wait.until(new Function<>() {
+                    public Boolean apply(WebDriver driver) {
+                        if (SeleniumUtils.elementIsDisabled(searchContext.findElement(identificador))) {
+                            LogsJB.warning(" El elemento no se encuentra habilitado para hacer click en el " + identificador.toString());
+                            return false;
                         }
-                    });
+                        LogsJB.info(" Hace click en el elemento por medio de " + identificador.toString());
+                        boolean result = SeleniumUtils.clickToElement(driver, searchContext.findElement(identificador));
+                        if (!result) {
+                            LogsJB.warning(" No pudo hacer click en el elemento, comuniquese con los administradores ");
+                        }
+                        return true;
+                    }
+                });
             } catch (WebDriverException ignored) {
             } catch (Exception e) {
                 LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + identificador.toString());
@@ -329,7 +329,6 @@ public class SeleniumParallel {
         };
         return SeleniumUtils.getSeleniumEjecutor().submit(run);
     }
-
 
     /***
      * Obtiene los elementos si estos existen en el contexto actual
@@ -344,9 +343,9 @@ public class SeleniumParallel {
         Callable<List<WebElement>> run = () -> {
             List<WebElement> elementos = new ArrayList<>();
             try {
-                elementos=wait.until(new Function<>() {
+                elementos = wait.until(new Function<>() {
                     public List<WebElement> apply(WebDriver driver) {
-                        LogsJB.trace( " Obtiene los elementos por medio de "+identificador.toString());
+                        LogsJB.trace(" Obtiene los elementos por medio de " + identificador.toString());
                         return searchContext.findElements(identificador);
                     }
                 });
@@ -363,5 +362,36 @@ public class SeleniumParallel {
         return SeleniumUtils.getSeleniumEjecutor().submit(run);
     }
 
-
+    /***
+     * Obtiene el elemento si este existe en el contexto actual
+     * @param driver Driver que manipula el navegador
+     * @param wait Espera fluida que aplicara la función lambda
+     * @param searchContext Contexto en el que se buscara el elemento en cuestión
+     * @param identificador Identificador del elemento a buscar
+     * @return Retorna un Future<WebElement> con el elemento encontrado, si no se encuentra el elemento o sucede un error
+     * durante la busqueda, se retornara un elemento nulo
+     */
+    static Future<WebElement> getElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CharSequence... Texto) {
+        Callable<WebElement> run = () -> {
+            final WebElement[] elemento = {null};
+            try {
+                wait.until(new Function<WebDriver, Boolean>() {
+                    public Boolean apply(WebDriver driver) {
+                        LogsJB.trace(" Obtiene el elemento por medio de " + identificador.toString());
+                        elemento[0] = searchContext.findElement(identificador);
+                        return true;
+                    }
+                });
+            } catch (WebDriverException ignored) {
+            } catch (Exception e) {
+                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + identificador.toString());
+                LogsJB.fatal("*");
+                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
+                LogsJB.fatal("*");
+            } finally {
+                return elemento[0];
+            }
+        };
+        return SeleniumUtils.getSeleniumEjecutor().submit(run);
+    }
 }
