@@ -5,6 +5,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Wait;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -12,122 +13,6 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 
 public class SeleniumParallel {
-
-    /*
-
-    public void temp(Wait<WebDriver> wait, SearchContext searchContext, By identificador) {
-        Callable<Boolean> run = () -> {
-            try {
-                //Verifica si el Elemento Existe
-                boolean exist = wait.until(new Function<>() {
-                    public Boolean apply(WebDriver driver) {
-                        List<WebElement> elements = searchContext.findElements(identificador);
-                        return !elements.isEmpty();
-                    }
-                });
-                if (exist) {
-                    LogsJB.debug( " Encontro el elemento por medio de "+identificador.toString());
-                }
-
-                //Si el elemento existe lo asígna y lo retornara
-                if (getElementExist()) {
-                    wait.until(new Function<WebDriver, Boolean>() {
-                        public Boolean apply(WebDriver driver) {
-                            utilities.writeLog( " Obtiene el elemento por medio de "+identificador.toString());
-                            setElemento(searchContext.findElement(identificador));
-                            return true;
-                        }
-                    });
-                    setElementos(wait.until(new Function<>() {
-                        public List<WebElement> apply(WebDriver driver) {
-                            utilities.writeLog( " Obtiene los elementos por medio de "+identificador.toString());
-                            return searchContext.findElements(identificador);
-                        }
-                    }));
-                    //Hace Click sobre el elemento
-                    if (!isClick()) {
-                        setClick(wait.until(new Function<>() {
-                            public Boolean apply(WebDriver driver) {
-                                if (utilities.elementIsDisabled(searchContext.findElement(identificador))) {
-                                    utilities.writeLog( " El elemento no se encuentra habilitado");
-                                    return false;
-                                }
-                                utilities.writeLog( " Hace click en el elemento por medio de "+identificador.toString());
-                                boolean result = utilities.clickToElement(searchContext.findElement(identificador));
-                                if (!result) {
-                                    utilities.writeLog( " No pudo hacer click en el elemento, comuniquese con los administradores ");
-                                }
-                                return true;
-                            }
-                        }));
-                    }
-                    //Limpia el elemento
-                    if (!isClearElement()) {
-                        setClearElement(wait.until(new Function<>() {
-                            public Boolean apply(WebDriver driver) {
-                                if (utilities.elementIsDisabled(searchContext.findElement(identificador))) {
-                                    utilities.writeLog( " El elemento no se encuentra habilitado");
-                                    return false;
-                                }
-                                utilities.writeLog( " Limpiando el elemento por medio de "+identificador.toString());
-                                boolean result = utilities.cleanElement(searchContext.findElement(identificador));
-                                if (!result) {
-                                    utilities.writeLog( " No pudo limpiar el elemento, comuniquese con los administradores ");
-                                }
-                                return true;
-                            }
-                        }));
-                    }
-                    //Envia el texto al elemento
-                    if (!isSendKeys()) {
-                        //
-                        setSendKeys(
-                                wait.until(new Function<>() {
-                                    public Boolean apply(WebDriver driver) {
-                                        if (!searchContext.findElement(identificador).isEnabled()) {
-                                            utilities.writeLog( " El elemento no se encuentra habilitado");
-                                            return true;
-                                        }
-                                        utilities.writeLog( " Enviando Texto al elemento por medio de Class Name: " + Arrays.toString(getTextoaenviar()).substring(1, Arrays.toString(getTextoaenviar()).length() - 1));
-                                        boolean result = utilities.sendKeysToElement(searchContext.findElement(identificador), getTextoaenviar());
-                                        if (!result) {
-                                            utilities.writeLog( " No pudo enviar el texto a el elemento, comuniquese con los administradores ");
-                                        }
-                                        return true;
-                                    }
-                                })
-                        );
-                    }
-                    //Obtiene el Texto del Elemento
-                    if (!isObtenerText()) {
-                        setObtenerText(
-                                wait.until(new Function<>() {
-                                    public Boolean apply(WebDriver driver) {
-                                        if (!searchContext.findElement(identificador).isEnabled()) {
-                                            utilities.writeLog( " El elemento no se encuentra habilitado");
-                                            return true;
-                                        }
-                                        setTexto(utilities.getTextOfWebElement(searchContext.findElement(identificador)));
-                                        utilities.writeLog( " Obteniendo el Texto del elemento por medio de Class Name: " + getTexto());
-                                        return true;
-                                    }
-                                })
-                        );
-                    }
-                }
-            } catch (WebDriverException ignored) {
-            } catch (Exception e) {
-                LogsJB.fatal( " Exepcion Capturada - Busquedad por Class Name ");
-                LogsJB.fatal( "*");
-                LogsJB.fatal( " " + ExceptionUtils.getStackTrace(e));
-                LogsJB.fatal( "*");
-            }
-            return true;
-        };
-        SeleniumUtils.getSeleniumEjecutor().submit(run);
-    }
-*/
-
     /***
      * Verifica si el Elemento Existe
      * @param wait Espera fluida que aplicara la función lambda
@@ -283,6 +168,112 @@ public class SeleniumParallel {
                 LogsJB.fatal("*");
             } finally {
                 return result;
+            }
+        };
+        return SeleniumUtils.getSeleniumEjecutor().submit(run);
+    }
+
+    /***
+     * Hace click en el elemento si este existe en el contexto actual
+     * @param driver Driver que manipula el navegador
+     * @param wait Espera fluida que aplicara la función lambda
+     * @param searchContext Contexto en el que se buscara el elemento en cuestión
+     * @param identificador Identificador del elemento al que se le hara click
+     * @return Retorna un Future<Boolean> con el resultado del click, true si hace click en el elemento, false si
+     * no logra hacer click en el elemento o sucede un error durante el click
+     */
+    static Future<Boolean> clickElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador) {
+        Callable<Boolean> run = () -> {
+            boolean exist = false;
+            try {
+                //Hace Click sobre el elemento
+                exist = wait.until(new Function<>() {
+                    public Boolean apply(WebDriver driver) {
+                        if (SeleniumUtils.elementIsDisabled(searchContext.findElement(identificador))) {
+                            LogsJB.warning(" El elemento no se encuentra habilitado para hacer click en el " + identificador.toString());
+                            return false;
+                        }
+                        LogsJB.info(" Hace click en el elemento por medio de " + identificador.toString());
+                        boolean result = SeleniumUtils.clickToElement(driver, searchContext.findElement(identificador));
+                        if (!result) {
+                            LogsJB.warning(" No pudo hacer click en el elemento, comuniquese con los administradores ");
+                        }
+                        return true;
+                    }
+                });
+            } catch (WebDriverException ignored) {
+            } catch (Exception e) {
+                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + identificador.toString());
+                LogsJB.fatal("*");
+                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
+                LogsJB.fatal("*");
+            } finally {
+                return exist;
+            }
+        };
+        return SeleniumUtils.getSeleniumEjecutor().submit(run);
+    }
+
+    /***
+     * Obtiene los elementos si estos existen en el contexto actual
+     * @param driver Driver que manipula el navegador
+     * @param wait Espera fluida que aplicara la función lambda
+     * @param searchContext Contexto en el que se buscara el elemento en cuestión
+     * @param identificador Identificador de los elementos a buscar
+     * @return Retorna un Future<List<WebElement>> con los elementos encontrados, si no se encuentran elementos o sucede un error
+     * durante la busqueda, se retornara una lista vacia
+     */
+    static Future<List<WebElement>> getElementsIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CharSequence... Texto) {
+        Callable<List<WebElement>> run = () -> {
+            List<WebElement> elementos = new ArrayList<>();
+            try {
+                elementos = wait.until(new Function<>() {
+                    public List<WebElement> apply(WebDriver driver) {
+                        LogsJB.trace(" Obtiene los elementos por medio de " + identificador.toString());
+                        return searchContext.findElements(identificador);
+                    }
+                });
+            } catch (WebDriverException ignored) {
+            } catch (Exception e) {
+                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + identificador.toString());
+                LogsJB.fatal("*");
+                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
+                LogsJB.fatal("*");
+            } finally {
+                return elementos;
+            }
+        };
+        return SeleniumUtils.getSeleniumEjecutor().submit(run);
+    }
+
+    /***
+     * Obtiene el elemento si este existe en el contexto actual
+     * @param driver Driver que manipula el navegador
+     * @param wait Espera fluida que aplicara la función lambda
+     * @param searchContext Contexto en el que se buscara el elemento en cuestión
+     * @param identificador Identificador del elemento a buscar
+     * @return Retorna un Future<WebElement> con el elemento encontrado, si no se encuentra el elemento o sucede un error
+     * durante la busqueda, se retornara un elemento nulo
+     */
+    static Future<WebElement> getElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CharSequence... Texto) {
+        Callable<WebElement> run = () -> {
+            final WebElement[] elemento = {null};
+            try {
+                wait.until(new Function<WebDriver, Boolean>() {
+                    public Boolean apply(WebDriver driver) {
+                        LogsJB.trace(" Obtiene el elemento por medio de " + identificador.toString());
+                        elemento[0] = searchContext.findElement(identificador);
+                        return true;
+                    }
+                });
+            } catch (WebDriverException ignored) {
+            } catch (Exception e) {
+                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + identificador.toString());
+                LogsJB.fatal("*");
+                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
+                LogsJB.fatal("*");
+            } finally {
+                return elemento[0];
             }
         };
         return SeleniumUtils.getSeleniumEjecutor().submit(run);
