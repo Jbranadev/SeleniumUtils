@@ -122,11 +122,10 @@ public class SeleniumUtils {
      * Función que convierte un array de objetos en un ArrayList de cadenas
      *
      * @param object  El Array de objetos que se desea convertit en cadenas
-     * @param acierto Variable booleana que decide si será un acierto(True) o un fallo (False)
      * @return Un ArrayList que contiene las representaciones en forma de cadena de los objetos
      */
-    public static ArrayList<String> convertObjectToArrayString(Object[] object, Boolean acierto) {
-        if (acierto) {
+    public static ArrayList<String> convertObjectToArrayString(Object[] object) {
+
             try {
                 ArrayList<String> array = new ArrayList<>();
                 for (Object o : object) {
@@ -138,9 +137,7 @@ public class SeleniumUtils {
                 LogsJB.fatal(e.getMessage());
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
-        } else {
-            LogsJB.fatal("error al parsear el Objeto object a strings");
-        }
+
         return null;
     }
 
@@ -406,7 +403,7 @@ public class SeleniumUtils {
      * @param elementScreenshot Elemento sobre el cual se desea tomar la captura de pantalla
      * @return Retorna un objeto File que representa la captura de pantalla del elemento, si no logra tomar la captura de pantalla retorna null
      */
-    private static File getImageScreeenshotWebElement(WebDriver driver, WebElement elementScreenshot) {
+    public static File getImageScreeenshotWebElement(WebDriver driver, WebElement elementScreenshot) {
         try {
             if (!Objects.isNull(elementScreenshot)) {
                 String tempelement = SeleniumUtils.RefreshReferenceToElement(driver, elementScreenshot).toString().split(" -> ")[1];
@@ -454,7 +451,7 @@ public class SeleniumUtils {
      * @param elemento Elemento a refrescar
      * @return null si no logra refrescar el elemento, caso contrario la referencia al elemento
      */
-    private static WebElement RefreshReferenceToElement(WebDriver driver, WebElement elemento) {
+    public static WebElement RefreshReferenceToElement(WebDriver driver, WebElement elemento) {
         try {
             if (!Objects.isNull(elemento)) {
                 String tempelement = elemento.toString().split(" -> ")[1];

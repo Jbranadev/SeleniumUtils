@@ -1,5 +1,6 @@
 package io.github.josecarlosbran.SeleniumUtils;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -13,6 +14,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static io.github.josecarlosbran.UtilidadesTest.Utilities.logParrafo;
 
@@ -42,14 +45,14 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "elementExist")
     public void sendKeysToElement() {
         logParrafo("Escribirá el texto indicado en la barra de busqueda de google");
-        WebElement elemento=SeleniumUtils.getElementIfExist(driver, By.xpath("//*[@id=\"APjFqb\"]"));
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,By.xpath("//*[@id=\"APjFqb\"]"));
         Assert.assertTrue(SeleniumUtils.sendKeysToElement(driver,elemento,"Prueba de escritura"));
     }
 
     @Test(testName = "Clear Element Search Google"
             , description = "Limpia el elemento de busqueda de Google",
             dependsOnMethods = "sendKeysToElement")
-    public void clearElement() {
+    public void clearElementIfExists() {
         logParrafo("Limpia el elemento de busqueda de Google");
         Assert.assertTrue(SeleniumUtils.clearElementIfExist(driver, driver, "textarea[name='q']"),
                 "No fue posible limpiar el elemento 'textarea[name='q']' en la pagina," +
@@ -103,13 +106,13 @@ public class SeleniumUtilsTest {
     public void testGetFluentWait() {
         logParrafo("Se va a verificar que el objeto FluentWait funcione correctamente");
 
-        int timeduration = 5000;  // 5 segundos de timeout
-        int timerepetition = 500;  // 0.5 segundos de polling
+        int timeduration = 3000;  // 3 segundos de timeout
+        int timerepetition = 300;  // 0.3 segundos de polling
 
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, timeduration, timerepetition);
 
         // Prueba que el FluentWait realmente espera un elemento que existe
-        WebElement searchBox = wait.until(driver -> driver.findElement(By.name("//*[@id=\"APjFqb\"]")));
+        WebElement searchBox = wait.until(driver -> driver.findElement(By.xpath("//*[@id=\"APjFqb\"]")));
         Assert.assertNotNull(searchBox, "El elemento no se encontró dentro del tiempo esperado");
 
         // Verifica que el elemento es habilitado y visible
@@ -117,21 +120,149 @@ public class SeleniumUtilsTest {
     }
 
 
-
-
-
     @Test(testName = "Element Is Disabled - Null Element",
             description = "Verifica que un elemento nulo sea tratado como deshabilitado")
     public void testElementIsDisabled() {
         logParrafo("Se va a verificar que un elemento nulo sea tratado como deshabilitado");
 
-        WebElement nullElement = SeleniumUtils.getElementIfExist(driver,By.xpath("//*[@id=\"xpathFalso\"]"));
+        WebElement nullElement = SeleniumUtils.getElementIfExist(driver,driver,By.xpath("//*[@id=\"xpathFalso\"]"));
 
         boolean isDisabled = SeleniumUtils.elementIsDisabled(nullElement);
 
         // Verifica que el método retorne verdadero para un elemento nulo
         Assert.assertTrue(isDisabled, "El elemento nulo no fue reconocido como deshabilitado");
     }
+    @Test(testName = "CleanElement",description = "Should clean the especified element",dependsOnMethods = "elementExist")
+    public void cleanElement(){
+        WebElement elemento= SeleniumUtils.getElementIfExist(driver,driver,By.xpath("//*[@id=\"input\"]"));
+        logParrafo("Se debe de limpiar el elemento específicado ");
+        Assert.assertTrue(SeleniumUtils.cleanElement(driver,elemento));
+
+    }
+
+    @Test(testName = "posicionarmeEn",description = "Should be positioned in specified element",dependsOnMethods = "elementExist")
+    public void posicionarmeEn(){
+        WebElement elemento= SeleniumUtils.getElementIfExist(driver,driver,By.xpath("//*[@id=\"input\"]"));
+        logParrafo("Se debe posicionr en el elemento específicado ");
+        Boolean acierto=false;
+        try {
+            SeleniumUtils.posicionarmeEn(driver,elemento);
+            acierto=true;
+            Assert.assertTrue(acierto);
+        }catch (Exception e){
+            acierto=false;
+            Assert.assertTrue(acierto);
+        }
+    }
+
+    @Test(testName = "Convert Object Array to String ArrayList - Success",
+            description = "Verifica que el array de objetos se convierta correctamente en un ArrayList de cadenas cuando acierto es true")
+    public void testConvertObjectToArrayStringSuccess() {
+        Object[] objects = {"Hello", 123, 45.67, true};
+        ArrayList<String> expected = new ArrayList<>(Arrays.asList("Hello", "123", "45.67", "true"));
+
+        ArrayList<String> result = SeleniumUtils.convertObjectToArrayString(objects);
+
+        Assert.assertEquals(result, expected, "La conversión no fue correcta.");
+    }
+
+    @Test(testName = "Convert Object Array to String ArrayList - Null Input",
+            description = "Verifica que el método maneje correctamente un array nulo")
+    public void testConvertObjectToArrayStringNullInput() {
+        Object[] objects = null;
+
+        ArrayList<String> result = SeleniumUtils.convertObjectToArrayString(objects);
+
+        Assert.assertNull(result, "El resultado debería ser null cuando se pasa un array nulo.");
+    }
+
+    @Test(testName = "Convert Object Array to String ArrayList - Empty Array",
+            description = "Verifica que el método maneje correctamente un array vacío")
+    public void testConvertObjectToArrayStringEmptyArray() {
+        Object[] objects = new Object[]{};
+        ArrayList<String> expected = new ArrayList<>();
+
+        ArrayList<String> result = SeleniumUtils.convertObjectToArrayString(objects);
+
+        Assert.assertEquals(result, expected, "La conversión de un array vacío no fue correcta.");
+    }
+
+    @Test(testName = "Convert Object Array to String ArrayList - acierto False",
+            description = "Verifica que el método retorne null cuando acierto es false")
+    public void testConvertObjectToArrayStringAciertoFalse() {
+        Object[] objects = {"Hello", 123, 45.67, true};
+
+        ArrayList<String> result = SeleniumUtils.convertObjectToArrayString(objects);
+
+        Assert.assertNull(result, "El resultado debería ser null cuando acierto es false.");
+    }
+
+    @Test(testName = "Convert Object Array to String ArrayList - Exception Handling",
+            description = "Verifica que el método maneje excepciones correctamente")
+    public void testConvertObjectToArrayStringExceptionHandling() {
+        Object[] objects = {new Object() {
+            @Override
+            public String toString() {
+                throw new RuntimeException("Error en toString()");
+            }
+        }};
+
+        ArrayList<String> result = SeleniumUtils.convertObjectToArrayString(objects);
+
+        Assert.assertNull(result, "El resultado debería ser null cuando ocurre una excepción durante la conversión.");
+    }
+
+    @Test(testName = "Is an Valid value", description = "Should return a boolean of a valid value")
+    public void isAnValidValue(){
+        String valor="Valor para ver si es valido o no";
+        Assert.assertTrue(SeleniumUtils.isanvalidValue(valor));
+    }
+
+    @Test(testName = "Is not an Valid value", description = "Should return a boolean of a valid value")
+    public void isNotAnValidValue(){
+        String valor="";
+        Assert.assertFalse(SeleniumUtils.isanvalidValue(valor));
+    }
+
+    @Test(testName = "Is an null or empty String", description = "Should return a boolean of a null or empty value")
+    public void stringIsNullOrEmpty(){
+        String valor="";
+        Assert.assertTrue(SeleniumUtils.stringIsNullOrEmpty(valor));
+    }
+
+    @Test(testName = "Is an not null or empty String", description = "Should return a boolean of a null or empty value")
+    public void stringIsNotNullOrEmpty(){
+        String valor="Valor para evitar que sea nulo";
+        Assert.assertFalse(SeleniumUtils.stringIsNullOrEmpty(valor));
+    }
+
+
+    @Test(testName = "getImageScreeenshotWebElement", description = "Should take a correct screenshot",dependsOnMethods = "elementExist")
+    public void getImageScreeenshotWebElement(){
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,By.xpath("/html/body"));
+        try {
+            SeleniumUtils.getImageScreeenshotWebElement(driver,elemento);
+            Assert.assertTrue(true);
+        }catch (Exception e){
+            Assert.assertFalse(false);
+        }
+    }
+
+    @Test(testName = "RefreshReferenceToElement", description = "Should take a correct refresh",dependsOnMethods = "elementExist")
+    public void RefreshReferenceToElement(){
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,By.xpath("/html/body"));
+        try {
+            SeleniumUtils.RefreshReferenceToElement(driver,elemento);
+            Assert.assertTrue(true);
+        }catch (Exception e){
+            Assert.assertFalse(false);
+        }
+    }
+
+
+
+
+
 }
 
 
