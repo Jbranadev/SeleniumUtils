@@ -5,6 +5,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Wait;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -287,4 +288,80 @@ public class SeleniumParallel {
         };
         return SeleniumUtils.getSeleniumEjecutor().submit(run);
     }
+
+    /***
+     * Hace click en el elemento si este existe en el contexto actual
+     * @param driver Driver que manipula el navegador
+     * @param wait Espera fluida que aplicara la función lambda
+     * @param searchContext Contexto en el que se buscara el elemento en cuestión
+     * @param identificador Identificador del elemento al que se le hara click
+     * @return Retorna un Future<Boolean> con el resultado del click, true si hace click en el elemento, false si
+     * no logra hacer click en el elemento o sucede un error durante el click
+     */
+    static Future<Boolean> clickElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador) {
+        Callable<Boolean> run = () -> {
+            boolean exist = false;
+            try {
+                //Hace Click sobre el elemento
+                exist= wait.until(new Function<>() {
+                        public Boolean apply(WebDriver driver) {
+                            if (SeleniumUtils.elementIsDisabled(searchContext.findElement(identificador))) {
+                                LogsJB.warning(" El elemento no se encuentra habilitado para hacer click en el " + identificador.toString());
+                                return false;
+                            }
+                            LogsJB.info( " Hace click en el elemento por medio de "+identificador.toString());
+                            boolean result = SeleniumUtils.clickToElement(driver, searchContext.findElement(identificador));
+                            if (!result) {
+                                LogsJB.warning( " No pudo hacer click en el elemento, comuniquese con los administradores ");
+                            }
+                            return true;
+                        }
+                    });
+            } catch (WebDriverException ignored) {
+            } catch (Exception e) {
+                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + identificador.toString());
+                LogsJB.fatal("*");
+                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
+                LogsJB.fatal("*");
+            } finally {
+                return exist;
+            }
+        };
+        return SeleniumUtils.getSeleniumEjecutor().submit(run);
+    }
+
+
+    /***
+     * Obtiene los elementos si estos existen en el contexto actual
+     * @param driver Driver que manipula el navegador
+     * @param wait Espera fluida que aplicara la función lambda
+     * @param searchContext Contexto en el que se buscara el elemento en cuestión
+     * @param identificador Identificador de los elementos a buscar
+     * @return Retorna un Future<List<WebElement>> con los elementos encontrados, si no se encuentran elementos o sucede un error
+     * durante la busqueda, se retornara una lista vacia
+     */
+    static Future<List<WebElement>> getElementsIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CharSequence... Texto) {
+        Callable<List<WebElement>> run = () -> {
+            List<WebElement> elementos = new ArrayList<>();
+            try {
+                elementos=wait.until(new Function<>() {
+                    public List<WebElement> apply(WebDriver driver) {
+                        LogsJB.trace( " Obtiene los elementos por medio de "+identificador.toString());
+                        return searchContext.findElements(identificador);
+                    }
+                });
+            } catch (WebDriverException ignored) {
+            } catch (Exception e) {
+                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + identificador.toString());
+                LogsJB.fatal("*");
+                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
+                LogsJB.fatal("*");
+            } finally {
+                return elementos;
+            }
+        };
+        return SeleniumUtils.getSeleniumEjecutor().submit(run);
+    }
+
+
 }
