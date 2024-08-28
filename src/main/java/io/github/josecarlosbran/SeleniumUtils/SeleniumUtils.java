@@ -1041,7 +1041,6 @@ public class SeleniumUtils {
         //Retorna null si el elemento no Existe
         return elementos;
     }
-
     /***
      * Presiona la tecla indicada en el condigo numerico indicado
      * @param codigo Codigo numerico de la tecla que queremos presionar
