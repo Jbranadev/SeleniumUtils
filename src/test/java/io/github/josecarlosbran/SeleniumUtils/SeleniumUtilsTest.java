@@ -400,10 +400,6 @@ public class SeleniumUtilsTest {
         respuesta=SeleniumUtils.getIdentificadorBy(By.xpath("//*[@id=\"APjFqb\"]"));
         Assert.assertFalse(respuesta.isEmpty());
     }
-    @Test(testName = "waitImplicity",description = "Debería de esperar a que cargue un elemento web de la pagina especificada ",dependsOnMethods = "elementExist")
-    public void waitImplicity(){
-
-    }
 
     @Test(testName = "getBooleanfromIntTrue",description = "Debería de retornar el valor booleano de un numero entero")
     public void getBooleanfromIntTrue(){
@@ -496,6 +492,41 @@ public class SeleniumUtilsTest {
 
     }
 
+    @Test(testName = "FrameActivo",description = "Obtiene el frame activo",dependsOnMethods = "elementExist")
+    public void FrameActivo(){
+        logParrafo("Se busca un elemento web FRAME a traves de JS para verificar si esta activo");
+        boolean exito = false;
+        exito = SeleniumUtils.FrameActivo(driver);
+        if (exito){
+            Assert.assertTrue(exito);
+        }else{
+            Assert.assertFalse(exito);
+        }
+    }
+
+    @Test(testName = "CambiarFrame",description = "Cambia de frame al enviado",dependsOnMethods = "elementExist")
+    public void CambiarFrame(){
+        logParrafo("Se busca un elemento web FRAME y se coloca como activo");
+        boolean exito = false;
+        exito = SeleniumUtils.CambiarFrame(driver,driver,"hfcr");
+        if (exito){
+            Assert.assertTrue(exito);
+        }else{
+            Assert.assertFalse(exito);
+        }
+    }
+
+    @Test(testName = "waitImplicity",description = "Cambia de frame al enviado",dependsOnMethods = "elementExist")
+    public void waitImplicity(){
+        logParrafo("Espera a que apareza el elemento deseado");
+        boolean exito = false;
+        exito = SeleniumUtils.waitImplicity(driver,By.id("hfcr"));
+        if (exito){
+            Assert.assertTrue(exito);
+        }else{
+            Assert.assertFalse(exito);
+        }
+    }
 
 
 
