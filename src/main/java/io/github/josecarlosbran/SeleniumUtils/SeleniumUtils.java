@@ -925,8 +925,9 @@ public class SeleniumUtils {
      *
      * @param driver Driver que está manipulando el navegador
      * @param by     Identificador del tipo By
+     * @return
      */
-    public static void waitImplicity(WebDriver driver, By by) {
+    public static boolean waitImplicity(WebDriver driver, By by) {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
             wait.until(driver1 -> !ElementoDeshabilitado(driver1.findElement(by)));
@@ -942,6 +943,7 @@ public class SeleniumUtils {
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
         }
+        return false;
     }
 
     /***
@@ -1357,10 +1359,11 @@ public class SeleniumUtils {
      *
      * @param driver WebDriver es el que se estáblecera el marco actual
      */
-    public static void FrameActivo(WebDriver driver) {
+    public static boolean FrameActivo(WebDriver driver) {
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-        String currentFrame = (String) jsExecutor.executeScript("return self.name");
+        String currentFrame = (String) jsExecutor.executeScript("return self.frameElement ? self.frameElement.id : ''");
         LogsJB.info("Frame: " + currentFrame);
+        return !currentFrame.isEmpty();
     }
 
     /**
@@ -1369,9 +1372,10 @@ public class SeleniumUtils {
      * @param driver WebDriver es el que cambiará el contexto al marco especificado
      * @param frame  Identificador del marco al que se desea cambiar
      */
-    public static void CambiarFrame(WebDriver driver, SearchContext searchcontext,String frame) {
+    public static boolean CambiarFrame(WebDriver driver, SearchContext searchcontext,String frame) {
         WebElement iframe = SeleniumUtils.obtenerWebElementx2(driver, searchcontext,"#" + frame);
         driver.switchTo().frame(iframe);
+        return !iframe.isEnabled();
     }
 
     /**
@@ -1489,7 +1493,7 @@ public class SeleniumUtils {
      * @param wait Wait espera predeterminada
      * @param by   Identificador del tipo By
      */
-    public void waitImplicity(WebDriverWait wait, By by) {
+    public static void waitImplicity(WebDriverWait wait, By by) {
         try {
             wait.until(driver -> driver.findElement(by).isDisplayed() || driver.findElement(by).isEnabled());
         } catch (TimeoutException ignored) {
@@ -1505,6 +1509,7 @@ public class SeleniumUtils {
             Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
         }
     }
+
 
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
