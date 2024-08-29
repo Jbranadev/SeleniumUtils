@@ -5,6 +5,7 @@ import com.josebran.LogsJB.LogsJB;
 import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
@@ -16,10 +17,7 @@ import org.testng.annotations.Test;
 import java.nio.channels.SeekableByteChannel;
 import java.security.Key;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.Future;
 
 
@@ -422,31 +420,80 @@ public class SeleniumUtilsTest {
     @Test(testName = "cambiarZoomPlus",description = "Debería de aumentar el zoom de la pagina que se está visualizando",dependsOnMethods = "elementExist")
     public void cambiarZoomPlus(){
         logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
-        SeleniumUtils.cambiarZOOM(driver,2, Keys.ADD);
+        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver,2, Keys.ADD));
     }
 
     @Test(testName = "cambiarZoomLess",description = "Debería de disminuir el zoom de la pagina que se está visualizando",dependsOnMethods = "elementExist")
     public void cambiarZoomLess(){
         logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
-        SeleniumUtils.cambiarZOOM(driver,2, Keys.SUBTRACT);
+        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver,2, Keys.SUBTRACT));
     }
 
     @Test(testName = "cambiarZoomPlus",description = "Debería de aumentar el zoom de la pagina que se está visualizando",dependsOnMethods = "elementExist")
     public void cambiarZoomPlusCodigoEntero(){
         logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
-        SeleniumUtils.cambiarZOOM(driver,2, 2);
+        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver,2, 2));
+
     }
 
     @Test(testName = "cambiarZoomLess",description = "Debería de disminuir el zoom de la pagina que se está visualizando",dependsOnMethods = "elementExist")
     public void cambiarZoomLessCodigoEntero(){
         logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
-        SeleniumUtils.cambiarZOOM(driver,2, 2);
+        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver,2, 2));
     }
 
     @Test(testName = "cambiarZOOMMenos",description = "Debería de disminuir el zoom de la pagina que se está visualizando",dependsOnMethods = "elementExist")
     public void cambiarZOOMMenos(){
         logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
-        SeleniumUtils.cambiarZOOM(driver,2, 2);
+        Assert.assertTrue(SeleniumUtils.cambiarZOOMMenos(driver,2));
+    }
+
+    @Test(testName = "cambiarZOOMMas",description = "Debería de aumentar el zoom de la pagina que se está visualizando",dependsOnMethods = "elementExist")
+    public void cambiarZoomMas(){
+        logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
+        Assert.assertTrue(SeleniumUtils.cambiarZOOMMas(driver,2));
+    }
+
+    @Test(testName = "scrollMouse",description = "Debería de hacer scroll con el mouse",dependsOnMethods = "elementExist")
+    public void scrollMouse(){
+        logParrafo("Se hará Scroll con el mouse por medio de Selenium");
+        Assert.assertTrue(SeleniumUtils.scrollMouse(2));
+
+    }
+
+    @Test(testName = "scrollMouseDown",description = "Debería de hacer scroll con el mouse hacia abajo",dependsOnMethods = "elementExist")
+    public void scrollMouseDown(){
+        logParrafo("Se hará Scroll hacia abajo con el mouse por medio de Selenium");
+        Assert.assertTrue(SeleniumUtils.scrollMouseDown(driver,2));
+
+    }
+
+    @Test(testName = "scrollMouseUp",description = "Debería de hacer scroll con el mouse hacia arriba",dependsOnMethods = "elementExist")
+    public void scrollMouseUp(){
+        logParrafo("Se hará Scroll hacia arriba con el mouse por medio de Selenium");
+        Assert.assertTrue(SeleniumUtils.scrollMouseUp(driver,2));
+
+    }
+
+    @Test(testName = "selectOptionWithoutComment",description = "Debería de seleccionar la opcion de un select",dependsOnMethods = "elementExist")
+    public void selectOptionWithoutComment(){
+        logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
+        Boolean respuesta=false;
+        respuesta=SeleniumUtils.selectOption(driver,driver,"elemento","opcion","comentario");
+        Assert.assertTrue(respuesta);
+    }
+
+    @Test(testName = "getElementIfExist",description = "Debería de obtener un elemento web si existe",dependsOnMethods = "elementExist")
+    public void getElementIfExist(){
+        logParrafo("Se busca un elemento web para verificar si existe. Si existe, se obtiene su información");
+        List<WebElement> respuesta=SeleniumUtils.getElementsIfExist(driver,driver,"/html/body/div[1]/div[6]/div[1]");
+        Boolean exito=false;
+        if(!respuesta.isEmpty()){
+            exito=true;
+        }
+
+        Assert.assertTrue(exito);
+
     }
 
 
