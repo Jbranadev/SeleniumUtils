@@ -1581,8 +1581,9 @@ public class SeleniumUtils {
      * Presiona la tecla indicada en él condigo numerico indicado
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
+     * @return
      */
-    public static void cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo) {
+    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
@@ -1592,10 +1593,13 @@ public class SeleniumUtils {
                 LogsJB.info("Suelta la tecla: " + codigo);
                 threadslepp(100);
             }
+            return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
+            return false;
+
         }
     }
 
@@ -1603,8 +1607,9 @@ public class SeleniumUtils {
      * Presiona la tecla indicada en él condigo numerico indicado
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
+     * @return
      */
-    public static void cambiarZOOM(WebDriver driver, int repeticiones, int codigo) {
+    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, int codigo) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
@@ -1615,11 +1620,14 @@ public class SeleniumUtils {
                 LogsJB.info("Suelta la tecla: " + codigo);
                 threadslepp(100);
             }
+            return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
+            return false;
         }
+
     }
 
     /***
@@ -1629,14 +1637,30 @@ public class SeleniumUtils {
      * Presiona la tecla indicada en él condigo numerico indicado
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      *
+     * @return
      */
-    public void cambiarZOOMMenos(WebDriver driver, int repeticiones) {
+    public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones) {
         try {
             cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
+            return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
+            return false;
+
+        }
+    }
+
+    public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones) {
+        try {
+            cambiarZOOM(driver, repeticiones, Keys.ADD);
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            Assert.fail("Error inesperado al presionar una tecla: ");
+            return false;
         }
     }
 
@@ -1646,7 +1670,7 @@ public class SeleniumUtils {
      * @param cantidad Si el número es positivo, el desplazamiento es hacia abajo en la pantalla, si el número es negativo
      *                 el desplazamiento es hacia arriba.
      */
-    public void scrollMouse(int cantidad) {
+    public static boolean scrollMouse(int cantidad) {
         try {
             Robot robot = new Robot();
             int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
@@ -1656,10 +1680,12 @@ public class SeleniumUtils {
             robot.mouseWheel(cantidad);
             LogsJB.info("Se realizo el movimiento del scroll: ");
             threadslepp(100);
+            return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al intentar realizar el scroll: ");
+            return false;
         }
     }
 
@@ -1668,16 +1694,18 @@ public class SeleniumUtils {
      *
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
      */
-    public void scrollMouseDown(WebDriver driver, int cantidadScrolls) {
+    public static boolean scrollMouseDown(WebDriver driver, int cantidadScrolls) {
         try {
             Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
                 actions.sendKeys(Keys.PAGE_DOWN).build().perform();
             }
+            return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al intentar realizar el scroll: ");
+            return false;
         }
     }
 
@@ -1686,16 +1714,18 @@ public class SeleniumUtils {
      *
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
      */
-    public void scrollMouseUp(WebDriver driver, int cantidadScrolls) {
+    public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls) {
         try {
             Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
                 actions.sendKeys(Keys.PAGE_UP).build().perform();
             }
+            return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al intentar realizar el scroll: ");
+            return false;
         }
     }
 
@@ -1706,7 +1736,7 @@ public class SeleniumUtils {
      * @param opcion Opcion del elemento que queremos seleccionar
      * @param comment Comentario que será colocado sobre la imagen capturada si el Elemento indicado existe
      */
-    public void selectOption(WebDriver driver,SearchContext searchcontext, String element, String opcion, String comment) {
+    public static boolean selectOption(WebDriver driver,SearchContext searchcontext, String element, String opcion, String comment) {
         try {
             WebElement elemento = obtenerWebElementx2(driver,searchcontext, element);
             if (!Objects.isNull(elemento)) {
@@ -1725,11 +1755,12 @@ public class SeleniumUtils {
                 }
             } else {
                 LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
-            }
+            }return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al seleccionar el elemento: " + element);
+            return false;
         }
     }
 
