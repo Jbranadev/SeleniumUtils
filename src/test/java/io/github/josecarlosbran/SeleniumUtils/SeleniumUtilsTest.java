@@ -475,7 +475,16 @@ public class SeleniumUtilsTest {
 
     }
 
-    @Test(testName = "selectOptionWithoutComment",description = "Debería de seleccionar la opcion de un select",dependsOnMethods = "elementExist")
+    @Test(testName = "selectOptionWithComment",description = "Debería de seleccionar la opcion de un select",dependsOnMethods = "elementExist")
+    public void selectOptionWithComment(){
+        logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
+        Boolean respuesta=false;
+        respuesta=SeleniumUtils.selectOption(driver,driver,"elemento","opcion","comentario");
+        Assert.assertTrue(respuesta);
+    }
+
+
+    @Test(testName = "selectOptionWithComment",description = "Debería de seleccionar la opcion de un select con comentario",dependsOnMethods = "elementExist")
     public void selectOptionWithoutComment(){
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
         Boolean respuesta=false;
@@ -495,6 +504,43 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(exito);
 
     }
+
+
+    public void simularConfirmJavascript(){
+        JavascriptExecutor js=(JavascriptExecutor) driver;
+        js.executeScript("confirm('hola')");
+    }
+
+    public void simularAlertJavascript(){
+        JavascriptExecutor js=(JavascriptExecutor) driver;
+        js.executeScript("alert('hola')");
+    }
+    @Test(testName = "acceptConfirmTest",description = "Se debe de aceptar el cuadro de dialogo que se dispara",dependsOnMethods = "elementExist")
+    public void acceptConfirmTest(){
+        boolean respuesta=false;
+        respuesta=SeleniumUtils.acceptConfirm(driver,true);
+        simularConfirmJavascript();
+        Assert.assertTrue(respuesta);
+    }
+
+    @Test(testName = "acceptConfirmTestHanddleError",description = "Se debe disparar un error al aceptar el cuadro de dialogo que se dispara",dependsOnMethods = "elementExist")
+    public void acceptConfirmTestHanddleError(){
+        boolean respuesta=false;
+        respuesta=SeleniumUtils.acceptConfirm(driver,true);
+        //simularConfirmJavascript();
+        Assert.assertTrue(respuesta);
+    }
+
+    @Test(testName = "acceptAlertTestWithErrors",description = "Se debe de aceptar el cuadro de dialogo que se dispara",dependsOnMethods = "elementExist")
+    public void acceptAlertTest(){
+        simularAlertJavascript();
+        Assert.assertFalse(SeleniumUtils.acceptAlert(driver));
+
+    }
+
+
+
+
 
 
 

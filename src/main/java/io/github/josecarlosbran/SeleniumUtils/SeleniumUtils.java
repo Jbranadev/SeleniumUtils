@@ -1384,36 +1384,7 @@ public class SeleniumUtils {
         driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
     }
 
-    /***
-     * Hace clic en el elemento proporcionado por el metodo estandar de selenium, si no puede hacer clic, intenta hacer clic por medio de JavaScript
-     * @param driver Driver que está controlando el navegador
-     * @param element Elemento al que se desea hacer clic
-     * @return Retorna True si logra hacer clic en el elemento, de lo contrario retorna False
-     */
-    public static boolean clickToElement(WebDriver driver, WebElement element) {
-        try {
-            if (Objects.isNull(element)) {
-                LogsJB.fatal("El elemento es nulo. No se puede hacer clic.");
-                return false;
-            }
-            try {
-                SeleniumUtils.posicionarmeEn(driver, element);
-                element.click();
-                LogsJB.info("Hizo clic en el elemento directamente.");
-                return true;
-            } catch (WebDriverException e) {
-                LogsJB.error("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
-                JavascriptExecutor js = (JavascriptExecutor) driver;
-                js.executeScript("arguments[0].click();", element);
-                LogsJB.info("Hizo clic en el elemento por medio de JavaScript.");
-                return true;
-            }
-        } catch (Exception e) {
-            LogsJB.fatal("Excepción capturada al intentar hacer clic en el elemento: " + element.toString());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            return false;
-        }
-    }
+
 
     /***
      * Mueve el navegador a la tab que está recibiendo como parametro
@@ -1541,15 +1512,18 @@ public class SeleniumUtils {
      * @param aceptar Variable booleana que acepta o declina el cuadro de diálogo
      * Debido a la naturaleza del manejo interno de accept por parte de javascript, la funcion DEBE DE LLAMARSE JUSTO ANTES DE DAR CLIC PARA DISPARAR EL CUADRO DE DIALOGO
      */
-    public void acceptConfirm(WebDriver driver, boolean aceptar) {
+    public static boolean acceptConfirm(WebDriver driver, boolean aceptar) {
         try {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.confirm=function(){return " + aceptar + "}");
+            return true;
         } catch (WebDriverException e) {
             LogsJB.fatal("Error WebDriver al interactuar con la alerta: " + e.getMessage());
+            return false;
             // Puedes agregar más manejo de excepciones específicas según sea necesario
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
+            return false;
         }
     }
 
@@ -1557,23 +1531,27 @@ public class SeleniumUtils {
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
      * @param driver Web Driver que manipula el navegador
      */
-    public void acceptAlert(WebDriver driver) {
+    public static boolean acceptAlert(WebDriver driver) {
         try {
             Wait wait = getFluentWait(driver, 5000, 100);
             Alert alert = (Alert) wait.until(ExpectedConditions.alertIsPresent());
             String text = alert.getText();
             LogsJB.info(text);
             alert.accept();
+            return true;
         } catch (java.util.NoSuchElementException e) {
             // Manejar la falta de alerta específica si es necesario
             LogsJB.fatal("No se encontró ninguna alerta presente.");
             JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
             jsExecutor.executeScript("window.alert = function() {};");
+            return false;
         } catch (WebDriverException e) {
             LogsJB.fatal("Error WebDriver al interactuar con la alerta: " + e.getMessage());
+            return false;
             // Puedes agregar más manejo de excepciones específicas según sea necesario
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
+            return false;
         }
     }
 
@@ -1770,7 +1748,7 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @param opcion Opcion del elemento que queremos seleccionar
      */
-    public boolean selectOption(WebDriver driver,SearchContext searchcontext, String element, String opcion) {
+    public static boolean selectOption(WebDriver driver,SearchContext searchcontext, String element, String opcion) {
         WebElement elemento = obtenerWebElementx2(driver,searchcontext, element);
         try {
             if (!Objects.isNull(elemento)) {
@@ -1837,4 +1815,37 @@ public class SeleniumUtils {
         }
         return movetoframeforwebelement(driver, frame);
     }
+
+    /***
+     * Hace clic en el elemento proporcionado por el metodo estandar de selenium, si no puede hacer clic, intenta hacer clic por medio de JavaScript
+     * @param driver Driver que está controlando el navegador
+     * @param element Elemento al que se desea hacer clic
+     * @return Retorna True si logra hacer clic en el elemento, de lo contrario retorna False
+     */
+    public static boolean clickToElement(WebDriver driver, WebElement element) {
+        try {
+            if (Objects.isNull(element)) {
+                LogsJB.fatal("El elemento es nulo. No se puede hacer clic.");
+                return false;
+            }
+            try {
+                SeleniumUtils.posicionarmeEn(driver, element);
+                element.click();
+                LogsJB.info("Hizo clic en el elemento directamente.");
+                return true;
+            } catch (WebDriverException e) {
+                LogsJB.error("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
+                JavascriptExecutor js = (JavascriptExecutor) driver;
+                js.executeScript("arguments[0].click();", element);
+                LogsJB.info("Hizo clic en el elemento por medio de JavaScript.");
+                return true;
+            }
+        } catch (Exception e) {
+            LogsJB.fatal("Excepción capturada al intentar hacer clic en el elemento: " + element.toString());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            return false;
+        }
+    }
+
+
 }
