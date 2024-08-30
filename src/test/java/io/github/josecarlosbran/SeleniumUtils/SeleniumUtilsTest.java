@@ -40,7 +40,16 @@ public class SeleniumUtilsTest {
         driver.get("");
     }
 
-
+    @Test(testName = "elementExistBoniGarcia"
+            , description = "Verifica que un elemento exista en la pagina de Boni garcia")
+    public void elementExistBoniGarcia() {
+        logParrafo("Irá a la pagina principal de Google");
+        driver.get("https://bonigarcia.dev/webdrivermanager/");
+        logParrafo("Verifica que el elemento //*[@id=\"header\"]/h1 exista en la pagina");
+        Assert.assertTrue(SeleniumUtils.ElementoExistente(driver, driver, "//*[@id=\"header\"]/h1"),
+                "No fue posible encontrar el elemento 'textarea[name='q']' en la pagina," +
+                        "valide el identificador del elemento");
+    }
     @Test(testName = "Element Exist Google"
             , description = "Verifica que un elemento exista en la pagina de Google")
     public void elementExist() {
