@@ -1416,7 +1416,7 @@ public class SeleniumUtils {
      * @param driver WebDriver que representa la sesión del navegador
      * @return Retorna a un objeto File que representa la captura de pantalla de la pagina web
      */
-    private File getImageScrennshot(WebDriver driver, WebElement elementScreenshot) {
+    public static File getImageScrennshot(WebDriver driver, WebElement elementScreenshot) {
         if (!Objects.isNull(elementScreenshot)) {
             WebElement element = RefreshReferenceToElement(driver, elementScreenshot);
             // Desplazarse hasta el elemento
@@ -1469,11 +1469,13 @@ public class SeleniumUtils {
      * @param driver Variable que manipula el navegador
      * @param by     Identificador del tipo By
      */
-    public void waitImplicityForElementNotExist(WebDriver driver, By by) {
+    public static boolean waitImplicityForElementNotExist(WebDriver driver, By by) {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
             wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
+            return true;
         } catch (TimeoutException ignored) {
+            return false;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
             LogsJB.fatal("*");
@@ -1484,6 +1486,7 @@ public class SeleniumUtils {
             LogsJB.fatal("*");
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
+            return false;
         }
     }
 

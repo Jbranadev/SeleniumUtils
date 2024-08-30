@@ -14,6 +14,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.nio.channels.SeekableByteChannel;
 import java.security.Key;
 import java.time.Duration;
@@ -34,6 +35,11 @@ public class SeleniumUtilsTest {
         LogsJB.setGradeLog(NivelLog.INFO);
 
     }
+
+    public void levantarPagina(){
+        driver.get("");
+    }
+
 
     @Test(testName = "Element Exist Google"
             , description = "Verifica que un elemento exista en la pagina de Google")
@@ -480,7 +486,7 @@ public class SeleniumUtilsTest {
     }
 
 
-    @Test(testName = "selectOptionWithComment",description = "Debería de seleccionar la opcion de un select con comentario",dependsOnMethods = "elementExist")
+    @Test(testName = "selectOptionWithoutComment",description = "Debería de seleccionar la opcion de un select con comentario",dependsOnMethods = "elementExist")
     public void selectOptionWithoutComment(){
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
         Boolean respuesta=false;
@@ -569,7 +575,145 @@ public class SeleniumUtilsTest {
 
     }
 
+    @Test(testName = "getElementsIfExistExito",description = "Se debe de obtener una lista de elementos, si es que existen",dependsOnMethods = "elementExist")
+    public void getElementsIfExistExito(){
+        List<WebElement> elementos=SeleniumUtils.getElementsIfExist(driver,driver,"/html/body/div[1]/div[2]/div/img");
+        Assert.assertNotNull(elementos);
+    }
 
+    @Test(testName = "getElementsIfExistFallo",description = "Se debe de obtener un error al obtener una lista de elementos, si es que existen",dependsOnMethods = "elementExist")
+    public void getElementsIfExistFallo(){
+        List<WebElement> elementos=SeleniumUtils.getElementsIfExist(driver,driver,"xxxxxxxxxxx");
+        boolean vacio=elementos.isEmpty();
+        Assert.assertTrue(vacio);
+    }
+
+    @Test(testName = "getElementIfExistExito",description = "Se debe de obtener un elemento, si es que existe",dependsOnMethods = "elementExist")
+    public void getElementIfExistExito(){
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[2]/div/img");
+        Assert.assertNotNull(elemento);
+    }
+
+    @Test(testName = "getElementIfExistFallo",description = "Se debe de obtener un error al obtener elemento, si es que existe",dependsOnMethods = "elementExist")
+    public void getElementIfExistFallo(){
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"xxxxxxxxxxxxxxxx");
+        Assert.assertNull(elemento);
+    }
+
+    @Test(testName = "clickToElementExito",description = "Click en un elemento",dependsOnMethods = "elementExist")
+    public void clickToElementExito(){
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[6]/div[1]");
+        Assert.assertTrue(SeleniumUtils.clickToElement(driver,elemento));
+    }
+
+    @Test(testName = "clickToElementFallo",description = "Error al dar click en un elemento",dependsOnMethods = "elementExist")
+    public void clickToElementFallo(){
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"xxxxxxxxxxx");
+        Assert.assertFalse(SeleniumUtils.clickToElement(driver,elemento));
+    }
+
+    @Test(testName = "obtenerWebElementsx2StringAcierto")
+    public void obtenerWebElementsx2StringAcierto(){
+        List<WebElement> elementos=SeleniumUtils.obtenerWebElementsx2(driver,driver,"/html/body/div[1]/div[2]/div/img");
+        Assert.assertNotNull(elementos);
+    }
+
+    @Test(testName = "obtenerWebElementsx2StringFallo")
+    public void obtenerWebElementsx2StringFallo(){
+        List<WebElement> elementos=SeleniumUtils.obtenerWebElementsx2(driver,driver,"xxxxxxxx");
+        boolean vacio=elementos.isEmpty();
+        Assert.assertTrue(vacio);
+    }
+
+    @Test(testName = "obtenerWebElementsx2ByAcierto")
+    public void obtenerWebElementsx2ByAcierto(){
+        List<WebElement> elementos=SeleniumUtils.obtenerWebElementsx2(driver,driver,By.xpath("/html/body/div[1]/div[2]/div/img"));
+        Assert.assertNotNull(elementos);
+    }
+
+    @Test(testName = "obtenerWebElementsx2ByFallo")
+    public void obtenerWebElementsx2ByFallo(){
+        List<WebElement> elementos=SeleniumUtils.obtenerWebElementsx2(driver,driver,By.xpath("xxxxxxxxxxxxxxxxxx"));
+        boolean vacio=elementos.isEmpty();
+        Assert.assertTrue(vacio);
+    }
+
+
+    @Test(testName = "getTextIfElementExistSinTiempoExito",description = "Obtiene el texto de un elemento web",dependsOnMethods = "elementExist")
+    public void getTextIfElementExistSinTiempoExito(){
+        String elemento=SeleniumUtils.getTextIfElementExist(driver,driver,"/html/body/div[1]/div[6]/div[1]");
+        Assert.assertNotNull(elemento);
+    }
+
+    @Test(testName = "getTextIfElementExistSinTiempoFallo",description = "Obtiene el texto de un elemento web",dependsOnMethods = "elementExist")
+    public void getTextIfElementExistSinTiempoFallo(){
+        String elemento=SeleniumUtils.getTextIfElementExist(driver,driver,"xxxxxxxxxxxxxxxxxx");
+        Assert.assertNull(elemento);
+    }
+
+    @Test(testName = "getTextIfElementExistConTiempoExito",description = "Obtiene el texto de un elemento web",dependsOnMethods = "elementExist")
+    public void getTextIfElementExistConTiempoExito(){
+        String elemento=SeleniumUtils.getTextIfElementExist(driver,driver,"/html/body/div[1]/div[6]/div[1]",4,2);
+        Assert.assertNotNull(elemento);
+    }
+
+    @Test(testName = "getTextIfElementExistConTiempoFallo",description = "Obtiene el texto de un elemento web",dependsOnMethods = "elementExist")
+    public void getTextIfElementExistConTiempoFallo(){
+        String elemento=SeleniumUtils.getTextIfElementExist(driver,driver,"xxxxxxxxxxxxxxxxxx",4,2);
+        Assert.assertNull(elemento);
+    }
+
+
+    @Test(testName = "seleccionarElementoAcierto",description = "Debe de seleccionar ele elemento especirficado",dependsOnMethods = "elementExist")
+    public void seleccionarElementoAcierto(){
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[6]/div[1]");
+        Assert.assertTrue(SeleniumUtils.seleccionarElemento(driver,driver,elemento));
+    }
+
+    @Test(testName = "seleccionarElementoFallo",description = "Debe de seleccionar ele elemento especirficado",dependsOnMethods = "elementExist")
+    public void seleccionarElementoFallo(){
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"xxxxxxxxxxxxx");
+        Assert.assertFalse(SeleniumUtils.seleccionarElemento(driver,driver,elemento));
+    }
+
+    @Test(testName = "deseleccionarElementoAcierto",description = "Debe de seleccionar ele elemento especirficado",dependsOnMethods = "elementExist")
+    public void deseleccionarElementoAcierto(){
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[6]/div[1]");
+        SeleniumUtils.seleccionarElemento(driver,driver,elemento);
+        Assert.assertTrue(SeleniumUtils.deseleccionarElemento(driver,driver,elemento));
+    }
+
+    @Test(testName = "deseleccionarElementoFallo",description = "Debe de seleccionar ele elemento especirficado",dependsOnMethods = "elementExist")
+    public void deseleccionarElementoFallo(){
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"xxxxxxxxxxxxx");
+        Assert.assertFalse(SeleniumUtils.deseleccionarElemento(driver,driver,elemento));
+    }
+
+
+//    @Test(testName = "obtenerTextoSeleccionadoSelectAcierto",description = "Tiene que obtener el texto seleccionado ",dependsOnMethods = "elementExist")
+//    public void obtenerTextoSeleccionadoSelectAcierto(){
+//        logParrafo("La prueba debería de obtener el texto de algun elemento seleccionado existente en la página de interés");
+//        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[6]/div[1]");
+//        String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
+//        Assert.assertNotNull(respuesta);
+//    }
+//
+//    @Test(testName = "obtenerTextoSeleccionadoSelectFallo",description = "Tiene que obtener el texto seleccionado ",dependsOnMethods = "elementExist")
+//    public void obtenerTextoSeleccionadoSelectFallo(){
+//        logParrafo("La prueba debería de obtener un errro al obtener el texto de algun elemento seleccionado existente en la página de interés");
+//        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"xxxxxxxxx");
+//        String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
+//        Assert.assertNull(respuesta);
+//    }
+
+    @Test(testName = "getImageScreenshotExito",description = "Toma de captura de pantalla en la págian proporcionada",dependsOnMethods="elementExist")
+    public void getImageScreenshotExito(){
+        logParrafo("Debería de tomar una captura de pantalla a un elemento específicado y veriricar que si exista ");
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[2]/div/img");
+        File respuesta=SeleniumUtils.getImageScrennshot(driver,elemento);
+        boolean condicion=respuesta.exists();
+        Assert.assertTrue(condicion);
+    }
 
 
 
@@ -587,5 +731,6 @@ public class SeleniumUtilsTest {
 
 
 }
+
 
 
