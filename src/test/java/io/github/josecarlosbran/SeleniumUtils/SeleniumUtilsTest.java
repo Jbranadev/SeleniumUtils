@@ -1,13 +1,10 @@
 package io.github.josecarlosbran.SeleniumUtils;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.josebran.LogsJB.LogsJB;
 import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
@@ -15,12 +12,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.nio.channels.SeekableByteChannel;
-import java.security.Key;
 import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.Future;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static io.github.josecarlosbran.UtilidadesTest.Utilities.logParrafo;
 
@@ -521,7 +516,7 @@ public class SeleniumUtilsTest {
     public void CambiarFrame(){
         logParrafo("Se busca un elemento web FRAME y se coloca como activo");
         boolean exito = false;
-        exito = SeleniumUtils.CambiarFrame(driver,driver,"hfcr");
+        exito = SeleniumUtils.movetoframeIDorName(driver,driver,"hfcr");
         if (exito){
             Assert.assertTrue(exito);
         }else{

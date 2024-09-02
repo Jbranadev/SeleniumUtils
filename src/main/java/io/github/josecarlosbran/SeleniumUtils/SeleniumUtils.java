@@ -1366,17 +1366,8 @@ public class SeleniumUtils {
         return !currentFrame.isEmpty();
     }
 
-    /**
-     * Función para cambiar el contexto del WebDriver para interactuar con un marco (frame) especifico en la BERediseño
-     *
-     * @param driver WebDriver es el que cambiará el contexto al marco especificado
-     * @param frame  Identificador del marco al que se desea cambiar
-     */
-    public static boolean CambiarFrame(WebDriver driver, SearchContext searchcontext,String frame) {
-        WebElement iframe = SeleniumUtils.obtenerWebElementx2(driver, searchcontext,"#" + frame);
-        driver.switchTo().frame(iframe);
-        return !iframe.isEnabled();
-    }
+
+
 
     /**
      * Función que permite implementar y modificar un tiempo de espera.
@@ -1812,7 +1803,7 @@ public class SeleniumUtils {
      * @param frameIDorName Id del frame al que se desea mover el driver
      * @return Si el frame existe y se mueve al mismo, retorna true, de lo contrario retorna false
      */
-    public boolean movetoframeIDorName(WebDriver driver, SearchContext searchcontext,String frameIDorName) {
+    public static boolean movetoframeIDorName(WebDriver driver, SearchContext searchcontext,String frameIDorName) {
         //Se traslada al frame de la transaccion
         threadslepp(500);
         WebElement frame = null;
