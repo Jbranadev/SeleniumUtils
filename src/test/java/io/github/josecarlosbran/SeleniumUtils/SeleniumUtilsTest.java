@@ -27,7 +27,7 @@ public class SeleniumUtilsTest {
         WebDriverManager.edgedriver().setup();
         driver = new EdgeDriver();
         driver.manage().window().maximize();
-        LogsJB.setGradeLog(NivelLog.INFO);
+        LogsJB.setGradeLog(NivelLog.FATAL);
 
     }
 

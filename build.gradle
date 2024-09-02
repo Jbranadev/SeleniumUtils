@@ -25,19 +25,19 @@ dependencies {
 
     //Dependencias para Testng, Selenium y APPIUM
     implementation 'org.testng:testng:7.10.2'
-    implementation 'org.seleniumhq.selenium:selenium-java:4.22.0'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.24.0'
     implementation 'io.appium:java-client:9.3.0'
-    implementation 'org.assertj:assertj-core:3.26.0'
-    implementation 'io.github.bonigarcia:webdrivermanager:5.9.1'
+    implementation 'org.assertj:assertj-core:3.26.3'
+    implementation 'io.github.bonigarcia:webdrivermanager:5.9.2'
     implementation 'com.aventstack:extentreports:5.1.2'
 
 
     //Utilidades Estandar desarrolladas por la Apache Fundation
-    implementation 'org.apache.commons:commons-lang3:3.14.0'
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.apache.commons:commons-compress:1.26.2'
     implementation 'io.github.josecarlosbran:logsjbsupport:1.0.1'
     implementation 'commons-io:commons-io:2.16.1'
-    implementation 'commons-codec:commons-codec:1.17.0'
+    implementation 'commons-codec:commons-codec:1.17.1'
 
 
 }
