@@ -33,7 +33,7 @@ dependencies {
 
 
     //Utilidades Estandar desarrolladas por la Apache Fundation
-    implementation 'org.apache.commons:commons-lang3:3.14.0'
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.apache.commons:commons-compress:1.26.2'
     implementation 'io.github.josecarlosbran:logsjbsupport:1.0.1'
     implementation 'commons-io:commons-io:2.16.1'
