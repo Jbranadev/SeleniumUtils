@@ -90,10 +90,10 @@ publishing {
         }
         maven {
             name = 'mavenCentral'
-            url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
             credentials {
-                username = project.findProperty("Ik71qZci") ?: ""
-                password = project.findProperty("k5+3rMERJxq8fW5XENm6bdBq3GmCRSzBV41FE7b7Ic1r") ?: ""
+                username = 'Ik71qZci'
+                password = 'k5+3rMERJxq8fW5XENm6bdBq3GmCRSzBV41FE7b7Ic1r'
             }
         }
 
@@ -102,5 +102,6 @@ publishing {
 }
 
 signing {
+    useGpgCmd()
     sign publishing.publications.mavenJava
 }

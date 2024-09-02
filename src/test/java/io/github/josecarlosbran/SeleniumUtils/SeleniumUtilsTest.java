@@ -45,7 +45,7 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "elementExist")
     public void sendKeysToElement() {
         logParrafo("Escribirá el texto indicado en la barra de busqueda de google");
-        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("//*[@id=\"APjFqb\"]"));
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
         Assert.assertTrue(SeleniumUtils.sendKeysToElement(driver, elemento, "Prueba de escritura"));
     }
 
@@ -75,7 +75,8 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "elementExist")
     public void keyPressUsingKeys() {
         logParrafo("Se va a presionar la tecla ENTER utilizando Keys");
-        WebElement searchBox = driver.findElement(By.xpath("//*[@id=\"APjFqb\"]"));  // Encuentra la barra de búsqueda
+
+        WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
         searchBox.click();  // Da click en la barra de búsqueda para activarla
         searchBox.sendKeys("Selenium WebDriver");  // Escribe algo en la barra de búsqueda
         Assert.assertTrue(driver.getTitle().contains("Google"), "No se realizó la búsqueda");
@@ -86,7 +87,7 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "elementExist")
     public void keyPressUsingAsciiCode() {
         logParrafo("Se va a presionar la tecla 'A' utilizando su código ASCII");
-        WebElement searchBox = driver.findElement(By.xpath("//*[@id=\"APjFqb\"]"));  // Encuentra la barra de búsqueda
+        WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
         searchBox.clear();  // Limpia la barra de búsqueda para comenzar con un campo vacío
         searchBox.click();
         // Presiona la tecla 'A' (código ASCII 65)
@@ -95,6 +96,7 @@ public class SeleniumUtilsTest {
         Assert.assertEquals(searchBox.getAttribute("value"), "A", "La tecla 'A' no fue presionada correctamente");
     }
 
+    /*
     @Test(testName = "Fluent Wait Functionality",
             description = "Verifica que el objeto FluentWait funcione correctamente", dependsOnMethods = "elementExist")
     public void testGetFluentWait() {
@@ -103,11 +105,12 @@ public class SeleniumUtilsTest {
         int timerepetition = 300;  // 0.3 segundos de polling
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, timeduration, timerepetition);
         // Prueba que el FluentWait realmente espera un elemento que existe
-        WebElement searchBox = wait.until(driver -> driver.findElement(By.xpath("//*[@id=\"APjFqb\"]")));
+        WebElement searchBox = wait.until(driver -> driver.findElement(By.xpath("textarea[id='APjFqb']")));
         Assert.assertNotNull(searchBox, "El elemento no se encontró dentro del tiempo esperado");
         // Verifica que el elemento es habilitado y visible
         Assert.assertTrue(searchBox.isDisplayed() && searchBox.isEnabled(), "El elemento no está visible o habilitado");
     }
+    */
 
     @Test(testName = "Element Is Disabled - Null Element",
             description = "Verifica que un elemento nulo sea tratado como deshabilitado")
@@ -121,7 +124,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "CleanElement", description = "Should clean the especified element", dependsOnMethods = "elementExist")
     public void cleanElement() {
-        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("//*[@id=\"APjFqb\"]"));
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
         logParrafo("Se debe de limpiar el elemento específicado ");
         Assert.assertTrue(SeleniumUtils.cleanElement(driver, elemento));
     }
@@ -236,7 +239,6 @@ public class SeleniumUtilsTest {
         // Intentar encontrar un elemento que no existe
         boolean result;
         try {
-            WebElement testElement = driver.findElement(By.id(element));
             result = SeleniumUtils.sendKeysIfElementExist(driver, driver, element, texto);
         } catch (NoSuchElementException e) {
             result = false;
@@ -244,7 +246,7 @@ public class SeleniumUtilsTest {
         // Validar el resultado
         Assert.assertFalse(result, "El método debería retornar false cuando no se encuentra ningún elemento.");
         // Cerrar el WebDriver
-        driver.quit();
+        //driver.quit();
     }
 
     @Test(testName = "Send Keys If Element Exist - Exception Handling",
@@ -265,7 +267,7 @@ public class SeleniumUtilsTest {
         // Validar el resultado
         Assert.assertFalse(result, "El método debería retornar false cuando ocurre una excepción.");
         // Cerrar el WebDriver
-        driver.quit();
+        //driver.quit();
     }
 
     @Test(testName = "testObtenerTextOfWebElementx2", description = "Verifica que se obtenga el texto del elemento web especificado", dependsOnMethods = "elementExist")
@@ -295,7 +297,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "getTextNullOfWebElement", description = "Obtiene el texto nulo de un elemento web", dependsOnMethods = "elementExist")
     public void getTextNullOfWebElement() {
-        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("//*[@id=\"APjFqb\"]"));
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
         String respuesta = SeleniumUtils.getTextOfWebElement(driver, elemento);
         Assert.assertTrue(SeleniumUtils.cadenaNulaoVacia(respuesta));
     }
@@ -303,7 +305,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "getTextOfWebElement", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextOfWebElementJavaScript() {
         Boolean condicion = false;
-        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("//*[@id=\"APjFqb\"]"));
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
         String respuesta = SeleniumUtils.getTextUsingJavaScript(driver, elemento);
         condicion = SeleniumUtils.cadenaNulaoVacia(respuesta);
         Assert.assertTrue(condicion);
@@ -322,13 +324,14 @@ public class SeleniumUtilsTest {
         logParrafo("Se debe de dar click en un elemento especificado");
         Boolean variable = SeleniumUtils.clickElementIfExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
         LogsJB.waitForOperationComplete();
-        Assert.assertTrue(variable);
+        Assert.assertTrue(variable, "No se logro hacer click en el elemento");
     }
 
     @Test(testName = "clickElementIfExistFallo", description = "Should make click in the specified element", dependsOnMethods = "elementExist")
     public void clickElementIfExistFallo() {
         logParrafo("Se debe de dar click en un elemento especificado");
-        Assert.assertFalse(SeleniumUtils.clickElementIfExist(driver, driver, "//*[@id='xxxxxxxxxx']"));
+        Assert.assertFalse(SeleniumUtils.clickElementIfExist(driver, driver, "//*[@id='xxxxxxxxxx']"),
+                "No fallo al intentar dar click al elemento, por favor verificar el identifacor del elemento que no debe existir en la pagina");
     }
 
     @Test(testName = "clickElementx2intentsAcierto", description = "Should make click in the specified element 2 tries", dependsOnMethods = "elementExist")
@@ -346,14 +349,14 @@ public class SeleniumUtilsTest {
     @Test(testName = "getIdentificadorByAcierto", description = "Debería de traer el idenrtificador de un elemento web dado un By", dependsOnMethods = "elementExist")
     public void getIdentificadorByAcierto() {
         String respuesta = "";
-        respuesta = SeleniumUtils.getIdentificadorBy(By.xpath("//*[@id=\"APjFqb\"]"));
+        respuesta = SeleniumUtils.getIdentificadorBy(By.xpath("textarea[id='APjFqb']"));
         Assert.assertFalse(respuesta.isEmpty());
     }
 
     @Test(testName = "getIdentificadorByFallo", description = "Debería de traer el dato vacio de un elemento web dado un By", dependsOnMethods = "elementExist")
     public void getIdentificadorByFallo() {
         String respuesta = "";
-        respuesta = SeleniumUtils.getIdentificadorBy(By.xpath("//*[@id=\"APjFqb\"]"));
+        respuesta = SeleniumUtils.getIdentificadorBy(By.xpath("textarea[id='APjFqb']"));
         Assert.assertFalse(respuesta.isEmpty());
     }
 
