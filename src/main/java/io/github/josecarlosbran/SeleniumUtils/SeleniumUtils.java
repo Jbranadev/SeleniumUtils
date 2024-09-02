@@ -120,23 +120,21 @@ public class SeleniumUtils {
     /**
      * Función que convierte un array de objetos en un ArrayList de cadenas
      *
-     * @param object  El Array de objetos que se desea convertir en cadenas
+     * @param object El Array de objetos que se desea convertir en cadenas
      * @return Un ArrayList que contiene las representaciones en forma de cadena de los objetos
      */
     public static ArrayList<String> convertObjectToArrayString(Object[] object) {
-
-            try {
-                ArrayList<String> array = new ArrayList<>();
-                for (Object o : object) {
-                    array.add((o.toString()));
-                }
-                return array;
-            } catch (Exception e) {
-                LogsJB.fatal("error al parsear el Objeto object a strings");
-                LogsJB.fatal(e.getMessage());
-                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+        try {
+            ArrayList<String> array = new ArrayList<>();
+            for (Object o : object) {
+                array.add((o.toString()));
             }
-
+            return array;
+        } catch (Exception e) {
+            LogsJB.fatal("error al parsear el Objeto object a strings");
+            LogsJB.fatal(e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+        }
         return null;
     }
 
@@ -532,7 +530,7 @@ public class SeleniumUtils {
                     " al  elemento: " + element.toString());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             result = false;
-        }finally {
+        } finally {
             return result;
         }
     }
@@ -1265,7 +1263,7 @@ public class SeleniumUtils {
      * @return True si el elemento está desseleccionado o si logra de seleccionarlo,
      * si el elemento proporcionado es null, retorna False
      */
-    public static boolean deseleccionarElemento(WebDriver driver, SearchContext searchContext,WebElement element) {
+    public static boolean deseleccionarElemento(WebDriver driver, SearchContext searchContext, WebElement element) {
         if (!Objects.isNull(element)) {
             LogsJB.info("La opcion está seleccionada: " + element.isSelected());
             LogsJB.info("Color: " + element.getCssValue("background-color"));
@@ -1276,7 +1274,7 @@ public class SeleniumUtils {
                 String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
                 String locator = data[0];
                 String term = data[1];
-                clicktoElementx2intents(driver, searchContext,term);
+                clicktoElementx2intents(driver, searchContext, term);
                 return true;
             } else {
                 return true;
@@ -1295,7 +1293,7 @@ public class SeleniumUtils {
      * @return True si el elemento está seleccionado o si logra seleccionarlo, si el elemento proporcionado
      * es null retorna False
      */
-    public static boolean seleccionarElemento(WebDriver driver, SearchContext searchcontext,WebElement element) {
+    public static boolean seleccionarElemento(WebDriver driver, SearchContext searchcontext, WebElement element) {
         if (!Objects.isNull(element)) {
             LogsJB.info("La opcion está seleccionada: " + element.isSelected());
             LogsJB.info("Color: " + element.getCssValue("background-color"));
@@ -1306,7 +1304,7 @@ public class SeleniumUtils {
                 String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
                 String locator = data[0];
                 String term = data[1];
-                clicktoElementx2intents(driver, searchcontext,term);
+                clicktoElementx2intents(driver, searchcontext, term);
                 return true;
             } else {
                 return true;
@@ -1322,10 +1320,10 @@ public class SeleniumUtils {
      * @param temp Elemento Select del cual queremos saber cuál es la primera Opcion Seleccionada
      * @return Retorna el texto de la opción seleccionada o una cadena vacía
      */
-    public static String obtenerTextoSeleccionadoSelect(WebDriver driver,WebElement temp) {
+    public static String obtenerTextoSeleccionadoSelect(WebDriver driver, WebElement temp) {
         Select proceso = new Select(temp);
         String retorno;
-        retorno = getTextOfWebElement(driver,proceso.getFirstSelectedOption());
+        retorno = getTextOfWebElement(driver, proceso.getFirstSelectedOption());
         return retorno;
     }
 
@@ -1342,14 +1340,14 @@ public class SeleniumUtils {
         assert campo != null;
         String texto = SeleniumUtils.getTextOfWebElement(driver, campo);
         LogsJB.info("Texto que tiene el elemento: " + texto);
-        if (SeleniumUtils.clicktoElementx2intents(driver,searchcontext, element)) {
+        if (SeleniumUtils.clicktoElementx2intents(driver, searchcontext, element)) {
             //Elimina carácter por carácter
             for (char c : texto.toCharArray()) {
                 keyPress(driver, KeyEvent.VK_BACK_SPACE);
             }
             //Escribe carácter por carácter
             for (char c : valor.toCharArray()) {
-                keyPress(driver,c);
+                keyPress(driver, c);
             }
         }
     }
@@ -1366,9 +1364,6 @@ public class SeleniumUtils {
         return !currentFrame.isEmpty();
     }
 
-
-
-
     /**
      * Función que permite implementar y modificar un tiempo de espera.
      *
@@ -1377,28 +1372,6 @@ public class SeleniumUtils {
      */
     public static void waitCall(WebDriver driver, int segs) {
         driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
-    }
-
-
-
-    /***
-     * Mueve el navegador a la tab que está recibiendo como parametro
-     * @param driver Driver que está manipulando el navegador
-     * @param previousTab Previous Tab al que nos queremos mover
-     */
-    public void movetoPreviousTab(WebDriver driver, String previousTab) {
-        if (SeleniumUtils.esValorValido(previousTab)) {
-            //Loop through until we find a new window handle
-            for (String windowHandle : driver.getWindowHandles()) {
-                LogsJB.debug("Previus Tab: " + previousTab);
-                LogsJB.debug("Windows Handle: " + windowHandle);
-                if (previousTab.contentEquals(windowHandle)) {
-                    LogsJB.info("Se movera el driver a la pestaña solicitada");
-                    driver.switchTo().window(windowHandle);
-                    break;
-                }
-            }
-        }
     }
 
     /**
@@ -1504,7 +1477,6 @@ public class SeleniumUtils {
         }
     }
 
-
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
      * @param driver Web Driver que manipula el navegador
@@ -1576,7 +1548,6 @@ public class SeleniumUtils {
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
             return false;
-
         }
     }
 
@@ -1604,7 +1575,6 @@ public class SeleniumUtils {
             Assert.fail("Error inesperado al presionar una tecla: ");
             return false;
         }
-
     }
 
     /***
@@ -1625,7 +1595,6 @@ public class SeleniumUtils {
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
             return false;
-
         }
     }
 
@@ -1713,9 +1682,9 @@ public class SeleniumUtils {
      * @param opcion Opcion del elemento que queremos seleccionar
      * @param comment Comentario que será colocado sobre la imagen capturada si el Elemento indicado existe
      */
-    public static boolean selectOption(WebDriver driver,SearchContext searchcontext, String element, String opcion, String comment) {
+    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment) {
         try {
-            WebElement elemento = obtenerWebElementx2(driver,searchcontext, element);
+            WebElement elemento = obtenerWebElementx2(driver, searchcontext, element);
             if (!Objects.isNull(elemento)) {
                 //Si encuentra el elemento ejecuta este codigo
                 try {
@@ -1732,7 +1701,8 @@ public class SeleniumUtils {
                 }
             } else {
                 LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
-            }return true;
+            }
+            return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
@@ -1747,8 +1717,8 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @param opcion Opcion del elemento que queremos seleccionar
      */
-    public static boolean selectOption(WebDriver driver,SearchContext searchcontext, String element, String opcion) {
-        WebElement elemento = obtenerWebElementx2(driver,searchcontext, element);
+    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion) {
+        WebElement elemento = obtenerWebElementx2(driver, searchcontext, element);
         try {
             if (!Objects.isNull(elemento)) {
                 //Si encuentra el elemento ejecuta este codigo
@@ -1803,13 +1773,13 @@ public class SeleniumUtils {
      * @param frameIDorName Id del frame al que se desea mover el driver
      * @return Si el frame existe y se mueve al mismo, retorna true, de lo contrario retorna false
      */
-    public static boolean movetoframeIDorName(WebDriver driver, SearchContext searchcontext,String frameIDorName) {
+    public static boolean movetoframeIDorName(WebDriver driver, SearchContext searchcontext, String frameIDorName) {
         //Se traslada al frame de la transaccion
         threadslepp(500);
         WebElement frame = null;
         int i = 0;
         while (Objects.isNull(frame) && i < 2) {
-            frame = obtenerWebElementx2(driver, searchcontext,frameIDorName);
+            frame = obtenerWebElementx2(driver, searchcontext, frameIDorName);
             i++;
         }
         return movetoframeforwebelement(driver, frame);
@@ -1846,5 +1816,23 @@ public class SeleniumUtils {
         }
     }
 
-
+    /***
+     * Mueve el navegador a la tab que está recibiendo como parametro
+     * @param driver Driver que está manipulando el navegador
+     * @param previousTab Previous Tab al que nos queremos mover
+     */
+    public void movetoPreviousTab(WebDriver driver, String previousTab) {
+        if (SeleniumUtils.esValorValido(previousTab)) {
+            //Loop through until we find a new window handle
+            for (String windowHandle : driver.getWindowHandles()) {
+                LogsJB.debug("Previus Tab: " + previousTab);
+                LogsJB.debug("Windows Handle: " + windowHandle);
+                if (previousTab.contentEquals(windowHandle)) {
+                    LogsJB.info("Se movera el driver a la pestaña solicitada");
+                    driver.switchTo().window(windowHandle);
+                    break;
+                }
+            }
+        }
+    }
 }

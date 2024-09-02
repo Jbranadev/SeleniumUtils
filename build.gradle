@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id 'signing'
 }
 
 group = 'io.github.josecarlosbran'
@@ -11,18 +12,13 @@ repositories {
 }
 
 dependencies {
-
     // Dependencia para TestNG
     testImplementation 'org.testng:testng:7.10.2'
-
     // Dependencia para ReporteTestNG
     testImplementation 'com.github.sdrss:reportng:2.7.0'
-
-
     //Dependencia para no escribir getters y setters
     implementation 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
-
     //Dependencias para Testng, Selenium y APPIUM
     implementation 'org.testng:testng:7.10.2'
     implementation 'org.seleniumhq.selenium:selenium-java:4.24.0'
@@ -30,16 +26,12 @@ dependencies {
     implementation 'org.assertj:assertj-core:3.26.3'
     implementation 'io.github.bonigarcia:webdrivermanager:5.9.2'
     implementation 'com.aventstack:extentreports:5.1.2'
-
-
     //Utilidades Estandar desarrolladas por la Apache Fundation
     implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.apache.commons:commons-compress:1.26.2'
     implementation 'io.github.josecarlosbran:logsjbsupport:1.0.1'
     implementation 'commons-io:commons-io:2.16.1'
     implementation 'commons-codec:commons-codec:1.17.1'
-
-
 }
 
 test {
@@ -51,11 +43,64 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+            pom {
+                name = 'seleniumutils'
+                description = 'Utilidades de Selenium'
+                url = 'https://github.com/Jbranadev/SeleniumUtils'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'mlemus'
+                        name = 'Mauricio Lemus'
+                        email = 'rodlemus03@gmail.com'
+                    }
+                    developer {
+                        id = 'jbran'
+                        name = 'Jose Bran'
+                        email = 'jbranadev@gmail.com'
+                    }
+                    developer {
+                        id = 'jcornejo'
+                        name = 'Jose Cornejo'
+                        email = 'gabrielvalenzuela1996@gmail.com'
+                    }
+                    developer {
+                        id = 'mdleon'
+                        name = 'Mayron de Leon'
+                        email = 'mayofito@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/Jbranadev/SeleniumUtils.git'
+                    developerConnection = 'scm:git:ssh://github.com:Jbranadev/SeleniumUtils.git'
+                    url = 'https://github.com/Jbranadev/SeleniumUtils'
+                }
+            }
         }
     }
     repositories {
         maven {
+            name = 'local'
             url = uri("${project.rootDir}/repo")
         }
+        maven {
+            name = 'mavenCentral'
+            url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            credentials {
+                username = project.findProperty("Ik71qZci") ?: ""
+                password = project.findProperty("k5+3rMERJxq8fW5XENm6bdBq3GmCRSzBV41FE7b7Ic1r") ?: ""
+            }
+        }
+
+
     }
+}
+
+signing {
+    sign publishing.publications.mavenJava
 }
