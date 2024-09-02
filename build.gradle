@@ -88,20 +88,20 @@ publishing {
             name = 'local'
             url = uri("${project.rootDir}/repo")
         }
-        maven {
-            name = 'mavenCentral'
-            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-            credentials {
-                username = 'Ik71qZci'
-                password = 'k5+3rMERJxq8fW5XENm6bdBq3GmCRSzBV41FE7b7Ic1r'
-            }
-        }
+//        maven {
+//            name = 'mavenCentral'
+//            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+//            credentials {
+//                username = 'Ik71qZci'
+//                password = 'k5+3rMERJxq8fW5XENm6bdBq3GmCRSzBV41FE7b7Ic1r'
+//            }
+//        }
 
 
     }
 }
-
-signing {
-    useGpgCmd()
-    sign publishing.publications.mavenJava
-}
+//
+//signing {
+//    useGpgCmd()
+//    sign publishing.publications.mavenJava
+//}
