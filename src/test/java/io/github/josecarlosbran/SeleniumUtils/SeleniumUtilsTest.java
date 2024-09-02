@@ -36,20 +36,9 @@ public class SeleniumUtilsTest {
 
     }
 
-    public void levantarPagina(){
-        driver.get("");
-    }
 
-    @Test(testName = "elementExistBoniGarcia"
-            , description = "Verifica que un elemento exista en la pagina de Boni garcia")
-    public void elementExistBoniGarcia() {
-        logParrafo("Irá a la pagina principal de Google");
-        driver.get("https://bonigarcia.dev/webdrivermanager/");
-        logParrafo("Verifica que el elemento //*[@id=\"header\"]/h1 exista en la pagina");
-        Assert.assertTrue(SeleniumUtils.ElementoExistente(driver, driver, "//*[@id=\"header\"]/h1"),
-                "No fue posible encontrar el elemento 'textarea[name='q']' en la pagina," +
-                        "valide el identificador del elemento");
-    }
+
+
     @Test(testName = "Element Exist Google"
             , description = "Verifica que un elemento exista en la pagina de Google")
     public void elementExist() {
@@ -699,21 +688,21 @@ public class SeleniumUtilsTest {
     }
 
 
-//    @Test(testName = "obtenerTextoSeleccionadoSelectAcierto",description = "Tiene que obtener el texto seleccionado ",dependsOnMethods = "elementExist")
-//    public void obtenerTextoSeleccionadoSelectAcierto(){
-//        logParrafo("La prueba debería de obtener el texto de algun elemento seleccionado existente en la página de interés");
-//        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[6]/div[1]");
-//        String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
-//        Assert.assertNotNull(respuesta);
-//    }
-//
-//    @Test(testName = "obtenerTextoSeleccionadoSelectFallo",description = "Tiene que obtener el texto seleccionado ",dependsOnMethods = "elementExist")
-//    public void obtenerTextoSeleccionadoSelectFallo(){
-//        logParrafo("La prueba debería de obtener un errro al obtener el texto de algun elemento seleccionado existente en la página de interés");
-//        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"xxxxxxxxx");
-//        String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
-//        Assert.assertNull(respuesta);
-//    }
+    @Test(testName = "obtenerTextoSeleccionadoSelectAcierto",description = "Tiene que obtener el texto seleccionado ",dependsOnMethods = "elementExist")
+    public void obtenerTextoSeleccionadoSelectAcierto(){
+        logParrafo("La prueba debería de obtener el texto de algun elemento seleccionado existente en la página de interés");
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[6]/div[1]");
+        String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
+        Assert.assertNotNull(respuesta);
+    }
+
+    @Test(testName = "obtenerTextoSeleccionadoSelectFallo",description = "Tiene que obtener el texto seleccionado ",dependsOnMethods = "elementExist")
+    public void obtenerTextoSeleccionadoSelectFallo(){
+        logParrafo("La prueba debería de obtener un errro al obtener el texto de algun elemento seleccionado existente en la página de interés");
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"xxxxxxxxx");
+        String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
+        Assert.assertNull(respuesta);
+    }
 
     @Test(testName = "getImageScreenshotExito",description = "Toma de captura de pantalla en la págian proporcionada",dependsOnMethods="elementExist")
     public void getImageScreenshotExito(){
@@ -723,6 +712,17 @@ public class SeleniumUtilsTest {
         boolean condicion=respuesta.exists();
         Assert.assertTrue(condicion);
     }
+
+//    @Test(testName = "elementExistBoniGarcia"
+//            , description = "Verifica que un elemento exista en la pagina de Boni garcia")
+//    public void elementExistBoniGarcia() {
+//        logParrafo("Irá a la pagina principal de Google");
+//        driver.get("https://bonigarcia.dev/webdrivermanager/");
+//        logParrafo("Verifica que el elemento //*[@id=\"header\"]/h1 exista en la pagina");
+//        Assert.assertTrue(SeleniumUtils.ElementoExistente(driver, driver, "//*[@id=\"header\"]/h1"),
+//                "No fue posible encontrar el elemento 'textarea[name='q']' en la pagina," +
+//                        "valide el identificador del elemento");
+//    }
 
 
 
