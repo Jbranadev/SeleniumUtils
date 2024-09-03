@@ -1332,10 +1332,16 @@ public class SeleniumUtils {
      * @return Retorna el texto de la opción seleccionada o una cadena vacía
      */
     public static String obtenerTextoSeleccionadoSelect(WebDriver driver, WebElement temp) {
-        Select proceso = new Select(temp);
-        String retorno;
-        retorno = getTextOfWebElement(driver, proceso.getFirstSelectedOption());
-        return retorno;
+        try{
+            Select proceso = new Select(temp);
+            String retorno;
+            retorno = getTextOfWebElement(driver, proceso.getFirstSelectedOption());
+            return retorno;
+        }catch (Exception e){
+            LogsJB.fatal(e.getMessage());
+            return "fatal";
+        }
+
     }
 
     /**
@@ -1467,28 +1473,6 @@ public class SeleniumUtils {
         }
     }
 
-    /**
-     * Espera implícita de 30 segundos, luego de los 30 segundos lanzara excepción
-     *
-     * @param wait Wait espera predeterminada
-     * @param by   Identificador del tipo By
-     */
-    public static void waitImplicity(WebDriverWait wait, By by) {
-        try {
-            wait.until(driver -> driver.findElement(by).isDisplayed() || driver.findElement(by).isEnabled());
-        } catch (TimeoutException ignored) {
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
-            LogsJB.fatal("*");
-            LogsJB.fatal(" " + e);
-            LogsJB.fatal(" Tipo de Excepción : " + e.getClass());
-            LogsJB.fatal(" Causa de la Excepción : " + e.getCause());
-            LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
-            LogsJB.fatal("*");
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
-        }
-    }
 
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
