@@ -682,9 +682,58 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(exito);
     }
 
+    /**
+     * Método que, por medio de javascript, genera un WebObject Select para poder probar los métodos
+     *
+     * @param nombreClase Es el nombre de clase que recibirá el objeto que estemos creando
+     */
+    public void crearSelect(String nombreClase) {
+        String comando = "var select = document.createElement('select');" +
+                "select.className = '"+nombreClase+"';" +  // Añade la clase al select
+                "var options = ['Opción 1', 'Opción 2', 'Opción 3', 'Opción 4'];" +
+                "options.forEach(function(optionText) {" +
+                "    var option = document.createElement('option');" +
+                "    option.value = optionText.toLowerCase().replace(/\\s+/g, '-');" +
+                "    option.text = optionText;" +
+                "    select.appendChild(option);" +
+                "});" +
+                "document.body.appendChild(select);";
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript(comando);
+    }
+
+
+    /**
+     * Método que, por medio de javascript, genera un WebObject de tipo frame, para poder probar los métodos.
+     *
+     * @param nombreClase nombre de clase que recibe nuestro frame
+     */
+    public void crearFrames(String nombreClase){
+            String comando = "var iframe = document.createElement('iframe');" +
+                    "iframe.className = '"+nombreClase+"';" +  // Añadir una clase al iframe
+                    "iframe.src = 'https://www.google.com';" +  // Establecer la fuente del iframe
+                    "iframe.width = '600';" +  // Ancho del iframe
+                    "iframe.height = '400';" +  // Altura del iframe
+                    "document.body.appendChild(iframe);";
+
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript(comando);
+
+
+    }
+
 
 
 //Falta obtenerTextoSeleccionadoSelectAcierto
+    @Test(testName = "obtenerTextoSeleccionadoSelectAcierto",description = "Obtener el texto de un select",dependsOnMethods = "elementExist")
+    public void obtenerTextoSeleccionadoSelectAcierto(){
+        crearSelect("mi-select-clase");
+        logParrafo("Debe de buscar un select para obtener el texto de ese elemento en específico ");
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"//select[@class='mi-select-clase']");
+        String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
+        Assert.assertNotNull(respuesta);
+    }
 
 
 
