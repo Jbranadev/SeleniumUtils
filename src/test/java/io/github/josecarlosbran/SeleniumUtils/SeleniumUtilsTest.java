@@ -11,6 +11,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -643,50 +644,44 @@ public class SeleniumUtilsTest {
     }
 
 
-    /*
 
-    @Test(testName = "obtenerTextoSeleccionadoSelectAcierto",description = "Tiene que obtener el texto seleccionado ",dependsOnMethods = "elementExist")
-    public void obtenerTextoSeleccionadoSelectAcierto(){
+
+    @Test(testName = "obtenerTextoSeleccionadoSelectFallo",description = "Tiene que obtener un error al obtener el texto seleccionado ",dependsOnMethods = "elementExist")
+    public void obtenerTextoSeleccionadoSelectFallo(){
         logParrafo("La prueba debería de obtener el texto de algun elemento seleccionado existente en la página de interés");
         WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[6]/div[1]");
         String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
-        Assert.assertNotNull(respuesta);
-    }
-
-     */
-/*
-    @Test(testName = "obtenerTextoSeleccionadoSelectFallo",description = "Tiene que obtener el texto seleccionado ",dependsOnMethods = "elementExist")
-    public void obtenerTextoSeleccionadoSelectFallo(){
-        logParrafo("La prueba debería de obtener un errro al obtener el texto de algun elemento seleccionado existente en la página de interés");
-        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"xxxxxxxxx");
-        String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
-        Assert.assertNull(respuesta);
+        boolean exito= respuesta.contains("fatal");
+        Assert.assertTrue(exito);
     }
 
 
- */
 
-    /*
-    @Test(testName = "getImageScreenshotExito",description = "Toma de captura de pantalla en la págian proporcionada",dependsOnMethods="elementExist")
-    public void getImageScreenshotExito(){
-        logParrafo("Debería de tomar una captura de pantalla a un elemento específicado y veriricar que si exista ");
-        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[2]/div/img");
-        File respuesta=SeleniumUtils.getImageScrennshot(driver,elemento);
-        boolean condicion=respuesta.exists();
-        Assert.assertTrue(condicion);
-    }
+//Falta obtenerTextoSeleccionadoSelectAcierto
 
-    */
-//    @Test(testName = "elementExistBoniGarcia"
-//            , description = "Verifica que un elemento exista en la pagina de Boni garcia")
-//    public void elementExistBoniGarcia() {
-//        logParrafo("Irá a la pagina principal de Google");
-//        driver.get("https://bonigarcia.dev/webdrivermanager/");
-//        logParrafo("Verifica que el elemento //*[@id=\"header\"]/h1 exista en la pagina");
-//        Assert.assertTrue(SeleniumUtils.ElementoExistente(driver, driver, "//*[@id=\"header\"]/h1"),
-//                "No fue posible encontrar el elemento 'textarea[name='q']' en la pagina," +
-//                        "valide el identificador del elemento");
+
+
+
+
+//    @Test(testName = "getImageScreenshotExito",description = "Toma de captura de pantalla en la págian proporcionada",dependsOnMethods="elementExist")
+//    public void getImageScreenshotExito(){
+//        logParrafo("Debería de tomar una captura de pantalla a un elemento específicado y veriricar que si exista ");
+//        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[2]");
+//        File respuesta=SeleniumUtils.getImageScrennshot(driver,elemento);
+//        boolean condicion=respuesta.exists();
+//        Assert.assertTrue(condicion);
 //    }
+
+    @Test(testName = "waitImplicity",description = "Debe de dar una espera implicita hasta que aparezca un elemento web ",dependsOnMethods = "elementExist")
+    public void waitImplicity(){
+        logParrafo("El método debe de dar una espera, con un máximo de 30 segundos para que aparezca un elemento en específico, si no, lanzará una excepción");
+        boolean condicion=SeleniumUtils.waitImplicity(driver,By.xpath("//*[@id=\"hplogo\"]"));
+        Assert.assertTrue(condicion);
+
+    }
+
+
+
 }
 
 
