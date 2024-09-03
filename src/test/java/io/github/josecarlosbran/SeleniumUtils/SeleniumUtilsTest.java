@@ -97,21 +97,48 @@ public class SeleniumUtilsTest {
         Assert.assertEquals(searchBox.getAttribute("value"), "A", "La tecla 'A' no fue presionada correctamente");
     }
 
-    /*
-    @Test(testName = "Fluent Wait Functionality",
-            description = "Verifica que el objeto FluentWait funcione correctamente", dependsOnMethods = "elementExist")
-    public void testGetFluentWait() {
-        logParrafo("Se va a verificar que el objeto FluentWait funcione correctamente");
-        int timeduration = 3000;  // 3 segundos de timeout
-        int timerepetition = 300;  // 0.3 segundos de polling
-        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, timeduration, timerepetition);
-        // Prueba que el FluentWait realmente espera un elemento que existe
-        WebElement searchBox = wait.until(driver -> driver.findElement(By.xpath("textarea[id='APjFqb']")));
-        Assert.assertNotNull(searchBox, "El elemento no se encontró dentro del tiempo esperado");
-        // Verifica que el elemento es habilitado y visible
-        Assert.assertTrue(searchBox.isDisplayed() && searchBox.isEnabled(), "El elemento no está visible o habilitado");
+    @Test(testName = "KeyPress Using Keys",
+            description = "Verifica que se puede presionar una tecla utilizando Keys",
+            dependsOnMethods = "elementExist")
+    public void KeyPressUsingKeys() {
+        logParrafo("Se va a presionar la tecla '-->' utilizando su Keys ");
+        WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
+        searchBox.clear();  // Limpia la barra de búsqueda para comenzar con un campo vacío
+        searchBox.click();
+        // Presiona la tecla '-->'
+        SeleniumUtils.keyPress(driver, Keys.ARROW_RIGHT);
+        // Verifica que la barra de búsqueda contiene la letra '-->'
+        Assert.assertEquals(searchBox.getAttribute("value"), "", "La tecla '-->' no fue presionada correctamente");
     }
-    */
+
+    @Test(testName = "KeyPressUsingKeysAssertControl",
+            description = "Verifica que se puede presionar una tecla utilizando Keys y la variable de controlAssert",
+            dependsOnMethods = "elementExist")
+    public void KeyPressUsingKeysAssertControl() {
+        logParrafo("Se va a presionar la tecla '-->' utilizando su Keys ");
+        WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
+        searchBox.clear();  // Limpia la barra de búsqueda para comenzar con un campo vacío
+        searchBox.click();
+        // Presiona la tecla '-->'
+        SeleniumUtils.keyPress(driver, Keys.ARROW_RIGHT,true);
+        // Verifica que la barra de búsqueda contiene la letra '-->'
+        Assert.assertEquals(searchBox.getAttribute("value"), "", "La tecla '-->' no fue presionada correctamente");
+    }
+
+    @Test(testName = "KeyPress Using ASCII Code Assert control",
+            description = "Verifica que se puede presionar una tecla utilizando un código ASCII con la variable de control true",
+            dependsOnMethods = "elementExist")
+    public void keyPressUsingAsciiCodeAssertControl() {
+        logParrafo("Se va a presionar la tecla 'A' utilizando su código ASCII");
+        WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
+        searchBox.clear();  // Limpia la barra de búsqueda para comenzar con un campo vacío
+        searchBox.click();
+        // Presiona la tecla 'A' (código ASCII 65)
+        SeleniumUtils.keyPress(driver, 65,true);
+        // Verifica que la barra de búsqueda contiene la letra 'A'
+        Assert.assertEquals(searchBox.getAttribute("value"), "A", "La tecla 'A' no fue presionada correctamente");
+    }
+
 
     @Test(testName = "Element Is Disabled - Null Element",
             description = "Verifica que un elemento nulo sea tratado como deshabilitado")
@@ -677,7 +704,12 @@ public class SeleniumUtilsTest {
         logParrafo("El método debe de dar una espera, con un máximo de 30 segundos para que aparezca un elemento en específico, si no, lanzará una excepción");
         boolean condicion=SeleniumUtils.waitImplicity(driver,By.xpath("//*[@id=\"hplogo\"]"));
         Assert.assertTrue(condicion);
+    }
 
+    @Test(testName = "waitCall",description = "Debería de hacer un waitCall exitosamente",dependsOnMethods = "elementExist")
+    public void waitCall(){
+        logParrafo("Debe de llamar al waitCall y retornar sin errores, pasando el driver y la duración");
+        Assert.assertTrue(SeleniumUtils.waitCall(driver,3));
     }
 
 

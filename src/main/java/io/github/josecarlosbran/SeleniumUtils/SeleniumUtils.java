@@ -53,6 +53,25 @@ public class SeleniumUtils {
     }
 
     /***
+     * Método que presiona una tecla del teclado simulado por selenium
+     * @param driver Driver que manipula el navegador y realiza las acciones
+     * @param codigo Clave de la tecla que se desea presionar
+     * @param controlAssert Variable booleana para controlar si se ejecuta el Assert.fail o no
+     */
+    public static void keyPress(WebDriver driver, Keys codigo,boolean controlAssert) {
+        try {
+            Actions actions = new Actions(driver);
+            actions.sendKeys(codigo).perform();
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(controlAssert) {
+                Assert.fail("Error inesperado al presionar una tecla: ");
+            }
+        }
+    }
+
+    /***
      * Presiona la tecla indicada en él condigo numerico indicado
      * @param driver Driver que manipula el navegador y realiza las acciones
      * @param codigo Codigo numerico de la tecla que queremos presionar
@@ -1410,8 +1429,16 @@ public class SeleniumUtils {
      * @param driver maneja los tiempos de espera para la carga de elementos
      * @param segs   indica los segundos del tiempo de espera.
      */
-    public static void waitCall(WebDriver driver, int segs) {
-        driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
+    public static boolean waitCall(WebDriver driver, int segs) {
+        try{
+            driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
+            return true;
+        }catch (Exception e){
+            LogsJB.info("----------------------");
+            LogsJB.fatal(e.getMessage());
+            LogsJB.info("----------------------");
+            return false;
+        }
     }
 
     /**
