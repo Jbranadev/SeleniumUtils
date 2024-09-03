@@ -69,6 +69,28 @@ public class SeleniumUtils {
         }
     }
 
+
+    /***
+     * Presiona la tecla indicada en él condigo numerico indicado
+     * @param driver Driver que manipula el navegador y realiza las acciones
+     * @param codigo Codigo numerico de la tecla que queremos presionar
+     * @param controlAssert Variable booleana para controlar si se ejecuta el Assert.fail o no
+     */
+    public static void keyPress(WebDriver driver, int codigo,boolean controlAssert) {
+        try {
+            char asciiValue = (char) codigo;
+            Actions actions = new Actions(driver);
+            actions.keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).perform();
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(controlAssert){
+                Assert.fail("Error inesperado al presionar una tecla: ");
+
+            }
+        }
+    }
+
     /***
      * Obtiene una espera fluida, con el fin de mejorar los tiempos.
      * @param driver driver que está controlando el navegador.
