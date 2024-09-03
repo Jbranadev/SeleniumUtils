@@ -444,7 +444,7 @@ public class SeleniumUtils {
 
     /**
      * Actualiza la referencia al elemento si está disponible en el contexto actual de selenium
-     *
+     * @param driver Driver que manipula el navegador
      * @param elemento Elemento a refrescar
      * @return null si no logra refrescar el elemento, caso contrario la referencia al elemento
      */
@@ -490,6 +490,12 @@ public class SeleniumUtils {
         return null;
     }
 
+    /**
+     * @param driver      El controlador de WebDriver utilizado para interactuar con el navegador.
+     * @param element     El elemento web al que se enviarán las teclas. Si el elemento es nulo, el método retornará `false`.
+     * @param keysToSend  Las secuencias de caracteres que se enviarán al elemento.
+     * @return            `true` si las teclas se ingresaron correctamente en el elemento; de lo contrario, `false`
+     * .*/
     public static boolean sendKeysToElement(WebDriver driver, WebElement element, CharSequence... keysToSend) {
         boolean result = false;
         try {
@@ -539,6 +545,7 @@ public class SeleniumUtils {
      * Envía un texto al elemento indicado, si este existe en el contexto actual.
      *
      * @param driver  Driver que está manipulando el navegador
+     * @param searchContext contexto en el que se desea buscar el elemento
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
      * @param Texto   Texto a envíar al elemento indicado
      * @return Retorna True si encontro el elemento y pudo setear el texto.
@@ -923,12 +930,13 @@ public class SeleniumUtils {
      *
      * @param driver Driver que está manipulando el navegador
      * @param by     Identificador del tipo By
-     * @return
+     * @return retorna verdadero si se da la espera de manera correcta
      */
     public static boolean waitImplicity(WebDriver driver, By by) {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
             wait.until(driver1 -> !ElementoDeshabilitado(driver1.findElement(by)));
+            return true;
         } catch (TimeoutException ignored) {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
@@ -1259,6 +1267,7 @@ public class SeleniumUtils {
      * Deselecciona el elemento proporcionado
      *
      * @param driver  Driver que está manipulando el navegador
+     * @param searchContext Contexto en el que se desea buscar el elemento
      * @param element Elemento que se desea deseleccionar, tiene que ser tipo radio
      * @return True si el elemento está desseleccionado o si logra de seleccionarlo,
      * si el elemento proporcionado es null, retorna False
@@ -1289,6 +1298,7 @@ public class SeleniumUtils {
      * Selecciona el elemento si no está seleccionado
      *
      * @param driver  Driver que está manipulando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param element Elemento que se desea seleccionar, tiene que ser tipo radio
      * @return True si el elemento está seleccionado o si logra seleccionarlo, si el elemento proporcionado
      * es null retorna False
@@ -1317,6 +1327,7 @@ public class SeleniumUtils {
 
     /***
      * Obtiene el texto de la opción seleccionada de un elemento Select
+     * @param driver  Driver que está manipulando el navegador
      * @param temp Elemento Select del cual queremos saber cuál es la primera Opcion Seleccionada
      * @return Retorna el texto de la opción seleccionada o una cadena vacía
      */
@@ -1331,6 +1342,7 @@ public class SeleniumUtils {
      * Envia carácter por carácter al elemento especificado
      *
      * @param driver  Driver que está manipulando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param element Elemento al que se desea envíar el texto
      * @param valor   String que se desea envíar al elemento
      */
@@ -1378,6 +1390,7 @@ public class SeleniumUtils {
      * Función para guardar la captura de pantalla de la página web y la guarda en un archivo
      *
      * @param driver WebDriver que representa la sesión del navegador
+     * @param elementScreenshot Elemento web, el cual se enfocará para tomar la captura de pantalla.
      * @return Retorna a un objeto File que representa la captura de pantalla de la pagina web
      */
     public static File getImageScrennshot(WebDriver driver, WebElement elementScreenshot) {
@@ -1528,6 +1541,7 @@ public class SeleniumUtils {
 
     /***
      * Presiona la tecla indicada en él condigo numerico indicado
+     * @param driver  Driver que está manipulando el navegador
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      * @return
@@ -1553,6 +1567,7 @@ public class SeleniumUtils {
 
     /***
      * Presiona la tecla indicada en él condigo numerico indicado
+     * @param driver  Driver que está manipulando el navegador
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      * @return
@@ -1577,12 +1592,13 @@ public class SeleniumUtils {
         }
     }
 
-    /***
+
 
 
      /***
-     * Presiona la tecla indicada en él condigo numerico indicado
-     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
+     * Presiona la tecla indicada en él codigo numerico indicado
+      * @param driver  Driver que está manipulando el navegador
+      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      *
      * @return
      */
@@ -1597,7 +1613,13 @@ public class SeleniumUtils {
             return false;
         }
     }
-
+    /***
+     * Presiona la tecla indicada en él codigo numerico indicado
+     * @param driver  Driver que está manipulando el navegador
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
+     *
+     * @return
+     */
     public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones) {
         try {
             cambiarZOOM(driver, repeticiones, Keys.ADD);
@@ -1611,7 +1633,7 @@ public class SeleniumUtils {
     }
 
     /**
-     * Mueve el escrol del mouse
+     * Mueve el scroll del mouse
      *
      * @param cantidad Si el número es positivo, el desplazamiento es hacia abajo en la pantalla, si el número es negativo
      *                 el desplazamiento es hacia arriba.
@@ -1637,7 +1659,7 @@ public class SeleniumUtils {
 
     /**
      * Mueve el escrol del mouse
-     *
+     * @param driver  Driver que está manipulando el navegador
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
      */
     public static boolean scrollMouseDown(WebDriver driver, int cantidadScrolls) {
@@ -1657,7 +1679,7 @@ public class SeleniumUtils {
 
     /**
      * Mueve el escrol del mouse
-     *
+     * @param driver  Driver que está manipulando el navegador
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
      */
     public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls) {
@@ -1678,6 +1700,7 @@ public class SeleniumUtils {
     /***
      *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
      * @param driver Driver que está manipulando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @param opcion Opcion del elemento que queremos seleccionar
      * @param comment Comentario que será colocado sobre la imagen capturada si el Elemento indicado existe
@@ -1714,6 +1737,7 @@ public class SeleniumUtils {
     /***
      *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
      * @param driver Driver que está manipulando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @param opcion Opcion del elemento que queremos seleccionar
      */
@@ -1770,6 +1794,7 @@ public class SeleniumUtils {
     /***
      * Mueve el driver el frame con el ID indicado si este existe en el contexto actual
      * @param driver driver que está controlando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param frameIDorName Id del frame al que se desea mover el driver
      * @return Si el frame existe y se mueve al mismo, retorna true, de lo contrario retorna false
      */
