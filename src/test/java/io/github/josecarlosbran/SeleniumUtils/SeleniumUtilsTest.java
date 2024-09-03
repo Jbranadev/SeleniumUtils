@@ -713,6 +713,14 @@ public class SeleniumUtilsTest {
     }
 
 
+    @Test(testName = "waitImplicityForElementNotExist",description = "Debería de hacer un wait Implicity para elementos que no existan",dependsOnMethods = "elementExist")
+    public void waitImplicityForElementNotExist(){
+        logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe ");
+        Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver,By.xpath("xxxxxxxxxx"))
+        );
+    }
+
+
 
 }
 
