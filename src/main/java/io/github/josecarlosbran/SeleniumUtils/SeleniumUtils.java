@@ -1811,7 +1811,7 @@ public class SeleniumUtils {
                 }
             } else {
                 LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
-            }
+            }return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
@@ -1900,13 +1900,16 @@ public class SeleniumUtils {
 
     //SEGUNDO LOTE DE MÉTODOS
 
+
+
+
     /**
      * Funcion que normaliza un texto dado aplicando operaciones para estandarizar su formato o contenido
      *
      * @param texto Se refiere al texto que se va normalizar
      * @return Retorna el texto normalizado
      */
-    public String Normalizar(String texto) {
+    public static String Normalizar(String texto) {
         String convertedString = Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
         LogsJB.info("Se normaliza texto: " + texto);
         return convertedString.toUpperCase();
@@ -1917,26 +1920,34 @@ public class SeleniumUtils {
      * @param Campo  Texto incluido en provider para validar si existe contenido.
      * @param Nombre Nombre del campo que se valida.
      */
-    public void ValidarNull(String Campo, String Nombre) {
-        if (cadenaNulaoVacia(Campo))
-            Assert.fail("Debe ingresar valor al campo " + Nombre);
+    public static boolean ValidarNull(String Campo, String Nombre) {
+        if (cadenaNulaoVacia(Campo)){
+            LogsJB.error("Debe de ingresar el valor del campo: "+Nombre);
+            return true;
+        }else{
+            return false;
+        }
+
     }
 
     /**
-     * Función para subir archivos a la BERediseño
+     * Función para subir archivos
      *
      * @param driver WebDriver se utiliza para interactuar con los elementos de la BERediseño
      * @param path   Identificador de la ruta donde se encuntra hubicado el archivo
      */
-    public void subirArchivo(WebDriver driver, String elementoFile,String path) {
+    public static boolean subirArchivo(WebDriver driver, String elementoFile,String path) {
         try {
+
             WebElement subirArchivo = driver.findElement(By.xpath(elementoFile));
             subirArchivo.sendKeys(path);
             Path ruta = Path.of(path);
             String nameFile = ruta.getFileName().toString();
             LogsJB.info("Se subio archivo: " + nameFile);
+            return true;
         } catch (Exception e) {
             LogsJB.error("No se pudo subir el archivo: " + ExceptionUtils.getStackTrace(e));
+            return false;
         }
     }
 
@@ -1945,8 +1956,16 @@ public class SeleniumUtils {
      *
      * @param driver es el manejador de la página, el cual será regresado al contenido principal
      */
-    public void regresarFramePrincipal(WebDriver driver){
-        driver.switchTo().defaultContent();
+    public static boolean regresarFramePrincipal(WebDriver driver){
+        try{
+            driver.switchTo().defaultContent();
+            LogsJB.info("Se regresa al frame inicial ");
+            return true;
+        }catch (Exception ex){
+            LogsJB.error("Se ha capturado un error al cambiar al frame principal: ");
+            LogsJB.fatal("Error: "+ex.getMessage());
+            return false;
+        }
     }
 
 
@@ -1957,46 +1976,39 @@ public class SeleniumUtils {
      * @param ipDecimal
      * @return
      */
-    public String convertirIpDecimalAHexadecimal(String ipDecimal) {
-        String[] partes = ipDecimal.split("\\.");
-        StringBuilder ipHexadecimal = new StringBuilder();
-        for (String parte : partes) {
-            int valorDecimal = Integer.parseInt(parte);
-            String valorHexadecimal = Integer.toHexString(valorDecimal);
-            // Asegurarse de que haya dos dígitos en la representación hexadecimal
-            if (valorHexadecimal.length() == 1) {
-                valorHexadecimal = "0" + valorHexadecimal;
+    public static String convertirIpDecimalAHexadecimal(String ipDecimal) {
+        // Dividimos la dirección IP en sus componentes (octetos)
+        String[] octetos = ipDecimal.split("\\.");
+
+        // Convertimos cada octeto a su representación hexadecimal
+        StringBuilder hex = new StringBuilder();
+        for (String octeto : octetos) {
+            // Parseamos el octeto a un entero y lo convertimos a hexadecimal
+            String hexOcteto = Integer.toHexString(Integer.parseInt(octeto));
+
+            // Si el octeto hexadecimal tiene solo un carácter, añadimos un cero al principio
+            if (hexOcteto.length() == 1) {
+                hex.append("0");
             }
-            ipHexadecimal.append(valorHexadecimal);
+            hex.append(hexOcteto);
         }
-        return ipHexadecimal.toString().toUpperCase(); // Convertir a mayúsculas por convención
+
+        // Convertimos la cadena a mayúsculas para el formato deseado
+        return hex.toString().toUpperCase();
     }
 
 
-    /**
-     * Función para mostrar una alerta de error almacenando el contenido en una variable, luego de mostrar la alerta se
-     * toma captura de pantalla y se concatena el mensaje.
-     *
-     * @param driver parámetro que en esta función permite visualizar y obtener el contenido de la variable "alert"
-     */
-    public void alertasError(WebDriver driver) {
-        Alert alert = driver.switchTo().alert();
-        String mensaje = alert.getText();
-        LogsJB.info("Alerta: " + mensaje);
-        alert.accept();
-        //getImageScreeenshotWebElement();
-        Assert.fail("Error obtenido: " + mensaje);
-    }
 
-
-    public void JsComando(WebDriver driver, String comandoJs){
+    public static boolean JsComando(WebDriver driver, String comandoJs){
         JavascriptExecutor js= (JavascriptExecutor) driver;
         try{
             js.executeScript(comandoJs);
             LogsJB.info("Ejecuta el siguiente comando de Javasript "+comandoJs);
+            return true;
         }catch(Exception ex){
             LogsJB.error("Error capturado en la función que ejecuta comandos JS: "+comandoJs);
             LogsJB.error("StackTrace de la excepción: "+ExceptionUtils.getStackTrace(ex));
+            return false;
         }
     }
 
