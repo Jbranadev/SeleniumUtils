@@ -706,11 +706,12 @@ public class SeleniumUtilsTest {
 
     /**
      * Método que, por medio de javascript, genera un WebObject de tipo frame, para poder probar los métodos.
-     *
+     * @param id nombre del id que recibe nuestro frame
      * @param nombreClase nombre de clase que recibe nuestro frame
      */
-    public void crearFrames(String nombreClase){
+    public void crearFrames(String id,String nombreClase){
             String comando = "var iframe = document.createElement('iframe');" +
+                    "iframe.id = '" + id + "';" +  // Añadir un id al iframe
                     "iframe.className = '"+nombreClase+"';" +  // Añadir una clase al iframe
                     "iframe.src = 'https://www.google.com';" +  // Establecer la fuente del iframe
                     "iframe.width = '600';" +  // Ancho del iframe
@@ -733,6 +734,16 @@ public class SeleniumUtilsTest {
         WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"//select[@class='mi-select-clase']");
         String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
         Assert.assertNotNull(respuesta);
+    }
+
+
+
+    @Test(testName = "movetoframeIDorName",description = "Debe de cambiar de frame en la página principal de google",dependsOnMethods = "elementExist")
+    public void movetoframeIDorName(){
+        crearFrames("mi-frame-id","mi-frame-clase");
+        logParrafo("Primero se crea, por medio de javascript un frame para inyectar en la página de google. Posteriormente debe de cambiarse a ese frame ");
+        boolean respuesta=SeleniumUtils.movetoframeIDorName(driver,driver,"mi-frame-id");
+        Assert.assertTrue(respuesta);
     }
 
 
