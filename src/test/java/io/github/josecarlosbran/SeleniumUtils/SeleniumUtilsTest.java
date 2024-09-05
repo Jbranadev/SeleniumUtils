@@ -780,6 +780,20 @@ public class SeleniumUtilsTest {
         );
     }
 
+    @Test(testName = "movetoframeforwebelement",description = "Debe de moverse de frame",dependsOnMethods = "elementExist")
+    public void movetoframeforwebelement(){
+        logParrafo("Primero debe de estar creado un frame por medio de javascript, posteriormente debe de cambiarse a ese frame ");
+        //crearFrames("mi-frame-id2","mi-frame-clase2");
+        driver.switchTo().defaultContent();
+        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"mi-frame-id");
+        boolean respuesta=SeleniumUtils.movetoframeforwebelement(driver,elemento);
+        Assert.assertTrue(respuesta);
+    }
+
+
+
+    //Segundo lote de métodos
+
 
 
 }
