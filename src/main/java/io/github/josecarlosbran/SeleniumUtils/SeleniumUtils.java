@@ -4,16 +4,20 @@ import com.josebran.LogsJB.LogsJB;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.logging.Logs;
 import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.nio.file.Path;
+import java.text.Normalizer;
 import java.time.Duration;
 import java.util.List;
 import java.util.*;
@@ -1893,4 +1897,107 @@ public class SeleniumUtils {
             }
         }
     }
+
+    //SEGUNDO LOTE DE MÉTODOS
+
+    /**
+     * Funcion que normaliza un texto dado aplicando operaciones para estandarizar su formato o contenido
+     *
+     * @param texto Se refiere al texto que se va normalizar
+     * @return Retorna el texto normalizado
+     */
+    public String Normalizar(String texto) {
+        String convertedString = Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        LogsJB.info("Se normaliza texto: " + texto);
+        return convertedString.toUpperCase();
+    }
+
+
+    /**
+     * @param Campo  Texto incluido en provider para validar si existe contenido.
+     * @param Nombre Nombre del campo que se valida.
+     */
+    public void ValidarNull(String Campo, String Nombre) {
+        if (cadenaNulaoVacia(Campo))
+            Assert.fail("Debe ingresar valor al campo " + Nombre);
+    }
+
+    /**
+     * Función para subir archivos a la BERediseño
+     *
+     * @param driver WebDriver se utiliza para interactuar con los elementos de la BERediseño
+     * @param path   Identificador de la ruta donde se encuntra hubicado el archivo
+     */
+    public void subirArchivo(WebDriver driver, String elementoFile,String path) {
+        try {
+            WebElement subirArchivo = driver.findElement(By.xpath(elementoFile));
+            subirArchivo.sendKeys(path);
+            Path ruta = Path.of(path);
+            String nameFile = ruta.getFileName().toString();
+            LogsJB.info("Se subio archivo: " + nameFile);
+        } catch (Exception e) {
+            LogsJB.error("No se pudo subir el archivo: " + ExceptionUtils.getStackTrace(e));
+        }
+    }
+
+    /**
+     * método para regresar el driver al contenido principal, el que aparece cuando se inicia la página.
+     *
+     * @param driver es el manejador de la página, el cual será regresado al contenido principal
+     */
+    public void regresarFramePrincipal(WebDriver driver){
+        driver.switchTo().defaultContent();
+    }
+
+
+    /**
+     * Este método convierte una direccion ip a terminal(Hexadecimal):
+     * Por ejemplo: 127.0.0.1-->7F000001
+     *
+     * @param ipDecimal
+     * @return
+     */
+    public String convertirIpDecimalAHexadecimal(String ipDecimal) {
+        String[] partes = ipDecimal.split("\\.");
+        StringBuilder ipHexadecimal = new StringBuilder();
+        for (String parte : partes) {
+            int valorDecimal = Integer.parseInt(parte);
+            String valorHexadecimal = Integer.toHexString(valorDecimal);
+            // Asegurarse de que haya dos dígitos en la representación hexadecimal
+            if (valorHexadecimal.length() == 1) {
+                valorHexadecimal = "0" + valorHexadecimal;
+            }
+            ipHexadecimal.append(valorHexadecimal);
+        }
+        return ipHexadecimal.toString().toUpperCase(); // Convertir a mayúsculas por convención
+    }
+
+
+    /**
+     * Función para mostrar una alerta de error almacenando el contenido en una variable, luego de mostrar la alerta se
+     * toma captura de pantalla y se concatena el mensaje.
+     *
+     * @param driver parámetro que en esta función permite visualizar y obtener el contenido de la variable "alert"
+     */
+    public void alertasError(WebDriver driver) {
+        Alert alert = driver.switchTo().alert();
+        String mensaje = alert.getText();
+        LogsJB.info("Alerta: " + mensaje);
+        alert.accept();
+        //getImageScreeenshotWebElement();
+        Assert.fail("Error obtenido: " + mensaje);
+    }
+
+
+    public void JsComando(WebDriver driver, String comandoJs){
+        JavascriptExecutor js= (JavascriptExecutor) driver;
+        try{
+            js.executeScript(comandoJs);
+            LogsJB.info("Ejecuta el siguiente comando de Javasript "+comandoJs);
+        }catch(Exception ex){
+            LogsJB.error("Error capturado en la función que ejecuta comandos JS: "+comandoJs);
+            LogsJB.error("StackTrace de la excepción: "+ExceptionUtils.getStackTrace(ex));
+        }
+    }
+
 }
