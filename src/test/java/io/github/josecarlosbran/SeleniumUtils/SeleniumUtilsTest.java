@@ -10,7 +10,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +19,22 @@ import static io.github.josecarlosbran.UtilidadesTest.Utilities.logParrafo;
 
 public class SeleniumUtilsTest {
     WebDriver driver;
+
+    /**
+     * El método sirve para enviar archivos por medio de la escritura cuando se presente un elemento de tipo input:File
+     *
+     * @param id          el nombre de id que recibirá nuestro input File
+     * @param nombreClase el nombre de clase que recibirá nuestro input File
+     */
+    public static void crearInputFile(WebDriver driver, String id, String nombreClase) {
+        String comando = "var input = document.createElement('input');" +
+                "input.type = 'file';" +  // Establecer el tipo de input como file
+                "input.id = '" + id + "';" +  // Asignar el ID al input
+                "input.className = '" + nombreClase + "';" +  // Asignar una clase al input
+                "document.body.appendChild(input);";  // Añadir el input al cuerpo del documento
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript(comando);
+    }
 
     @BeforeClass
     public void setUp() {
@@ -118,7 +133,7 @@ public class SeleniumUtilsTest {
         searchBox.clear();  // Limpia la barra de búsqueda para comenzar con un campo vacío
         searchBox.click();
         // Presiona la tecla '-->'
-        SeleniumUtils.keyPress(driver, Keys.ARROW_RIGHT,true);
+        SeleniumUtils.keyPress(driver, Keys.ARROW_RIGHT, true);
         // Verifica que la barra de búsqueda contiene la letra '-->'
         Assert.assertEquals(searchBox.getAttribute("value"), "", "La tecla '-->' no fue presionada correctamente");
     }
@@ -132,11 +147,10 @@ public class SeleniumUtilsTest {
         searchBox.clear();  // Limpia la barra de búsqueda para comenzar con un campo vacío
         searchBox.click();
         // Presiona la tecla 'A' (código ASCII 65)
-        SeleniumUtils.keyPress(driver, 65,true);
+        SeleniumUtils.keyPress(driver, 65, true);
         // Verifica que la barra de búsqueda contiene la letra 'A'
         Assert.assertEquals(searchBox.getAttribute("value"), "A", "La tecla 'A' no fue presionada correctamente");
     }
-
 
     @Test(testName = "Element Is Disabled - Null Element",
             description = "Verifica que un elemento nulo sea tratado como deshabilitado")
@@ -360,8 +374,6 @@ public class SeleniumUtilsTest {
                 "No fallo al intentar dar click al elemento, por favor verificar el identifacor del elemento que no debe existir en la pagina");
     }
 
-
-
     @Test(testName = "clickElementx2intentsAcierto", description = "Should make click in the specified element 2 tries", dependsOnMethods = "elementExist")
     public void clickElementx2intentsAcierto() {
         logParrafo("Se debe de dar click en un elemento especificado");
@@ -436,13 +448,11 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.cambiarZOOMMenos(driver, 2));
     }
 
-
     @Test(testName = "cambiarZOOMMenosFallo", description = "Debería dar un error al disminuir el zoom de la página visualizada", dependsOnMethods = "elementExist", expectedExceptions = AssertionError.class)
     public void cambiarZOOMMenosFallo() {
         logParrafo("Se debe dar un error al momento de disminuir la cantidad de Zoom que se realiza");
         SeleniumUtils.cambiarZOOMMenos(null, 2);
     }
-
 
     @Test(testName = "cambiarZOOMMas", description = "Debería de aumentar el zoom de la pagina que se está visualizando", dependsOnMethods = "elementExist")
     public void cambiarZoomMas() {
@@ -477,8 +487,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "scrollMouseUpFallo", description = "Debería de dar un error al  hacer scroll con el mouse hacia arriba", dependsOnMethods = "elementExist")
     public void scrollMouseUpFallo() {
         logParrafo("Se dará un error cuando el driver haga Scroll hacia arriba con el mouse por medio de Selenium");
-        Assert.assertFalse(SeleniumUtils.scrollMouseUp(null,0));
-
+        Assert.assertFalse(SeleniumUtils.scrollMouseUp(null, 0));
     }
 
     @Test(testName = "selectOptionWithComment", description = "Debería de seleccionar la opcion de un select", dependsOnMethods = "elementExist")
@@ -488,8 +497,6 @@ public class SeleniumUtilsTest {
         respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario");
         Assert.assertTrue(respuesta);
     }
-
-
 
     @Test(testName = "getElementIfExist", description = "Debería de obtener un elemento web si existe", dependsOnMethods = "elementExist")
     public void getElementIfExist() {
@@ -514,18 +521,6 @@ public class SeleniumUtilsTest {
         }
     }
 
-    @Test(testName = "CambiarFrame", description = "Cambia de frame al enviado", dependsOnMethods = "elementExist")
-    public void CambiarFrame() {
-        logParrafo("Se busca un elemento web FRAME y se coloca como activo");
-        boolean exito = false;
-        exito = SeleniumUtils.movetoframeIDorName(driver, driver, "hfcr");
-        if (exito) {
-            Assert.assertTrue(exito);
-        } else {
-            Assert.assertFalse(exito);
-        }
-    }
-
     /*
     @Test(testName = "waitImplicity",description = "Cambia de frame al enviado",dependsOnMethods = "elementExist")
     public void waitImplicity(){
@@ -540,6 +535,18 @@ public class SeleniumUtilsTest {
     }
 
      */
+
+    @Test(testName = "CambiarFrame", description = "Cambia de frame al enviado", dependsOnMethods = "elementExist")
+    public void CambiarFrame() {
+        logParrafo("Se busca un elemento web FRAME y se coloca como activo");
+        boolean exito = false;
+        exito = SeleniumUtils.movetoframeIDorName(driver, driver, "hfcr");
+        if (exito) {
+            Assert.assertTrue(exito);
+        } else {
+            Assert.assertFalse(exito);
+        }
+    }
 
     public void simularConfirmJavascript() {
         JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -567,14 +574,11 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(respuesta);
     }
 
-
-    @Test(testName = "acceptAlertTestWithErrors",description = "Se debe de aceptar el cuadro de dialogo que se dispara",dependsOnMethods = "elementExist")
-    public void acceptAlertTest(){
+    @Test(testName = "acceptAlertTestWithErrors", description = "Se debe de aceptar el cuadro de dialogo que se dispara", dependsOnMethods = "elementExist")
+    public void acceptAlertTest() {
         simularAlertJavascript();
         Assert.assertFalse(SeleniumUtils.acceptAlert(driver));
-
     }
-
 
     @Test(testName = "getElementsIfExistExito", description = "Se debe de obtener una lista de elementos, si es que existen", dependsOnMethods = "elementExist")
     public void getElementsIfExistExito() {
@@ -691,15 +695,12 @@ public class SeleniumUtilsTest {
         Assert.assertFalse(SeleniumUtils.deseleccionarElemento(driver, driver, elemento));
     }
 
-
-
-
-    @Test(testName = "obtenerTextoSeleccionadoSelectFallo",description = "Tiene que obtener un error al obtener el texto seleccionado ",dependsOnMethods = "elementExist")
-    public void obtenerTextoSeleccionadoSelectFallo(){
+    @Test(testName = "obtenerTextoSeleccionadoSelectFallo", description = "Tiene que obtener un error al obtener el texto seleccionado ", dependsOnMethods = "elementExist")
+    public void obtenerTextoSeleccionadoSelectFallo() {
         logParrafo("La prueba debería de obtener el texto de algun elemento seleccionado existente en la página de interés");
-        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"/html/body/div[1]/div[6]/div[1]");
-        String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
-        boolean exito= respuesta.contains("fatal");
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
+        String respuesta = SeleniumUtils.obtenerTextoSeleccionadoSelect(driver, elemento);
+        boolean exito = respuesta.contains("fatal");
         Assert.assertTrue(exito);
     }
 
@@ -710,7 +711,7 @@ public class SeleniumUtilsTest {
      */
     public void crearSelect(String nombreClase) {
         String comando = "var select = document.createElement('select');" +
-                "select.className = '"+nombreClase+"';" +  // Añade la clase al select
+                "select.className = '" + nombreClase + "';" +  // Añade la clase al select
                 "var options = ['Opción 1', 'Opción 2', 'Opción 3', 'Opción 4'];" +
                 "options.forEach(function(optionText) {" +
                 "    var option = document.createElement('option');" +
@@ -719,58 +720,37 @@ public class SeleniumUtilsTest {
                 "    select.appendChild(option);" +
                 "});" +
                 "document.body.appendChild(select);";
-
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript(comando);
     }
 
-
     /**
      * Método que, por medio de javascript, genera un WebObject de tipo frame, para poder probar los métodos.
-     * @param id nombre del id que recibe nuestro frame
+     *
+     * @param id          nombre del id que recibe nuestro frame
      * @param nombreClase nombre de clase que recibe nuestro frame
      */
-    public void crearFrames(String id,String nombreClase){
-            String comando = "var iframe = document.createElement('iframe');" +
-                    "iframe.id = '" + id + "';" +  // Añadir un id al iframe
-                    "iframe.className = '"+nombreClase+"';" +  // Añadir una clase al iframe
-                    "iframe.src = 'https://www.google.com';" +  // Establecer la fuente del iframe
-                    "iframe.width = '600';" +  // Ancho del iframe
-                    "iframe.height = '400';" +  // Altura del iframe
-                    "document.body.appendChild(iframe);";
-
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            js.executeScript(comando);
-
-
+    public void crearFrames(String id, String nombreClase) {
+        String comando = "var iframe = document.createElement('iframe');" +
+                "iframe.id = '" + id + "';" +  // Añadir un id al iframe
+                "iframe.className = '" + nombreClase + "';" +  // Añadir una clase al iframe
+                "iframe.src = 'https://www.google.com';" +  // Establecer la fuente del iframe
+                "iframe.width = '600';" +  // Ancho del iframe
+                "iframe.height = '400';" +  // Altura del iframe
+                "document.body.appendChild(iframe);";
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript(comando);
     }
 
-
-
-//Falta obtenerTextoSeleccionadoSelectAcierto
-    @Test(testName = "obtenerTextoSeleccionadoSelectAcierto",description = "Obtener el texto de un select",dependsOnMethods = "elementExist")
-    public void obtenerTextoSeleccionadoSelectAcierto(){
+    //Falta obtenerTextoSeleccionadoSelectAcierto
+    @Test(testName = "obtenerTextoSeleccionadoSelectAcierto", description = "Obtener el texto de un select", dependsOnMethods = "elementExist")
+    public void obtenerTextoSeleccionadoSelectAcierto() {
         crearSelect("mi-select-clase");
         logParrafo("Debe de buscar un select para obtener el texto de ese elemento en específico ");
-        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"//select[@class='mi-select-clase']");
-        String respuesta=SeleniumUtils.obtenerTextoSeleccionadoSelect(driver,elemento);
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "//select[@class='mi-select-clase']");
+        String respuesta = SeleniumUtils.obtenerTextoSeleccionadoSelect(driver, elemento);
         Assert.assertNotNull(respuesta);
     }
-
-
-
-    @Test(testName = "movetoframeIDorName",description = "Debe de cambiar de frame en la página principal de google",dependsOnMethods = "elementExist")
-    public void movetoframeIDorName(){
-        crearFrames("mi-frame-id","mi-frame-clase");
-        logParrafo("Primero se crea, por medio de javascript un frame para inyectar en la página de google. Posteriormente debe de cambiarse a ese frame ");
-        boolean respuesta=SeleniumUtils.movetoframeIDorName(driver,driver,"mi-frame-id");
-        Assert.assertTrue(respuesta);
-    }
-
-
-
-
-
 //    @Test(testName = "getImageScreenshotExito",description = "Toma de captura de pantalla en la págian proporcionada",dependsOnMethods="elementExist")
 //    public void getImageScreenshotExito(){
 //        logParrafo("Debería de tomar una captura de pantalla a un elemento específicado y veriricar que si exista ");
@@ -780,151 +760,132 @@ public class SeleniumUtilsTest {
 //        Assert.assertTrue(condicion);
 //    }
 
-    @Test(testName = "waitImplicity",description = "Debe de dar una espera implicita hasta que aparezca un elemento web ",dependsOnMethods = "elementExist")
-    public void waitImplicity(){
+    @Test(testName = "movetoframeIDorName", description = "Debe de cambiar de frame en la página principal de google", dependsOnMethods = "elementExist")
+    public void movetoframeIDorName() {
+        crearFrames("mi-frame-id", "mi-frame-clase");
+        logParrafo("Primero se crea, por medio de javascript un frame para inyectar en la página de google. Posteriormente debe de cambiarse a ese frame ");
+        boolean respuesta = SeleniumUtils.movetoframeIDorName(driver, driver, "mi-frame-id");
+        Assert.assertTrue(respuesta);
+    }
+
+    @Test(testName = "waitImplicity", description = "Debe de dar una espera implicita hasta que aparezca un elemento web ", dependsOnMethods = "elementExist")
+    public void waitImplicity() {
         logParrafo("El método debe de dar una espera, con un máximo de 30 segundos para que aparezca un elemento en específico, si no, lanzará una excepción");
-        boolean condicion=SeleniumUtils.waitImplicity(driver,By.xpath("//*[@id=\"hplogo\"]"));
+        boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"));
         Assert.assertTrue(condicion);
     }
 
-    @Test(testName = "waitCall",description = "Debería de hacer un waitCall exitosamente",dependsOnMethods = "elementExist")
-    public void waitCall(){
+    @Test(testName = "waitCall", description = "Debería de hacer un waitCall exitosamente", dependsOnMethods = "elementExist")
+    public void waitCall() {
         logParrafo("Debe de llamar al waitCall y retornar sin errores, pasando el driver y la duración");
-        Assert.assertTrue(SeleniumUtils.waitCall(driver,3));
+        Assert.assertTrue(SeleniumUtils.waitCall(driver, 3));
     }
 
-
-    @Test(testName = "waitImplicityForElementNotExist",description = "Debería de hacer un wait Implicity para elementos que no existan",dependsOnMethods = "elementExist")
-    public void waitImplicityForElementNotExist(){
+    @Test(testName = "waitImplicityForElementNotExist", description = "Debería de hacer un wait Implicity para elementos que no existan", dependsOnMethods = "elementExist")
+    public void waitImplicityForElementNotExist() {
         logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe ");
-        Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver,By.xpath("xxxxxxxxxx"))
+        Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"))
         );
     }
+    //Segundo lote de métodos
 
-    @Test(testName = "movetoframeforwebelement",description = "Debe de moverse de frame",dependsOnMethods = "elementExist")
-    public void movetoframeforwebelement(){
+    @Test(testName = "movetoframeforwebelement", description = "Debe de moverse de frame", dependsOnMethods = "elementExist")
+    public void movetoframeforwebelement() {
         logParrafo("Primero debe de estar creado un frame por medio de javascript, posteriormente debe de cambiarse a ese frame ");
         //crearFrames("mi-frame-id2","mi-frame-clase2");
         driver.switchTo().defaultContent();
-        WebElement elemento=SeleniumUtils.getElementIfExist(driver,driver,"mi-frame-id");
-        boolean respuesta=SeleniumUtils.movetoframeforwebelement(driver,elemento);
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "mi-frame-id");
+        boolean respuesta = SeleniumUtils.movetoframeforwebelement(driver, elemento);
         Assert.assertTrue(respuesta);
     }
 
-
-
-    //Segundo lote de métodos
-
-    @Test(testName = "NormalizarExito",description = "Debe de retornar el string en mayusculas y normalizado")
-    public void NormalizarExito(){
+    @Test(testName = "NormalizarExito", description = "Debe de retornar el string en mayusculas y normalizado")
+    public void NormalizarExito() {
         logParrafo("Se le ingresa un texto sin normalizar, y el método debe de retornar un String normalizado y en mayusculas");
-        String stringSinNormalizar="café";
-        String normalizado=SeleniumUtils.Normalizar(stringSinNormalizar);
-        Assert.assertEquals(normalizado,"CAFA");
+        String stringSinNormalizar = "café";
+        String normalizado = SeleniumUtils.Normalizar(stringSinNormalizar);
+        Assert.assertEquals(normalizado, "CAFA");
     }
 
-    @Test(testName = "NormalizarFallo",description = "Debe de retornar un error en el string en mayusculas y normalizado")
-    public void NormalizarFallo(){
+    @Test(testName = "NormalizarFallo", description = "Debe de retornar un error en el string en mayusculas y normalizado")
+    public void NormalizarFallo() {
         logParrafo("Se le ingresa un texto sin normalizar, y el método debe de retornar un String normalizado y en mayusculas");
-        String stringSinNormalizar="café";
-        String normalizado=SeleniumUtils.Normalizar(stringSinNormalizar);
-        Assert.assertNotEquals(normalizado,"xxxx");
+        String stringSinNormalizar = "café";
+        String normalizado = SeleniumUtils.Normalizar(stringSinNormalizar);
+        Assert.assertNotEquals(normalizado, "xxxx");
     }
 
-     @Test(testName = "validarNullExito",description = "Debe de validar si un campo está nulo",dependsOnMethods = "elementExist")
-    public void ValidarNullExito(){
-        String campo="";
-        String nombre="Nombre";
-
-        boolean respuesta=SeleniumUtils.ValidarNull(campo,nombre);
+    @Test(testName = "validarNullExito", description = "Debe de validar si un campo está nulo", dependsOnMethods = "elementExist")
+    public void ValidarNullExito() {
+        String campo = "";
+        String nombre = "Nombre";
+        boolean respuesta = SeleniumUtils.ValidarNull(campo, nombre);
         Assert.assertTrue(respuesta);
     }
 
-    @Test(testName = "validarNullFallo",description = "Debe de validar si un campo está nulo",dependsOnMethods = "elementExist")
-    public void ValidarNullFallo(){
-        String campo="NoVacio";
-        String nombre="Nombre";
-
-        boolean respuesta=SeleniumUtils.ValidarNull(campo,nombre);
+    @Test(testName = "validarNullFallo", description = "Debe de validar si un campo está nulo", dependsOnMethods = "elementExist")
+    public void ValidarNullFallo() {
+        String campo = "NoVacio";
+        String nombre = "Nombre";
+        boolean respuesta = SeleniumUtils.ValidarNull(campo, nombre);
         Assert.assertFalse(respuesta);
     }
 
-    /**El método sirve para enviar archivos por medio de la escritura cuando se presente un elemento de tipo input:File
-     *
-     * @param id el nombre de id que recibirá nuestro input File
-     * @param nombreClase el nombre de clase que recibirá nuestro input File
-     */
-    public static void crearInputFile(WebDriver driver,String id, String nombreClase) {
-        String comando = "var input = document.createElement('input');" +
-                "input.type = 'file';" +  // Establecer el tipo de input como file
-                "input.id = '" + id + "';" +  // Asignar el ID al input
-                "input.className = '" + nombreClase + "';" +  // Asignar una clase al input
-                "document.body.appendChild(input);";  // Añadir el input al cuerpo del documento
-
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript(comando);
-    }
-
-
-    @Test(testName = "subirArchivoExito",description = "Debe de subir un archivo por medio de texto",dependsOnMethods = "elementExist")
-    public void subirArchivoExito(){
-        String id="id-elementoFile";
-        String clase="clase-elementoFile";
-        crearInputFile(driver,id,clase);
-        String rutaArchivo="C:/Users/mlemus/Pictures/Captura.PNG";
-        boolean condicion=SeleniumUtils.subirArchivo(driver,"//*[@id=\"id-elementoFile\"]",rutaArchivo);
+    @Test(testName = "subirArchivoExito", description = "Debe de subir un archivo por medio de texto", dependsOnMethods = "elementExist")
+    public void subirArchivoExito() {
+        String id = "id-elementoFile";
+        String clase = "clase-elementoFile";
+        crearInputFile(driver, id, clase);
+        String rutaArchivo = "C:/Users/mlemus/Pictures/Captura.PNG";
+        boolean condicion = SeleniumUtils.subirArchivo(driver, "//*[@id=\"id-elementoFile\"]", rutaArchivo);
         Assert.assertTrue(condicion);
     }
 
-    @Test(testName = "subirArchivoFallo",description = "Debe de lanzar un error al subir un archivo por medio de texto",dependsOnMethods = "elementExist")
-    public void subirArchivoFallo(){
-        String id="id-elementoFile";
-        String clase="clase-elementoFile";
-        crearInputFile(driver,id,clase);
-        String rutaArchivo="C:/Users/mlemus/Pictures/Captura.PNG";
-        boolean condicion=SeleniumUtils.subirArchivo(driver,"xxxxx",rutaArchivo);
+    @Test(testName = "subirArchivoFallo", description = "Debe de lanzar un error al subir un archivo por medio de texto", dependsOnMethods = "elementExist")
+    public void subirArchivoFallo() {
+        String id = "id-elementoFile";
+        String clase = "clase-elementoFile";
+        crearInputFile(driver, id, clase);
+        String rutaArchivo = "C:/Users/mlemus/Pictures/Captura.PNG";
+        boolean condicion = SeleniumUtils.subirArchivo(driver, "xxxxx", rutaArchivo);
         Assert.assertFalse(condicion);
     }
 
-    @Test(testName = "regresarFramePrincipal",description = "Debe de regresar al frame inicial",dependsOnMethods = "elementExist")
-    public void regresarFramePrincipal(){
+    @Test(testName = "regresarFramePrincipal", description = "Debe de regresar al frame inicial", dependsOnMethods = "elementExist")
+    public void regresarFramePrincipal() {
         logParrafo("Se debe de regresar al frame que se muestra cuando se ingresa por primera vez a la página ");
-        boolean condicion=SeleniumUtils.regresarFramePrincipal(driver);
+        boolean condicion = SeleniumUtils.regresarFramePrincipal(driver);
         Assert.assertTrue(condicion);
     }
 
-    @Test(testName = "regresarFramePrincipalFallo",description = "Debe de saltar un error al regresar al frame inicial",dependsOnMethods = "elementExist")
-    public void regresarFramePrincipalFallo(){
+    @Test(testName = "regresarFramePrincipalFallo", description = "Debe de saltar un error al regresar al frame inicial", dependsOnMethods = "elementExist")
+    public void regresarFramePrincipalFallo() {
         logParrafo("Se debe de dar un fallo al momento de regresar al frame que se muestra cuando se ingresa por primera vez a la página ");
-        boolean condicion=SeleniumUtils.regresarFramePrincipal(null);
+        boolean condicion = SeleniumUtils.regresarFramePrincipal(null);
         Assert.assertFalse(condicion);
     }
 
-
-    @Test(testName = "convertirIpDecimalAHexadecimal",description = "Debe de retornar la terminal de una direccion ip")
-    public void convertirIpDecimalAHexadecimal(){
+    @Test(testName = "convertirIpDecimalAHexadecimal", description = "Debe de retornar la terminal de una direccion ip")
+    public void convertirIpDecimalAHexadecimal() {
         logParrafo("Se debe de convertir cada uno de los módulos de la direccion ip xxx.xxx.xxx.xxx a hexadecimal y concatenarlos para retornar la terminal ");
-        String ip="127.0.0.1";
-        String terminal=SeleniumUtils.convertirIpDecimalAHexadecimal(ip);
-        Assert.assertEquals(terminal,"7F000001");
+        String ip = "127.0.0.1";
+        String terminal = SeleniumUtils.convertirIpDecimalAHexadecimal(ip);
+        Assert.assertEquals(terminal, "7F000001");
     }
 
-
-
-    @Test(testName = "JsComandoExito",description = "Debe de ejecutar un comando de javascript",dependsOnMethods = "elementExist")
-    public void JsComandoExito(){
+    @Test(testName = "JsComandoExito", description = "Debe de ejecutar un comando de javascript", dependsOnMethods = "elementExist")
+    public void JsComandoExito() {
         logParrafo("Debe de ejecutar un comando determinado de javascript por medio de un JavascriptExecutor ");
-        String comando="console.log('Comando ejecutado');";
-        boolean respuesta=SeleniumUtils.JsComando(driver,comando);
+        String comando = "console.log('Comando ejecutado');";
+        boolean respuesta = SeleniumUtils.JsComando(driver, comando);
         Assert.assertTrue(respuesta);
     }
 
-
-    @Test(testName = "JsComandoFallo",description = "Debe de fallar al momento de ejecutar un comando de javascript",dependsOnMethods = "elementExist")
-    public void JsComandoFallo(){
+    @Test(testName = "JsComandoFallo", description = "Debe de fallar al momento de ejecutar un comando de javascript", dependsOnMethods = "elementExist")
+    public void JsComandoFallo() {
         logParrafo("Debe de ejecutar un comando determinado de javascript por medio de un JavascriptExecutor ");
-        String comando=null;
-        boolean respuesta=SeleniumUtils.JsComando(driver,comando);
+        String comando = null;
+        boolean respuesta = SeleniumUtils.JsComando(driver, comando);
         Assert.assertFalse(respuesta);
     }
 
@@ -935,11 +896,6 @@ public class SeleniumUtilsTest {
         respuesta = SeleniumUtils.selectOption(driver, driver, "//select[@class='mi-select-clase']", "1");
         Assert.assertTrue(respuesta);
     }
-
-
-
-
-
 }
 
 
