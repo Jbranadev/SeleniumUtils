@@ -5,7 +5,11 @@ plugins {
 }
 
 group = 'io.github.josecarlosbran'
-version = '1.0'
+version = '1.1'
+
+//Publicación en maven
+// ./gradlew clean build javadocJar sourcesJar publish
+
 
 repositories {
     mavenCentral()
@@ -34,6 +38,31 @@ dependencies {
     implementation 'commons-codec:commons-codec:1.17.1'
 }
 
+javadoc {
+    options {
+        encoding 'UTF-8'
+        links 'https://docs.oracle.com/javase/8/docs/api/'
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
+}
+
+tasks.register('javadocJar', Jar) {
+    archiveClassifier.set('javadoc')
+    from tasks.javadoc
+}
+
+tasks.register('sourcesJar', Jar) {
+    archiveClassifier.set('sources')
+    from sourceSets.main.allSource
+}
+
+tasks.named('publish') {
+    dependsOn 'javadocJar', 'sourcesJar'
+}
+
 test {
     useTestNG()
 }
@@ -42,7 +71,11 @@ test {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifactId = 'seleniumutils'
             from components.java
+            // Añade los artefactos javadoc y sources
+            artifact(tasks.named('javadocJar'))
+            artifact(tasks.named('sourcesJar'))
             pom {
                 name = 'seleniumutils'
                 description = 'Utilidades de Selenium'
@@ -104,4 +137,11 @@ publishing {
 signing {
     useGpgCmd()
     sign publishing.publications.mavenJava
+}
+
+
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }
