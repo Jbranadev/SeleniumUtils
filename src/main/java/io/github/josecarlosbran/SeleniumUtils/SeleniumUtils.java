@@ -4,16 +4,20 @@ import com.josebran.LogsJB.LogsJB;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.logging.Logs;
 import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.nio.file.Path;
+import java.text.Normalizer;
 import java.time.Duration;
 import java.util.List;
 import java.util.*;
@@ -53,6 +57,25 @@ public class SeleniumUtils {
     }
 
     /***
+     * Método que presiona una tecla del teclado simulado por selenium
+     * @param driver Driver que manipula el navegador y realiza las acciones
+     * @param codigo Clave de la tecla que se desea presionar
+     * @param controlAssert Variable booleana para controlar si se ejecuta el Assert.fail o no
+     */
+    public static void keyPress(WebDriver driver, Keys codigo,boolean controlAssert) {
+        try {
+            Actions actions = new Actions(driver);
+            actions.sendKeys(codigo).perform();
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(controlAssert) {
+                Assert.fail("Error inesperado al presionar una tecla: ");
+            }
+        }
+    }
+
+    /***
      * Presiona la tecla indicada en él condigo numerico indicado
      * @param driver Driver que manipula el navegador y realiza las acciones
      * @param codigo Codigo numerico de la tecla que queremos presionar
@@ -66,6 +89,28 @@ public class SeleniumUtils {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al presionar una tecla: ");
+        }
+    }
+
+
+    /***
+     * Presiona la tecla indicada en él condigo numerico indicado
+     * @param driver Driver que manipula el navegador y realiza las acciones
+     * @param codigo Codigo numerico de la tecla que queremos presionar
+     * @param controlAssert Variable booleana para controlar si se ejecuta el Assert.fail o no
+     */
+    public static void keyPress(WebDriver driver, int codigo,boolean controlAssert) {
+        try {
+            char asciiValue = (char) codigo;
+            Actions actions = new Actions(driver);
+            actions.keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).perform();
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(controlAssert){
+                Assert.fail("Error inesperado al presionar una tecla: ");
+
+            }
         }
     }
 
@@ -444,7 +489,7 @@ public class SeleniumUtils {
 
     /**
      * Actualiza la referencia al elemento si está disponible en el contexto actual de selenium
-     *
+     * @param driver Driver que manipula el navegador
      * @param elemento Elemento a refrescar
      * @return null si no logra refrescar el elemento, caso contrario la referencia al elemento
      */
@@ -490,6 +535,12 @@ public class SeleniumUtils {
         return null;
     }
 
+    /**
+     * @param driver      El controlador de WebDriver utilizado para interactuar con el navegador.
+     * @param element     El elemento web al que se enviarán las teclas. Si el elemento es nulo, el método retornará `false`.
+     * @param keysToSend  Las secuencias de caracteres que se enviarán al elemento.
+     * @return            `true` si las teclas se ingresaron correctamente en el elemento; de lo contrario, `false`
+     * .*/
     public static boolean sendKeysToElement(WebDriver driver, WebElement element, CharSequence... keysToSend) {
         boolean result = false;
         try {
@@ -539,6 +590,7 @@ public class SeleniumUtils {
      * Envía un texto al elemento indicado, si este existe en el contexto actual.
      *
      * @param driver  Driver que está manipulando el navegador
+     * @param searchContext contexto en el que se desea buscar el elemento
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
      * @param Texto   Texto a envíar al elemento indicado
      * @return Retorna True si encontro el elemento y pudo setear el texto.
@@ -923,7 +975,7 @@ public class SeleniumUtils {
      *
      * @param driver Driver que está manipulando el navegador
      * @param by     Identificador del tipo By
-     * @return
+     * @return retorna verdadero si se da la espera de manera correcta
      */
     public static boolean waitImplicity(WebDriver driver, By by) {
         boolean bandera = false;
@@ -1256,6 +1308,7 @@ public class SeleniumUtils {
      * Deselecciona el elemento proporcionado
      *
      * @param driver  Driver que está manipulando el navegador
+     * @param searchContext Contexto en el que se desea buscar el elemento
      * @param element Elemento que se desea deseleccionar, tiene que ser tipo radio
      * @return True si el elemento está desseleccionado o si logra de seleccionarlo,
      * si el elemento proporcionado es null, retorna False
@@ -1286,6 +1339,7 @@ public class SeleniumUtils {
      * Selecciona el elemento si no está seleccionado
      *
      * @param driver  Driver que está manipulando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param element Elemento que se desea seleccionar, tiene que ser tipo radio
      * @return True si el elemento está seleccionado o si logra seleccionarlo, si el elemento proporcionado
      * es null retorna False
@@ -1314,20 +1368,28 @@ public class SeleniumUtils {
 
     /***
      * Obtiene el texto de la opción seleccionada de un elemento Select
+     * @param driver  Driver que está manipulando el navegador
      * @param temp Elemento Select del cual queremos saber cuál es la primera Opcion Seleccionada
      * @return Retorna el texto de la opción seleccionada o una cadena vacía
      */
     public static String obtenerTextoSeleccionadoSelect(WebDriver driver, WebElement temp) {
-        Select proceso = new Select(temp);
-        String retorno;
-        retorno = getTextOfWebElement(driver, proceso.getFirstSelectedOption());
-        return retorno;
+        try{
+            Select proceso = new Select(temp);
+            String retorno;
+            retorno = getTextOfWebElement(driver, proceso.getFirstSelectedOption());
+            return retorno;
+        }catch (Exception e){
+            LogsJB.fatal(e.getMessage());
+            return "fatal";
+        }
+
     }
 
     /**
      * Envia carácter por carácter al elemento especificado
      *
      * @param driver  Driver que está manipulando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param element Elemento al que se desea envíar el texto
      * @param valor   String que se desea envíar al elemento
      */
@@ -1367,14 +1429,23 @@ public class SeleniumUtils {
      * @param driver maneja los tiempos de espera para la carga de elementos
      * @param segs   indica los segundos del tiempo de espera.
      */
-    public static void waitCall(WebDriver driver, int segs) {
-        driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
+    public static boolean waitCall(WebDriver driver, int segs) {
+        try{
+            driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
+            return true;
+        }catch (Exception e){
+            LogsJB.info("----------------------");
+            LogsJB.fatal(e.getMessage());
+            LogsJB.info("----------------------");
+            return false;
+        }
     }
 
     /**
      * Función para guardar la captura de pantalla de la página web y la guarda en un archivo
      *
      * @param driver WebDriver que representa la sesión del navegador
+     * @param elementScreenshot Elemento web, el cual se enfocará para tomar la captura de pantalla.
      * @return Retorna a un objeto File que representa la captura de pantalla de la pagina web
      */
     public static File getImageScrennshot(WebDriver driver, WebElement elementScreenshot) {
@@ -1451,6 +1522,7 @@ public class SeleniumUtils {
         }
     }
 
+
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
      * @param driver Web Driver que manipula el navegador
@@ -1502,6 +1574,7 @@ public class SeleniumUtils {
 
     /***
      * Presiona la tecla indicada en él condigo numerico indicado
+     * @param driver  Driver que está manipulando el navegador
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      * @return
@@ -1527,6 +1600,7 @@ public class SeleniumUtils {
 
     /***
      * Presiona la tecla indicada en él condigo numerico indicado
+     * @param driver  Driver que está manipulando el navegador
      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      * @param codigo Codigo numerico de la tecla que queremos presionar
      * @return
@@ -1551,12 +1625,13 @@ public class SeleniumUtils {
         }
     }
 
-    /***
+
 
 
      /***
-     * Presiona la tecla indicada en él condigo numerico indicado
-     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
+     * Presiona la tecla indicada en él codigo numerico indicado
+      * @param driver  Driver que está manipulando el navegador
+      * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
      *
      * @return
      */
@@ -1571,7 +1646,13 @@ public class SeleniumUtils {
             return false;
         }
     }
-
+    /***
+     * Presiona la tecla indicada en él codigo numerico indicado
+     * @param driver  Driver que está manipulando el navegador
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
+     *
+     * @return
+     */
     public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones) {
         try {
             cambiarZOOM(driver, repeticiones, Keys.ADD);
@@ -1585,7 +1666,7 @@ public class SeleniumUtils {
     }
 
     /**
-     * Mueve el escrol del mouse
+     * Mueve el scroll del mouse
      *
      * @param cantidad Si el número es positivo, el desplazamiento es hacia abajo en la pantalla, si el número es negativo
      *                 el desplazamiento es hacia arriba.
@@ -1611,7 +1692,7 @@ public class SeleniumUtils {
 
     /**
      * Mueve el escrol del mouse
-     *
+     * @param driver  Driver que está manipulando el navegador
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
      */
     public static boolean scrollMouseDown(WebDriver driver, int cantidadScrolls) {
@@ -1631,7 +1712,7 @@ public class SeleniumUtils {
 
     /**
      * Mueve el escrol del mouse
-     *
+     * @param driver  Driver que está manipulando el navegador
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
      */
     public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls) {
@@ -1652,6 +1733,7 @@ public class SeleniumUtils {
     /***
      *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
      * @param driver Driver que está manipulando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @param opcion Opcion del elemento que queremos seleccionar
      * @param comment Comentario que será colocado sobre la imagen capturada si el Elemento indicado existe
@@ -1688,6 +1770,7 @@ public class SeleniumUtils {
     /***
      *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
      * @param driver Driver que está manipulando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @param opcion Opcion del elemento que queremos seleccionar
      */
@@ -1724,7 +1807,7 @@ public class SeleniumUtils {
                 }
             } else {
                 LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
-            }
+            }return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
@@ -1744,6 +1827,7 @@ public class SeleniumUtils {
     /***
      * Mueve el driver el frame con el ID indicado si este existe en el contexto actual
      * @param driver driver que está controlando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param frameIDorName Id del frame al que se desea mover el driver
      * @return Si el frame existe y se mueve al mismo, retorna true, de lo contrario retorna false
      */
@@ -1809,4 +1893,119 @@ public class SeleniumUtils {
             }
         }
     }
+
+    //SEGUNDO LOTE DE MÉTODOS
+
+
+
+
+    /**
+     * Funcion que normaliza un texto dado aplicando operaciones para estandarizar su formato o contenido
+     *
+     * @param texto Se refiere al texto que se va normalizar
+     * @return Retorna el texto normalizado
+     */
+    public static String Normalizar(String texto) {
+        String convertedString = Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        LogsJB.info("Se normaliza texto: " + texto);
+        return convertedString.toUpperCase();
+    }
+
+
+    /**
+     * @param Campo  Texto incluido en provider para validar si existe contenido.
+     * @param Nombre Nombre del campo que se valida.
+     */
+    public static boolean ValidarNull(String Campo, String Nombre) {
+        if (cadenaNulaoVacia(Campo)){
+            LogsJB.error("Debe de ingresar el valor del campo: "+Nombre);
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+    /**
+     * Función para subir archivos
+     *
+     * @param driver WebDriver se utiliza para interactuar con los elementos de la BERediseño
+     * @param path   Identificador de la ruta donde se encuntra hubicado el archivo
+     */
+    public static boolean subirArchivo(WebDriver driver, String elementoFile,String path) {
+        try {
+
+            WebElement subirArchivo = driver.findElement(By.xpath(elementoFile));
+            subirArchivo.sendKeys(path);
+            Path ruta = Path.of(path);
+            String nameFile = ruta.getFileName().toString();
+            LogsJB.info("Se subio archivo: " + nameFile);
+            return true;
+        } catch (Exception e) {
+            LogsJB.error("No se pudo subir el archivo: " + ExceptionUtils.getStackTrace(e));
+            return false;
+        }
+    }
+
+    /**
+     * método para regresar el driver al contenido principal, el que aparece cuando se inicia la página.
+     *
+     * @param driver es el manejador de la página, el cual será regresado al contenido principal
+     */
+    public static boolean regresarFramePrincipal(WebDriver driver){
+        try{
+            driver.switchTo().defaultContent();
+            LogsJB.info("Se regresa al frame inicial ");
+            return true;
+        }catch (Exception ex){
+            LogsJB.error("Se ha capturado un error al cambiar al frame principal: ");
+            LogsJB.fatal("Error: "+ex.getMessage());
+            return false;
+        }
+    }
+
+
+    /**
+     * Este método convierte una direccion ip a terminal(Hexadecimal):
+     * Por ejemplo: 127.0.0.1-->7F000001
+     *
+     * @param ipDecimal
+     * @return
+     */
+    public static String convertirIpDecimalAHexadecimal(String ipDecimal) {
+        // Dividimos la dirección IP en sus componentes (octetos)
+        String[] octetos = ipDecimal.split("\\.");
+
+        // Convertimos cada octeto a su representación hexadecimal
+        StringBuilder hex = new StringBuilder();
+        for (String octeto : octetos) {
+            // Parseamos el octeto a un entero y lo convertimos a hexadecimal
+            String hexOcteto = Integer.toHexString(Integer.parseInt(octeto));
+
+            // Si el octeto hexadecimal tiene solo un carácter, añadimos un cero al principio
+            if (hexOcteto.length() == 1) {
+                hex.append("0");
+            }
+            hex.append(hexOcteto);
+        }
+
+        // Convertimos la cadena a mayúsculas para el formato deseado
+        return hex.toString().toUpperCase();
+    }
+
+
+
+    public static boolean JsComando(WebDriver driver, String comandoJs){
+        JavascriptExecutor js= (JavascriptExecutor) driver;
+        try{
+            js.executeScript(comandoJs);
+            LogsJB.info("Ejecuta el siguiente comando de Javasript "+comandoJs);
+            return true;
+        }catch(Exception ex){
+            LogsJB.error("Error capturado en la función que ejecuta comandos JS: "+comandoJs);
+            LogsJB.error("StackTrace de la excepción: "+ExceptionUtils.getStackTrace(ex));
+            return false;
+        }
+    }
+
 }
