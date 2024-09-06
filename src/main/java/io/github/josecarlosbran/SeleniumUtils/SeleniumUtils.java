@@ -7,9 +7,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
 
@@ -85,11 +83,11 @@ public class SeleniumUtils {
                 .ignoring(UnhandledAlertException.class)
                 .ignoring(Exception.class)
                 .ignoring(TimeoutException.class)
-                .ignoring(NoSuchElementException.class)
+                .ignoring(org.openqa.selenium.NoSuchElementException.class)
                 .ignoring(InvalidElementStateException.class)
                 .ignoring(JavascriptException.class)
                 .ignoring(StaleElementReferenceException.class)
-                .ignoring(UnreachableBrowserException.class)
+                .ignoring(org.openqa.selenium.remote.UnreachableBrowserException.class)
                 .ignoring(InvalidSelectorException.class)
                 .ignoring(WebDriverException.class)
                 .ignoring(ElementClickInterceptedException.class);
@@ -228,13 +226,13 @@ public class SeleniumUtils {
         LogsJB.debug(" Buscara si existe el elemento indicado: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        Date fecha = Calendar.getInstance().getTime();
+        java.util.Date fecha = Calendar.getInstance().getTime();
         Calendar addseconds = Calendar.getInstance();
         addseconds.setTime(fecha);
         addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
         fecha = addseconds.getTime();
         LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        Date fecha2 = Calendar.getInstance().getTime();
+        java.util.Date fecha2 = Calendar.getInstance().getTime();
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.elementExist(wait, searchContext, By.id(element));
@@ -308,13 +306,13 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existe el elemento indicado, lo limpiara: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        Date fecha = Calendar.getInstance().getTime();
+        java.util.Date fecha = Calendar.getInstance().getTime();
         Calendar addseconds = Calendar.getInstance();
         addseconds.setTime(fecha);
         addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
         fecha = addseconds.getTime();
         LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        Date fecha2 = Calendar.getInstance().getTime();
+        java.util.Date fecha2 = Calendar.getInstance().getTime();
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.id(element));
@@ -434,7 +432,7 @@ public class SeleniumUtils {
                 }
             }
             LogsJB.warning("No pudo tomar la captura de pantalla del elemento indicado, retorna null");
-        } catch (InvalidSelectorException | NoSuchElementException ex) {
+        } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
             return null;
         } catch (Exception e) {
             LogsJB.fatal("Excepción capturada al tomar la captura de pantalla");
@@ -482,7 +480,7 @@ public class SeleniumUtils {
                 }
             }
             LogsJB.info("No fue posible refrescar la referencia al elemento");
-        } catch (InvalidSelectorException | NoSuchElementException ex) {
+        } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
             return null;
         } catch (Exception e) {
             LogsJB.fatal("Excepción al refrescar el elemento");
@@ -552,13 +550,13 @@ public class SeleniumUtils {
                 ", enviara el texto: " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        Date fecha = Calendar.getInstance().getTime();
+        java.util.Date fecha = Calendar.getInstance().getTime();
         Calendar addseconds = Calendar.getInstance();
         addseconds.setTime(fecha);
         addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
         fecha = addseconds.getTime();
         LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        Date fecha2 = Calendar.getInstance().getTime();
+        java.util.Date fecha2 = Calendar.getInstance().getTime();
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.id(element), Texto);
@@ -647,13 +645,13 @@ public class SeleniumUtils {
         LogsJB.debug(" Obtendrá el texto del elemento si este existe: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        Date fecha = Calendar.getInstance().getTime();
+        java.util.Date fecha = Calendar.getInstance().getTime();
         Calendar addseconds = Calendar.getInstance();
         addseconds.setTime(fecha);
         addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
         fecha = addseconds.getTime();
         LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + timeDuration + " mili segundos: " + timeRepetition);
-        Date fecha2 = Calendar.getInstance().getTime();
+        java.util.Date fecha2 = Calendar.getInstance().getTime();
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, timeDuration, timeRepetition);
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<String> futureId = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.id(element));
@@ -821,13 +819,13 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existe el elemento indicado, hará click en el elemento: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        Date fecha = Calendar.getInstance().getTime();
+        java.util.Date fecha = Calendar.getInstance().getTime();
         Calendar addseconds = Calendar.getInstance();
         addseconds.setTime(fecha);
         addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
         fecha = addseconds.getTime();
         LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        Date fecha2 = Calendar.getInstance().getTime();
+        java.util.Date fecha2 = Calendar.getInstance().getTime();
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.id(element));
@@ -936,16 +934,11 @@ public class SeleniumUtils {
         } catch (TimeoutException ignored) {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
-            LogsJB.fatal("*");
-            LogsJB.fatal(" " + e);
-            LogsJB.fatal(" Tipo de Excepción : " + e.getClass());
-            LogsJB.fatal(" Causa de la Excepción : " + e.getCause());
-            LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
-            LogsJB.fatal("*");
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
+        } finally {
+            return bandera;
         }
-        return bandera;
     }
 
     /***
@@ -964,13 +957,13 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existen los elementos que corresponden al identificador: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        Date fecha = Calendar.getInstance().getTime();
+        java.util.Date fecha = Calendar.getInstance().getTime();
         Calendar addseconds = Calendar.getInstance();
         addseconds.setTime(fecha);
         addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
         fecha = addseconds.getTime();
         LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        Date fecha2 = Calendar.getInstance().getTime();
+        java.util.Date fecha2 = Calendar.getInstance().getTime();
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<List<WebElement>> futureId = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.id(element));
@@ -1066,13 +1059,13 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existen los elementos que corresponden al identificador: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        Date fecha = Calendar.getInstance().getTime();
+        java.util.Date fecha = Calendar.getInstance().getTime();
         Calendar addseconds = Calendar.getInstance();
         addseconds.setTime(fecha);
         addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
         fecha = addseconds.getTime();
         LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        Date fecha2 = Calendar.getInstance().getTime();
+        java.util.Date fecha2 = Calendar.getInstance().getTime();
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         // Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<WebElement> futureId = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.id(element));
@@ -1600,8 +1593,8 @@ public class SeleniumUtils {
     public static boolean scrollMouse(int cantidad) {
         try {
             Robot robot = new Robot();
-            int ancho = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
-            int alto = Toolkit.getDefaultToolkit().getScreenSize().height / 2;
+            int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
+            int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height / 2;
             LogsJB.info("Altura de la pantalla " + alto * 2 + " ancho de la pantalla " + ancho * 2);
             robot.mouseMove(ancho, alto);
             robot.mouseWheel(cantidad);
@@ -1763,7 +1756,7 @@ public class SeleniumUtils {
             frame = obtenerWebElementx2(driver, searchcontext, frameIDorName);
             i++;
         }
-        return SeleniumUtils.movetoframeforwebelement(driver, frame);
+        return movetoframeforwebelement(driver, frame);
     }
 
     /***
@@ -1816,5 +1809,4 @@ public class SeleniumUtils {
             }
         }
     }
-
 }

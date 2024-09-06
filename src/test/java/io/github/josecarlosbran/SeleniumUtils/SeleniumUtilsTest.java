@@ -5,7 +5,6 @@ import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -75,7 +74,6 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "elementExist")
     public void keyPressUsingKeys() {
         logParrafo("Se va a presionar la tecla ENTER utilizando Keys");
-
         WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
         searchBox.click();  // Da click en la barra de búsqueda para activarla
         searchBox.sendKeys("Selenium WebDriver");  // Escribe algo en la barra de búsqueda
