@@ -439,11 +439,12 @@ public class SeleniumUtilsTest {
     }
 
 
-    @Test(testName = "cambiarZOOMMenosFallo", description = "Debería de dar un error al momento de disminuir el zoom de la pagina que se está visualizando", dependsOnMethods = "elementExist")
+    @Test(testName = "cambiarZOOMMenosFallo", description = "Debería dar un error al disminuir el zoom de la página visualizada", dependsOnMethods = "elementExist", expectedExceptions = AssertionError.class)
     public void cambiarZOOMMenosFallo() {
-        logParrafo("Se debe de dar un error al momento de disminuir la cantidad de Zoom que se realiza");
-        Assert.assertTrue(SeleniumUtils.cambiarZOOMMenos(null, 2));
+        logParrafo("Se debe dar un error al momento de disminuir la cantidad de Zoom que se realiza");
+        SeleniumUtils.cambiarZOOMMenos(null, 2);
     }
+
 
     @Test(testName = "cambiarZOOMMas", description = "Debería de aumentar el zoom de la pagina que se está visualizando", dependsOnMethods = "elementExist")
     public void cambiarZoomMas() {
