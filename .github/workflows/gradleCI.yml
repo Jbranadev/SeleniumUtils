@@ -33,6 +33,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: gradle
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
       #Limpiamos la cache de Gradle
       - name: Limpiamos la cache de Gradle
         run: ./gradlew clean
