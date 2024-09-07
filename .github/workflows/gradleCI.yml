@@ -1,0 +1,51 @@
+# This workflow will build a Java project with Gradle, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Java CI with Gradle
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master" , "JBran", "MLemus", "JCornejo", "RSandoval" ]
+  pull_request:
+    branches: [ "master" ]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v3.6.0
+        #Seteamos la version de Java
+      - name: Set up JDK 21
+        uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018 # v4.2.2
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+      #Limpiamos la cache de Gradle
+      - name: Limpiamos la cache de Gradle
+        run: ./gradlew clean
+        #Corremos los Test de Gradle
+      - name: Run tests and collect coverage
+        run: ./gradlew test
+        #Enviamos los resultados a Codecov
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+      - name: Update dependency graph
+        uses: advanced-security/maven-dependency-submission-action@4f64ddab9d742a4806eeb588d238e4c311a8397d
+
+
