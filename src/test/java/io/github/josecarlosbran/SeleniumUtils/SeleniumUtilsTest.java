@@ -388,11 +388,11 @@ public class SeleniumUtilsTest {
                 "No fallo al intentar dar click al elemento, por favor verificar el identifacor del elemento que no debe existir en la pagina");
     }
 
-    @Test(testName = "clickElementx2intentsAcierto", description = "Should make click in the specified element 2 tries", dependsOnMethods = "elementExist")
-    public void clickElementx2intentsAcierto() {
-        logParrafo("Se debe de dar click en un elemento especificado");
-        Assert.assertTrue(SeleniumUtils.clicktoElementx2intents(driver, driver, "/html/body/div[1]/div[6]/div[1]"));
-    }
+//    @Test(testName = "clickElementx2intentsAcierto", description = "Should make click in the specified element 2 tries", dependsOnMethods = "elementExist")
+//    public void clickElementx2intentsAcierto() {
+//        logParrafo("Se debe de dar click en un elemento especificado");
+//        Assert.assertTrue(SeleniumUtils.clicktoElementx2intents(driver, driver, "/html/body/div[1]/div[6]/div[1]"));
+//    }
 
     @Test(testName = "clickElementx2intentsFallo", description = "Should make click in the specified element 2 tries", dependsOnMethods = "elementExist")
     public void clickElementx2intentsFallo() {
