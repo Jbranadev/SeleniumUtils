@@ -33,9 +33,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: gradle
+          # Instalar Google Chrome
       - name: Install Chrome
         uses: browser-actions/setup-chrome@v1
-        run: chrome --version
 
 #        run: |
 #          chmod +x ./scripts/InstallChrome.sh
