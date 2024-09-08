@@ -2,19 +2,15 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'signing'
+    id 'jacoco' // Agrega el plugin de JaCoCo
 }
-
 group = 'io.github.josecarlosbran'
 version = '1.1.1'
-
 //Publicación en maven
 // ./gradlew clean build javadocJar sourcesJar publish
-
-
 repositories {
     mavenCentral()
 }
-
 dependencies {
     // Dependencia para TestNG
     testImplementation 'org.testng:testng:7.10.2'
@@ -37,36 +33,40 @@ dependencies {
     implementation 'commons-io:commons-io:2.16.1'
     implementation 'commons-codec:commons-codec:1.17.1'
 }
-
 javadoc {
     options {
         encoding 'UTF-8'
         links 'https://docs.oracle.com/javase/8/docs/api/'
     }
 }
-
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
 }
-
 tasks.register('javadocJar', Jar) {
     archiveClassifier.set('javadoc')
     from tasks.javadoc
 }
-
 tasks.register('sourcesJar', Jar) {
     archiveClassifier.set('sources')
     from sourceSets.main.allSource
 }
-
 tasks.named('publish') {
     dependsOn 'javadocJar', 'sourcesJar'
+}
+jacoco {
+    toolVersion = "0.8.10"
 }
 
 test {
     useTestNG()
+    finalizedBy jacocoTestReport // Genera el reporte de JaCoCo después de las pruebas
 }
-
+jacocoTestReport {
+    reports {
+        xml.required = true // Genera el reporte en formato XML
+        html.required = true // También puedes mantener el HTML si lo necesitas
+    }
+}
 
 publishing {
     publications {
@@ -137,8 +137,6 @@ publishing {
                 password = System.getenv("DEPLOY_ACTIONS_GITHUB")
             }
         }
-
-
     }
 }
 
