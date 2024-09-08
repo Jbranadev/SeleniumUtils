@@ -32,10 +32,11 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-        with:
-          gradle-version: '8.8'  # Especifica la versión exacta de Gradle
+          cache: 'gradle'
+#      - name: Setup Gradle
+#        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+#        with:
+#          gradle-version: '8.8'  # Especifica la versión exacta de Gradle
 
       # Instalar Google Chrome
       - name: Install Chrome
@@ -47,8 +48,6 @@ jobs:
       #Limpiamos la cache de Gradle
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-      - name: Limpiamos la cache de Gradle
-        run: ./gradlew clean
         #Corremos los Test de Gradle
       - name: Run tests and collect coverage
         run: ./gradlew clean test
