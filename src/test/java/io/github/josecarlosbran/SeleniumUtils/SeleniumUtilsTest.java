@@ -43,7 +43,7 @@ public class SeleniumUtilsTest {
 
     @BeforeClass
     public void setUp() {
-        wdm = WebDriverManager.chromedriver().browserInDocker();
+        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
         driver = wdm.create();
         driver.manage().window().maximize();
         LogsJB.setGradeLog(NivelLog.FATAL);
