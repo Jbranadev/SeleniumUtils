@@ -142,7 +142,7 @@ publishing {
 
 signing {
     //useGpgCmd()
-    useInMemoryPgpKeys(findProperty("GPG_KEY_ID"), findProperty("GPG_PRIVATE_KEY"), findProperty("SIGN_KEY_PASS"))
+    useInMemoryPgpKeys(System.getenv("GPG_KEY_ID"), System.getenv("GPG_PRIVATE_KEY"), System.getenv("SIGN_KEY_PASS"))
     sign publishing.publications.mavenJava
 }
 
