@@ -48,7 +48,7 @@ jobs:
         run: ./gradlew clean
         #Corremos los Test de Gradle
       - name: Run tests and collect coverage
-        run: ./gradlew test
+        run: ./gradlew clean test
         #Enviamos los resultados a Codecov
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
