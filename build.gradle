@@ -140,9 +140,17 @@ publishing {
     }
 }
 
+//signing {
+//    //useGpgCmd()
+////    useInMemoryPgpKeys(System.getenv("GPG_KEY_ID"), System.getenv("GPG_PRIVATE_KEY"), System.getenv("SIGN_KEY_PASS"))
+//    useInMemoryPgpKeys( System.getenv("GPG_PRIVATE_KEY"), System.getenv("SIGN_KEY_PASS"))
+//    sign publishing.publications.mavenJava
+//}
+
 signing {
-    //useGpgCmd()
-    useInMemoryPgpKeys(System.getenv("GPG_KEY_ID"), System.getenv("GPG_PRIVATE_KEY"), System.getenv("SIGN_KEY_PASS"))
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications.mavenJava
 }
 
