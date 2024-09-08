@@ -32,16 +32,15 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: gradle
-          # Instalar Google Chrome
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+    # Instalar Google Chrome
       - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
-
-#        run: |
-#          chmod +x ./scripts/InstallChrome.sh
-#          ./scripts/InstallChrome.sh
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+        uses: browser-actions/setup-chrome@v1.7.2
+        with:
+          chrome-version: 120
+          install-chromedriver: true
+          install-dependencies: true
       #Limpiamos la cache de Gradle
       - name: Limpiamos la cache de Gradle
         run: ./gradlew clean
