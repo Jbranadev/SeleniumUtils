@@ -33,7 +33,7 @@ public class SeleniumUtils {
     private static String inespecific = "N/E";
     @Getter
     @Setter
-    private static Integer searchTime = 2500;
+    private static Integer searchTime = 3000;
     @Getter
     @Setter
     private static Integer searchRepetitionTime = 100;
