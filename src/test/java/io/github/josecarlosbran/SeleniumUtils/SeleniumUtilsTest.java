@@ -46,11 +46,12 @@ public class SeleniumUtilsTest {
 //        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
 //        driver = wdm.create();
         WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
+        /*ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--headless");
-        driver = new ChromeDriver(options);
+        driver = new ChromeDriver(options);*/
+        driver=new ChromeDriver();
         driver.manage().window().maximize();
         LogsJB.setGradeLog(NivelLog.FATAL);
     }
@@ -387,11 +388,11 @@ public class SeleniumUtilsTest {
                 "No fallo al intentar dar click al elemento, por favor verificar el identifacor del elemento que no debe existir en la pagina");
     }
 
-//    @Test(testName = "clickElementx2intentsAcierto", description = "Should make click in the specified element 2 tries", dependsOnMethods = "elementExist")
-//    public void clickElementx2intentsAcierto() {
-//        logParrafo("Se debe de dar click en un elemento especificado");
-//        Assert.assertTrue(SeleniumUtils.clicktoElementx2intents(driver, driver, "//*[@id='APjFqb']"));
-//    }
+    @Test(testName = "clickElementx2intentsAcierto", description = "Should make click in the specified element 2 tries", dependsOnMethods = "elementExist")
+    public void clickElementx2intentsAcierto() {
+        logParrafo("Se debe de dar click en un elemento especificado");
+        Assert.assertTrue(SeleniumUtils.clicktoElementx2intents(driver, driver, "//*[@id='APjFqb']"));
+    }
 
     @Test(testName = "clickElementx2intentsFallo", description = "Should make click in the specified element 2 tries", dependsOnMethods = "elementExist")
     public void clickElementx2intentsFallo() {
