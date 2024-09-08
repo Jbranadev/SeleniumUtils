@@ -42,6 +42,8 @@ jobs:
           install-chromedriver: true
           install-dependencies: true
       #Limpiamos la cache de Gradle
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
       - name: Limpiamos la cache de Gradle
         run: ./gradlew clean
         #Corremos los Test de Gradle
