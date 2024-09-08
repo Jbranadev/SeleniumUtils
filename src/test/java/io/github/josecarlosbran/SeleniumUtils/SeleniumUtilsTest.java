@@ -6,7 +6,6 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -23,7 +22,6 @@ import static io.github.josecarlosbran.UtilidadesTest.Utilities.logParrafo;
 public class SeleniumUtilsTest {
     WebDriver driver;
     WebDriverManager wdm;
-
 
     /**
      * El método sirve para enviar archivos por medio de la escritura cuando se presente un elemento de tipo input:File
@@ -51,6 +49,7 @@ public class SeleniumUtilsTest {
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--headless");
         driver = new ChromeDriver(options);
+        //driver=new ChromeDriver();
         driver.manage().window().maximize();
         LogsJB.setGradeLog(NivelLog.FATAL);
     }
@@ -65,7 +64,6 @@ public class SeleniumUtilsTest {
                 "No fue posible encontrar el elemento 'textarea[name='q']' en la pagina," +
                         "valide el identificador del elemento");
     }
-
 //    @Test(testName = "SendKeys Element Search Google"
 //            , description = "Limpia el elemento de busqueda de Google",
 //            dependsOnMethods = "elementExist")
@@ -97,7 +95,6 @@ public class SeleniumUtilsTest {
         // Verifica que la duración está dentro de un rango aceptable (por ejemplo, +/- 100 ms)
         Assert.assertTrue(duration >= 5000 && duration <= 5100, "El método no durmió el hilo el tiempo esperado");
     }
-
 //    @Test(testName = "KeyPress Using Keys",
 //            description = "Verifica que se puede presionar una tecla utilizando el objeto Keys",
 //            dependsOnMethods = "elementExist")
@@ -150,7 +147,6 @@ public class SeleniumUtilsTest {
         // Verifica que la barra de búsqueda contiene la letra '-->'
         Assert.assertEquals(searchBox.getAttribute("value"), "", "La tecla '-->' no fue presionada correctamente");
     }
-
 //    @Test(testName = "KeyPress Using ASCII Code Assert control",
 //            description = "Verifica que se puede presionar una tecla utilizando un código ASCII con la variable de control true",
 //            dependsOnMethods = "elementExist")
@@ -338,7 +334,6 @@ public class SeleniumUtilsTest {
         condicion = SeleniumUtils.cadenaNulaoVacia(SeleniumUtils.obtenerOfTextWebElementx2(driver, driver, elementoBusqueda, 5, 2));
         Assert.assertTrue(condicion);
     }
-
 //    @Test(testName = "getTextOfWebElement", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
 //    public void getTextOfWebElement() {
 //        Boolean condicion = false;
@@ -386,11 +381,10 @@ public class SeleniumUtilsTest {
         Assert.assertFalse(SeleniumUtils.clickElementIfExist(driver, driver, "//*[@id='xxxxxxxxxx']"),
                 "No fallo al intentar dar click al elemento, por favor verificar el identifacor del elemento que no debe existir en la pagina");
     }
-
 //    @Test(testName = "clickElementx2intentsAcierto", description = "Should make click in the specified element 2 tries", dependsOnMethods = "elementExist")
 //    public void clickElementx2intentsAcierto() {
 //        logParrafo("Se debe de dar click en un elemento especificado");
-//        Assert.assertTrue(SeleniumUtils.clicktoElementx2intents(driver, driver, "//*[@id='APjFqb']"));
+//        Assert.assertTrue(SeleniumUtils.clicktoElementx2intents(driver, driver, "/html/body/div[1]/div[6]/div[1]"));
 //    }
 
     @Test(testName = "clickElementx2intentsFallo", description = "Should make click in the specified element 2 tries", dependsOnMethods = "elementExist")
@@ -480,7 +474,6 @@ public class SeleniumUtilsTest {
         logParrafo("Se debe de dar un error al momento de aumentar la cantidad de Zoom que se realiza");
         Assert.assertFalse(SeleniumUtils.cambiarZOOMMas(null, 2));
     }
-
 //    @Test(testName = "scrollMouse", description = "Debería de hacer scroll con el mouse", dependsOnMethods = "elementExist")
 //    public void scrollMouse() {
 //        logParrafo("Se hará Scroll con el mouse por medio de Selenium");
@@ -513,7 +506,6 @@ public class SeleniumUtilsTest {
         respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario");
         Assert.assertTrue(respuesta);
     }
-
 //    @Test(testName = "getElementIfExist", description = "Debería de obtener un elemento web si existe", dependsOnMethods = "elementExist")
 //    public void getElementIfExist() {
 //        logParrafo("Se busca un elemento web para verificar si existe. Si existe, se obtiene su información");
@@ -623,7 +615,6 @@ public class SeleniumUtilsTest {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "xxxxxxxxxxxxxxxx");
         Assert.assertNull(elemento);
     }
-
 //    @Test(testName = "clickToElementExito", description = "Click en un elemento", dependsOnMethods = "elementExist")
 //    public void clickToElementExito() {
 //        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
@@ -661,7 +652,6 @@ public class SeleniumUtilsTest {
         boolean vacio = elementos.isEmpty();
         Assert.assertTrue(vacio);
     }
-
 //    @Test(testName = "getTextIfElementExistSinTiempoExito", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
 //    public void getTextIfElementExistSinTiempoExito() {
 //        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
@@ -673,7 +663,6 @@ public class SeleniumUtilsTest {
         String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "xxxxxxxxxxxxxxxxxx");
         Assert.assertNull(elemento);
     }
-
 //    @Test(testName = "getTextIfElementExistConTiempoExito", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
 //    public void getTextIfElementExistConTiempoExito() {
 //        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "/html/body/div[1]/div[6]/div[1]", 4, 2);
@@ -685,7 +674,6 @@ public class SeleniumUtilsTest {
         String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "xxxxxxxxxxxxxxxxxx", 4, 2);
         Assert.assertNull(elemento);
     }
-
 //    @Test(testName = "seleccionarElementoAcierto", description = "Debe de seleccionar ele elemento especirficado", dependsOnMethods = "elementExist")
 //    public void seleccionarElementoAcierto() {
 //        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
@@ -697,7 +685,6 @@ public class SeleniumUtilsTest {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "xxxxxxxxxxxxx");
         Assert.assertFalse(SeleniumUtils.seleccionarElemento(driver, driver, elemento));
     }
-
 //    @Test(testName = "deseleccionarElementoAcierto", description = "Debe de seleccionar ele elemento especirficado", dependsOnMethods = "elementExist")
 //    public void deseleccionarElementoAcierto() {
 //        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
@@ -783,7 +770,6 @@ public class SeleniumUtilsTest {
         boolean respuesta = SeleniumUtils.movetoframeIDorName(driver, driver, "mi-frame-id");
         Assert.assertTrue(respuesta);
     }
-
 //    @Test(testName = "waitImplicity", description = "Debe de dar una espera implicita hasta que aparezca un elemento web ", dependsOnMethods = "elementExist")
 //    public void waitImplicity() {
 //        logParrafo("El método debe de dar una espera, con un máximo de 30 segundos para que aparezca un elemento en específico, si no, lanzará una excepción");
@@ -917,7 +903,7 @@ public class SeleniumUtilsTest {
     }
 
     @AfterClass
-    public void tearDown(){
+    public void tearDown() {
         if (driver != null) {
             driver.quit();
         }
