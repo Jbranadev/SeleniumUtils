@@ -22,6 +22,8 @@ import static io.github.josecarlosbran.UtilidadesTest.Utilities.logParrafo;
 
 public class SeleniumUtilsTest {
     WebDriver driver;
+    WebDriverManager wdm;
+
 
     /**
      * El método sirve para enviar archivos por medio de la escritura cuando se presente un elemento de tipo input:File
@@ -41,12 +43,8 @@ public class SeleniumUtilsTest {
 
     @BeforeClass
     public void setUp() {
-        WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--headless");
-        driver = new ChromeDriver(options);
+        wdm = WebDriverManager.chromedriver().browserInDocker();
+        driver = wdm.create();
         driver.manage().window().maximize();
         LogsJB.setGradeLog(NivelLog.FATAL);
     }
@@ -914,8 +912,8 @@ public class SeleniumUtilsTest {
 
     @AfterClass
     public void tearDown(){
-        if (driver != null) {
-            driver.quit();
+        if (wdm != null) {
+            wdm.quit();
         }
     }
 }
