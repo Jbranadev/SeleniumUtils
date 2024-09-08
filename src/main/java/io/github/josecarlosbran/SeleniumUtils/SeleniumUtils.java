@@ -36,7 +36,7 @@ public class SeleniumUtils {
     private static Integer searchTime = 3000;
     @Getter
     @Setter
-    private static Integer searchRepetitionTime = 100;
+    private static Integer searchRepetitionTime = 50;
 
     /***
      * Método que presiona una tecla del teclado simulado por selenium
