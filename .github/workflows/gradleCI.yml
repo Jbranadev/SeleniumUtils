@@ -10,7 +10,7 @@ name: Java CI with Gradle
 on:
   workflow_dispatch:
   push:
-    branches: [ "master" , "JBran", "MLemus", "JCornejo", "RSandoval" ]
+    branches: [ "master" , "Jbran", "MLemus", "JCornejo", "RSandoval" ]
   pull_request:
     branches: [ "master" ]
 permissions:
