@@ -54,9 +54,9 @@ jobs:
       - name: Publish to Maven Central
         run: ./gradlew clean build javadocJar sourcesJar publish
         env:
-          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
+          ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.GPG_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGN_KEY_PASS }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
           USER_NAME: ${{ secrets.USER_NAME }}
