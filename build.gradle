@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.github.josecarlosbran'
-version = '1.1'
+version = '1.1.1'
 
 //Publicación en maven
 // ./gradlew clean build javadocJar sourcesJar publish
@@ -148,6 +148,17 @@ signing {
     sign publishing.publications.mavenJava
 }
 
+/*
+signing {
+    useGpgCmd()
+    sign publishing.publications.mavenJava
+}
+
+// Pasar la frase de paso de GPG automáticamente
+tasks.withType(Sign) {
+    useInMemoryPgpKeys(findProperty("SIGN_KEY_PASS"))
+}
+*/
 
 javadoc {
     if (JavaVersion.current().isJava9Compatible()) {
