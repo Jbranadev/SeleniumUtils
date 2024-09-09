@@ -652,11 +652,11 @@ public class SeleniumUtilsTest {
         boolean vacio = elementos.isEmpty();
         Assert.assertTrue(vacio);
     }
-//    @Test(testName = "getTextIfElementExistSinTiempoExito", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
-//    public void getTextIfElementExistSinTiempoExito() {
-//        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
-//        Assert.assertNotNull(elemento);
-//    }
+    @Test(testName = "getTextIfElementExistSinTiempoExito", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
+    public void getTextIfElementExistSinTiempoExito() {
+        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
+        Assert.assertNotNull(elemento);
+    }
 
     @Test(testName = "getTextIfElementExistSinTiempoFallo", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextIfElementExistSinTiempoFallo() {
