@@ -1905,8 +1905,9 @@ public class SeleniumUtils {
      */
     public static boolean subirArchivo(WebDriver driver, String elementoFile, String path) {
         try {
-            WebElement subirArchivo = driver.findElement(By.xpath(elementoFile));
-            subirArchivo.sendKeys(path);
+            WebElement subirArchivo = SeleniumUtils.obtenerWebElementx2(driver, driver, elementoFile);
+            SeleniumUtils.sendKeysToElement(driver, subirArchivo, path);
+            StringUtils.equalsIgnoreCase("", "");
             Path ruta = Path.of(path);
             String nameFile = ruta.getFileName().toString();
             LogsJB.info("Se subio archivo: " + nameFile);
