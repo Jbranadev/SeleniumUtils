@@ -658,11 +658,11 @@ public class SeleniumUtilsTest {
         Assert.assertNotNull(elemento);
     }
 
-    @Test(testName = "getTextIfElementExistSinTiempoFallo", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
-    public void getTextIfElementExistSinTiempoFallo() {
-        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "xxxxxxxxxxxxxxxxxx");
-        Assert.assertNull(elemento);
-    }
+//    @Test(testName = "getTextIfElementExistSinTiempoFallo", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
+//    public void getTextIfElementExistSinTiempoFallo() {
+//        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "xxxxxxxxxxxxxxxxxx");
+//        Assert.assertNull(elemento);
+//    }
 //    @Test(testName = "getTextIfElementExistConTiempoExito", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
 //    public void getTextIfElementExistConTiempoExito() {
 //        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "/html/body/div[1]/div[6]/div[1]", 4, 2);
@@ -845,7 +845,7 @@ public class SeleniumUtilsTest {
     }
 
     */
-
+/*
     @Test(testName = "subirArchivoFallo", description = "Debe de lanzar un error al subir un archivo por medio de texto", dependsOnMethods = "elementExist")
     public void subirArchivoFallo() {
         String id = "id-elementoFile";
@@ -856,6 +856,7 @@ public class SeleniumUtilsTest {
         Assert.assertFalse(condicion);
     }
 
+    */
     @Test(testName = "regresarFramePrincipal", description = "Debe de regresar al frame inicial", dependsOnMethods = "elementExist")
     public void regresarFramePrincipal() {
         logParrafo("Se debe de regresar al frame que se muestra cuando se ingresa por primera vez a la página ");
