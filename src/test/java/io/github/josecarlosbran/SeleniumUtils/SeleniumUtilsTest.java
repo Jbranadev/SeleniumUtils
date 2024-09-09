@@ -615,11 +615,11 @@ public class SeleniumUtilsTest {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "xxxxxxxxxxxxxxxx");
         Assert.assertNull(elemento);
     }
-//    @Test(testName = "clickToElementExito", description = "Click en un elemento", dependsOnMethods = "elementExist")
-//    public void clickToElementExito() {
-//        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
-//        Assert.assertTrue(SeleniumUtils.clickToElement(driver, elemento));
-//    }
+    @Test(testName = "clickToElementExito", description = "Click en un elemento", dependsOnMethods = "elementExist")
+    public void clickToElementExito() {
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
+        Assert.assertTrue(SeleniumUtils.clickToElement(driver, elemento));
+    }
 
     @Test(testName = "clickToElementFallo", description = "Error al dar click en un elemento", dependsOnMethods = "elementExist")
     public void clickToElementFallo() {
