@@ -2231,7 +2231,7 @@ public class SeleniumUtils {
      */
     public void sendKeystoElementvalidValueX2(WebDriver driver,SearchContext searchContext, String element, String value) {
         if (!SeleniumUtils.cadenaNulaoVacia(value)) {
-            if (!value.equalsIgnoreCase(this.testContext.inespecific)) {
+            if (!value.equalsIgnoreCase(inespecific)) {
                 sendkeystoelementX2(driver,searchContext, element, value);
             }
         }
@@ -2246,7 +2246,7 @@ public class SeleniumUtils {
      */
     public void sendKeystoElementvalidValue(WebDriver driver,SearchContext searchContext, String element, String value) {
         if (!SeleniumUtils.cadenaNulaoVacia(value)) {
-            if (!value.equalsIgnoreCase(this.testContext.inespecific)) {
+            if (!value.equalsIgnoreCase(inespecific)) {
                 sendKeystoElement(driver, searchContext,element, false);
             }
         }
