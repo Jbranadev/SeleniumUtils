@@ -2113,33 +2113,20 @@ public class SeleniumUtils {
     }
     //SEGUNDO LOTE DE MÉTODOS
 
-    /**
-     * @param Campo  Texto incluido en provider para validar si existe contenido.
-     * @param Nombre Nombre del campo que se valida.
-     */
-    public static boolean ValidarNull(String Campo, String Nombre) {
-        if (cadenaNulaoVacia(Campo)) {
-            LogsJB.error("Debe de ingresar el valor del campo: " + Nombre);
+    public static boolean validarNull(String campo, String nombre) {
+        if (cadenaNulaoVacia(campo)) {
+            LogsJB.error("Debe ingresar el valor del campo: " + nombre);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
-    /**
-     * Función para subir archivos
-     *
-     * @param driver WebDriver se utiliza para interactuar con los elementos de la BERediseño
-     * @param path   Identificador de la ruta donde se encuntra hubicado el archivo
-     */
     public static boolean subirArchivo(WebDriver driver, String elementoFile, String path) {
         try {
-            WebElement subirArchivo = SeleniumUtils.obtenerWebElementx2(driver, driver, elementoFile);
-            SeleniumUtils.sendKeysToElement(driver, subirArchivo, path);
-            StringUtils.equalsIgnoreCase("", "");
-            Path ruta = Path.of(path);
-            String nameFile = ruta.getFileName().toString();
-            LogsJB.info("Se subio archivo: " + nameFile);
+            WebElement subirArchivo = obtenerWebElementx2(driver, driver, elementoFile);
+            sendKeysToElement(driver, subirArchivo, path);
+            String nameFile = Path.of(path).getFileName().toString();
+            LogsJB.info("Se subió archivo: " + nameFile);
             return true;
         } catch (Exception e) {
             LogsJB.error("No se pudo subir el archivo: " + ExceptionUtils.getStackTrace(e));
@@ -2147,74 +2134,42 @@ public class SeleniumUtils {
         }
     }
 
-    /**
-     * método para regresar el driver al contenido principal, el que aparece cuando se inicia la página.
-     *
-     * @param driver es el manejador de la página, el cual será regresado al contenido principal
-     */
     public static boolean regresarFramePrincipal(WebDriver driver) {
         try {
             driver.switchTo().defaultContent();
-            LogsJB.info("Se regresa al frame inicial ");
+            LogsJB.info("Se regresa al frame inicial");
             return true;
         } catch (Exception ex) {
-            LogsJB.error("Se ha capturado un error al cambiar al frame principal: ");
-            LogsJB.fatal("Error: " + ex.getMessage());
+            LogsJB.error("Error al cambiar al frame principal: " + ex.getMessage());
             return false;
         }
     }
 
-    /**
-     * Este método convierte una direccion ip a terminal(Hexadecimal):
-     * Por ejemplo: 127.0.0.1-->7F000001
-     *
-     * @param ipDecimal
-     * @return
-     */
     public static String convertirIpDecimalAHexadecimal(String ipDecimal) {
-        // Dividimos la dirección IP en sus componentes (octetos)
-        String[] octetos = ipDecimal.split("\\.");
-        // Convertimos cada octeto a su representación hexadecimal
         StringBuilder hex = new StringBuilder();
-        for (String octeto : octetos) {
-            // Parseamos el octeto a un entero y lo convertimos a hexadecimal
+        for (String octeto : ipDecimal.split("\\.")) {
             String hexOcteto = Integer.toHexString(Integer.parseInt(octeto));
-            // Si el octeto hexadecimal tiene solo un carácter, añadimos un cero al principio
-            if (hexOcteto.length() == 1) {
-                hex.append("0");
-            }
-            hex.append(hexOcteto);
+            hex.append(hexOcteto.length() == 1 ? "0" + hexOcteto : hexOcteto);
         }
-        // Convertimos la cadena a mayúsculas para el formato deseado
         return hex.toString().toUpperCase();
     }
 
-    public static boolean JsComando(WebDriver driver, String comandoJs) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
+    public static boolean ejecutarJsComando(WebDriver driver, String comandoJs) {
         try {
-            js.executeScript(comandoJs);
-            LogsJB.info("Ejecuta el siguiente comando de Javasript " + comandoJs);
+            ((JavascriptExecutor) driver).executeScript(comandoJs);
+            LogsJB.info("Ejecutado comando JS: " + comandoJs);
             return true;
         } catch (Exception ex) {
-            LogsJB.error("Error capturado en la función que ejecuta comandos JS: " + comandoJs);
-            LogsJB.error("StackTrace de la excepción: " + ExceptionUtils.getStackTrace(ex));
+            LogsJB.error("Error ejecutando comando JS: " + comandoJs + ". StackTrace: " + ExceptionUtils.getStackTrace(ex));
             return false;
         }
     }
 
-    /***
-     * Mueve el navegador a la tab que está recibiendo como parametro
-     * @param driver Driver que está manipulando el navegador
-     * @param previousTab Previous Tab al que nos queremos mover
-     */
-    public void movetoPreviousTab(WebDriver driver, String previousTab) {
-        if (SeleniumUtils.esValorValido(previousTab)) {
-            //Loop through until we find a new window handle
+    public void moverATabAnterior(WebDriver driver, String previousTab) {
+        if (esValorValido(previousTab)) {
             for (String windowHandle : driver.getWindowHandles()) {
-                LogsJB.debug("Previus Tab: " + previousTab);
-                LogsJB.debug("Windows Handle: " + windowHandle);
-                if (previousTab.contentEquals(windowHandle)) {
-                    LogsJB.info("Se movera el driver a la pestaña solicitada");
+                if (previousTab.equals(windowHandle)) {
+                    LogsJB.info("Moviendo a la pestaña solicitada");
                     driver.switchTo().window(windowHandle);
                     break;
                 }
@@ -2222,154 +2177,83 @@ public class SeleniumUtils {
         }
     }
 
-    /**
-     * Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter
-     *
-     * @param driver  driver que manipula el navegador
-     * @param element elemento al que se envÃ­ara el texto
-     * @param value   Valor que se validara no sea null o vacio
-     */
-    public void sendKeystoElementvalidValueX2(WebDriver driver,SearchContext searchContext, String element, String value) {
-        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
-            if (!value.equalsIgnoreCase(inespecific)) {
-                sendkeystoelementX2(driver,searchContext, element, value);
-            }
+    public void enviarTextoSiValidoX2(WebDriver driver, SearchContext searchContext, String element, String value) {
+        if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
+            enviarTextoX2(driver, searchContext, element, value);
         }
     }
 
-    /**
-     * Envia el texto al elemento especificado
-     *
-     * @param driver  driver que manipula el navegador
-     * @param element elemento al que se envÃ­ara el texto
-     * @param value   Valor que se validara no sea null o vacio
-     */
-    public void sendKeystoElementvalidValue(WebDriver driver,SearchContext searchContext, String element, String value) {
-        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
-            if (!value.equalsIgnoreCase(inespecific)) {
-                sendKeystoElement(driver, searchContext,element, false);
-            }
+    public void enviarTextoSiValido(WebDriver driver, SearchContext searchContext, String element, String value) {
+        if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
+            enviarTexto(driver,searchContext,element,false,value);
         }
     }
 
-    /**
-     * Trata de envíar el texto al elemento especificado en mas de una ocasión
-     *
-     * @param driver  Driver que está manipulando el navegador
-     * @param element Atributo por medio del cual identificaremos el elemento a modificar
-     * @param texto   Texto que deseamos envíar al elmento
-     * @return True si logra envíar el texto, de lo contrario false
-     */
-    private Boolean sendKeystoElementx2intents(WebDriver driver,SearchContext searchContext, String element, CharSequence... texto) {
-        int i = 0;
-        while (i < 2) {
-            if (SeleniumUtils.sendKeysIfElementExist(driver,searchContext, element, texto)) {
+    private boolean enviarTextoX2Intentos(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
+        for (int i = 0; i < 2; i++) {
+            if (sendKeysIfElementExist(driver, searchContext, element, texto)) {
                 return true;
             }
-            i++;
         }
         return false;
     }
 
-    /***
-     * Envía dos veces el texto indicado al elemento indicado
-     * @param searchContext Driver que está manipulando el navegador
-     * @param elemento Atributo por medio del cual identificaremos el elemento a modificar
-     * @param texto Texto que deseamos envíar al elmento
-     */
-    public void sendkeystoelementX2(WebDriver driver,SearchContext searchContext, String elemento, String texto) {
-        sendKeystoElement(driver,searchContext,elemento,false,texto);
-        SeleniumUtils.keyPress(driver, Keys.ENTER);
-        sendKeystoElement(driver,searchContext, elemento,false, texto);
-        SeleniumUtils.keyPress(driver, Keys.ENTER);
+    public void enviarTextoX2(WebDriver driver, SearchContext searchContext, String element, String texto) {
+        enviarTexto(driver,searchContext,element,false,texto);
+        keyPress(driver, Keys.ENTER);
+        enviarTexto(driver, searchContext, element,false,texto);
+        keyPress(driver, Keys.ENTER);
     }
 
-    /***
-     * Realiza 2 veces la busquedad de el texto de un elemento
-     * @param driver Driver que controla el navegador
-     * @param element Atributo del elemento a buscar
-     * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
-     */
-    public String obtenerTextWebElementx2(WebDriver driver,SearchContext searchContext, String element) {
-        int i = 0;
-        String texto = null;
-        while (Objects.isNull(texto) && i < 2) {
-            texto = SeleniumUtils.getTextIfElementExist(driver, searchContext, element);
-            i++;
+    public String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element) {
+        for (int i = 0; i < 2; i++) {
+            String texto = getTextIfElementExist(driver, searchContext, element);
+            if (texto != null) {
+                return texto;
+            }
         }
-        return texto;
+        return null;
     }
 
-    /****
-     * Realiza 2 veces la busquedad de el texto de un elemento
-     * @param driver Driver que controla el navegador
-     * @param element Atributo del elemento a buscar
-     * @param timeduration Duración de la busquedad del texto del elemento especificado
-     * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
-     * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
-     */
-    public String obtenerTextWebElementx2(WebDriver driver,SearchContext searchContext, String element, int timeduration, int timerepetition) {
-        int i = 0;
-        String texto = null;
-        while (Objects.isNull(texto) && i < 2) {
-            texto = SeleniumUtils.getTextIfElementExist(driver, searchContext, element, timeduration, timerepetition);
-            i++;
+    public String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
+        for (int i = 0; i < 2; i++) {
+            String texto = getTextIfElementExist(driver, searchContext, element, timeduration, timerepetition);
+            if (texto != null) {
+                return texto;
+            }
         }
-        return texto;
+        return null;
     }
 
-    /**
-     * Envía un texto al elemento indicado, si este existe en el contexto actual.
-     *
-     * @param driver  Driver que está manipulando el navegador
-     * @param element Atributo del elemento, por medio del cual se realizara la busqueda
-     * @param Texto   Texto a envíar al elemento indicado
-     * @param banderaAssert Bandera para controlar si se quiere controlar el Assert.fail
-     */
-    public Boolean sendKeystoElement(WebDriver driver,SearchContext searchContext, String element, String Texto, boolean banderaAssert) {
+    public boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
         try {
-            if (sendKeystoElementx2intents(driver, searchContext,element, Texto)) {
-                WebElement elemento=obtenerWebElementx2(driver,searchContext,element);
+            if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
+                WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
                 getImageScreeenshotWebElement(driver,elemento);
                 return true;
-            } else {
-                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se envío el Texto y no se tomo la captura");
             }
+            LogsJB.info("No se encontró el elemento: " + element);
         } catch (Exception e) {
-            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
-            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
-            LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
-                Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
-            }
+            manejarErrorEnvioTexto(element, e, assertFail);
         }
         return false;
     }
 
-    /**
-     * Envía un texto al elemento indicado, si este existe en el contexto actual.
-     *
-     * @param driver  Driver que está manipulando el navegador
-     * @param element Atributo del elemento, por medio del cual se realizara la busqueda
-     * @param Texto   Texto a envíar al elemento indicado
-     */
-    public Boolean sendKeystoElement(WebDriver driver, SearchContext searchContext, String element, boolean banderaAssert, CharSequence... Texto) {
+    public boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
         try {
-            if (sendKeystoElementx2intents(driver, searchContext,element, Texto)) {
-                return true;
-            } else {
-                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se envío el Texto");
-            }
+            return enviarTextoX2Intentos(driver, searchContext, element, texto);
         } catch (Exception e) {
-            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
-            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
-            LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
-                Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
-
-            }
+            manejarErrorEnvioTexto(element, e, assertFail);
         }
         return false;
+    }
+
+    private void manejarErrorEnvioTexto(String element, Exception e, boolean assertFail) {
+        LogsJB.error("Error enviando texto al elemento: " + element + ". " + e.getMessage());
+        LogsJB.error("Stacktrace: " + ExceptionUtils.getStackTrace(e));
+        if (assertFail) {
+            Assert.fail("Error enviando texto al elemento: " + element);
+        }
     }
 
 

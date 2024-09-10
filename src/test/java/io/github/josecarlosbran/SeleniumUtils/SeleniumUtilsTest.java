@@ -504,7 +504,7 @@ public class SeleniumUtilsTest {
     public void selectOptionWithComment() {
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
         boolean respuesta = false;
-        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario");
+        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario",false);
         Assert.assertTrue(respuesta);
     }
     @Test(testName = "getElementIfExist", description = "Debería de obtener un elemento web si existe", dependsOnMethods = "elementExist")
@@ -822,7 +822,7 @@ public class SeleniumUtilsTest {
     public void ValidarNullExito() {
         String campo = "";
         String nombre = "Nombre";
-        boolean respuesta = SeleniumUtils.ValidarNull(campo, nombre);
+        boolean respuesta = SeleniumUtils.validarNull(campo, nombre);
         Assert.assertTrue(respuesta);
     }
 
@@ -830,7 +830,7 @@ public class SeleniumUtilsTest {
     public void ValidarNullFallo() {
         String campo = "NoVacio";
         String nombre = "Nombre";
-        boolean respuesta = SeleniumUtils.ValidarNull(campo, nombre);
+        boolean respuesta = SeleniumUtils.validarNull(campo,nombre);
         Assert.assertFalse(respuesta);
     }
 
@@ -883,7 +883,7 @@ public class SeleniumUtilsTest {
     public void JsComandoExito() {
         logParrafo("Debe de ejecutar un comando determinado de javascript por medio de un JavascriptExecutor ");
         String comando = "console.log('Comando ejecutado');";
-        boolean respuesta = SeleniumUtils.JsComando(driver, comando);
+        boolean respuesta=SeleniumUtils.ejecutarJsComando(driver,comando);
         Assert.assertTrue(respuesta);
     }
 
@@ -891,7 +891,7 @@ public class SeleniumUtilsTest {
     public void JsComandoFallo() {
         logParrafo("Debe de ejecutar un comando determinado de javascript por medio de un JavascriptExecutor ");
         String comando = null;
-        boolean respuesta = SeleniumUtils.JsComando(driver, comando);
+        boolean respuesta = SeleniumUtils.ejecutarJsComando(driver, comando);
         Assert.assertFalse(respuesta);
     }
 
