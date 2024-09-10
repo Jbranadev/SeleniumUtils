@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.logging.Logs;
 import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
 
@@ -241,8 +240,7 @@ public class SeleniumUtils {
                 // Crear un objeto Actions
                 Actions actions = new Actions(driver);
                 // Desplazar el scroll hasta el elemento
-                actions.moveToElement(elemento);
-                actions.perform();
+                actions.moveToElement(elemento).perform();
             } catch (WebDriverException e) {
                 // Desplazar el scroll hasta el elemento
                 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elemento);
@@ -266,13 +264,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Buscara si existe el elemento indicado: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.elementExist(wait, searchContext, By.id(element));
@@ -284,8 +278,7 @@ public class SeleniumUtils {
         Future<Boolean> futureXpath = SeleniumParallel.elementExist(wait, searchContext, By.xpath(element));
         Future<Boolean> futureName = SeleniumParallel.elementExist(wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && !fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && futureId.get()) {
                     return true;
@@ -316,13 +309,10 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+
+        if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No Existe el elemento especificado: " + element);
         } else {
             LogsJB.info(" Logro encontrar el elemento especificado: " + element);
@@ -346,13 +336,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existe el elemento indicado, lo limpiara: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.id(element));
@@ -364,8 +350,7 @@ public class SeleniumUtils {
         Future<Boolean> futureXpath = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.xpath(element));
         Future<Boolean> futureName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && !fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && futureId.get()) {
                     return true;
@@ -396,13 +381,10 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+
+        if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No logro limpiar el elemento especificado: " + element);
         } else {
             LogsJB.info(" Logro limpiar el elemento especificado: " + element);
@@ -599,13 +581,9 @@ public class SeleniumUtils {
                 ", enviara el texto: " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.id(element), Texto);
@@ -617,8 +595,7 @@ public class SeleniumUtils {
         Future<Boolean> futureXpath = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.xpath(element), Texto);
         Future<Boolean> futureName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.name(element), Texto);
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && !fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && futureId.get()) {
                     return true;
@@ -649,13 +626,10 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+
+        if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No logro encontrar y setear el Texto: " + Arrays.toString(Texto) +
                     " en el elemento especificado: " + element);
         } else {
@@ -694,13 +668,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Obtendrá el texto del elemento si este existe: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + timeDuration + " mili segundos: " + timeRepetition);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, timeDuration, timeRepetition);
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<String> futureId = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.id(element));
@@ -712,8 +682,7 @@ public class SeleniumUtils {
         Future<String> futureXpath = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.xpath(element));
         Future<String> futureName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && !fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && !futureId.get().isEmpty()) {
                     texto = futureId.get();
@@ -752,13 +721,10 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+
+        if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No pudo hacer obtener el texto del elemento especificado, ya que no existe: " + element);
         } else {
             LogsJB.info(" Logro encontrar y obtener el texto: " + texto + " del elemento especificado: " + element);
@@ -868,13 +834,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existe el elemento indicado, hará click en el elemento: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.id(element));
@@ -886,8 +848,7 @@ public class SeleniumUtils {
         Future<Boolean> futureXpath = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.xpath(element));
         Future<Boolean> futureName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && !fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && futureId.get()) {
                     return true;
@@ -918,13 +879,10 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+
+        if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No pudo hacer click en el elemento especificado, ya que no existe: " + element);
         } else {
             LogsJB.info(" Logro encontrar y hacer click en el elemento especificado: " + element);
@@ -1033,13 +991,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existen los elementos que corresponden al identificador: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<List<WebElement>> futureId = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.id(element));
@@ -1051,8 +1005,7 @@ public class SeleniumUtils {
         Future<List<WebElement>> futureXpath = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.xpath(element));
         Future<List<WebElement>> futureName = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && !futureId.get().isEmpty()) {
                     LogsJB.info("Elementos encontrados por ID: " + futureId.get());
@@ -1091,13 +1044,10 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if ((fecha2.after(fecha)) || elementos.isEmpty()) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+
+        if (System.currentTimeMillis() >= endTime || elementos.isEmpty()) {
             LogsJB.warning(" No pudo obtener los elementos especificados, ya que no existen: " + elementos);
         }
         //Retorna null si el elemento no Existe
@@ -1135,13 +1085,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existen los elementos que corresponden al identificador: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         // Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<WebElement> futureId = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.id(element));
@@ -1153,8 +1099,7 @@ public class SeleniumUtils {
         Future<WebElement> futureXpath = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.xpath(element));
         Future<WebElement> futureName = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone()) {
                     elemento = futureId.get();
@@ -1217,13 +1162,10 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if ((fecha2.after(fecha)) || Objects.isNull(elemento)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+
+        if (System.currentTimeMillis() >= endTime || Objects.isNull(elemento)) {
             LogsJB.warning(" No pudo obtener el elemento especificado, ya que no existe: " + element);
         }
         //Retorna null si el elemento no Existe

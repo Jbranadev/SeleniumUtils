@@ -5,7 +5,6 @@ import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -45,14 +44,14 @@ public class SeleniumUtilsTest {
 //        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
 //        driver = wdm.create();
         WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
+        /*ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--headless");
-        driver = new ChromeDriver(options);
-        //driver=new ChromeDriver();
+        driver = new ChromeDriver(options);*/
+        driver=new ChromeDriver();
         driver.manage().window().maximize();
-        LogsJB.setGradeLog(NivelLog.FATAL);
+        LogsJB.setGradeLog(NivelLog.TRACE);
     }
 
     @Test(testName = "Element Exist Google"
@@ -376,6 +375,20 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(variable, "No se logro hacer click en el elemento");
     }
 
+
+
+    @Test(testName = "clickElementIfExistBran")
+    public void clickElementIfExistBran() {
+        logParrafo("Se debe de dar click en un elemento especificado");
+        driver.get("http://10.253.15.109/SIB/transaction/LOGON.asp");
+        Boolean variable = SeleniumUtils.clickElementIfExist(driver, driver, "input[type='submit'][value='Conectar']");
+        LogsJB.waitForOperationComplete();
+        Assert.assertTrue(variable, "No se logro hacer click en el elemento");
+    }
+
+
+
+
     @Test(testName = "clickElementIfExistFallo", description = "Should make click in the specified element", dependsOnMethods = "elementExist")
     public void clickElementIfExistFallo() {
         logParrafo("Se debe de dar click en un elemento especificado");
@@ -504,7 +517,7 @@ public class SeleniumUtilsTest {
     public void selectOptionWithComment() {
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
         boolean respuesta = false;
-        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario");
+        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario", false);
         Assert.assertTrue(respuesta);
     }
     @Test(testName = "getElementIfExist", description = "Debería de obtener un elemento web si existe", dependsOnMethods = "elementExist")
