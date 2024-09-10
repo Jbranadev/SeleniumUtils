@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.logging.Logs;
 import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
 
@@ -50,7 +51,6 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
         }
     }
 
@@ -86,7 +86,6 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
         }
     }
 
@@ -985,7 +984,34 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
+        } finally {
+            return bandera;
+        }
+    }
+
+
+    /**
+     * Espera implícita de 30 segundos, luego de los 30 segundos lanzara excepción
+     *
+     * @param driver Driver que está manipulando el navegador
+     * @param by     Identificador del tipo By
+     * @param banderaAssert bandera para decidir si se quiere manejar o no, el assertFail
+     * @return retorna verdadero si se da la espera de manera correcta
+     */
+    public static boolean waitImplicity(WebDriver driver, By by,boolean banderaAssert) {
+        boolean bandera = false;
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            wait.until(driver1 -> !ElementoDeshabilitado(driver1.findElement(by)));
+            bandera = true;
+        } catch (TimeoutException ignored) {
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(banderaAssert){
+                Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
+
+            }
         } finally {
             return bandera;
         }
@@ -1472,7 +1498,7 @@ public class SeleniumUtils {
                     double newZoomValue = (zoomActualValue < 100.0) ? (zoomActualValue - 15.0) : 100.0;
                     js.executeScript("document.body.style.zoom = '" + newZoomValue + "%'");
                 } catch (NumberFormatException e) {
-                    System.out.println("El valor de zoomActual no es numérico: " + zoomActual);
+                    LogsJB.info("El valor de zoomActual no es numérico: "+zoomActual);
                 }
             }
             File scrFile = SeleniumUtils.getImageScreeenshotWebElement(driver, elementScreenshot);
@@ -1514,7 +1540,36 @@ public class SeleniumUtils {
             LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
             LogsJB.fatal("*");
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
+            return false;
+        }
+    }
+
+    /**
+     * Espera implícita de 5 segundos o menos si el elemento desaparece del DOM, luego de los 5 segundos lanzara excepción
+     *
+     * @param driver Variable que manipula el navegador
+     * @param by     Identificador del tipo By
+     * @param banderaAssert Bandera para preguntar si se quiere el assertFail
+     */
+    public static boolean waitImplicityForElementNotExist(WebDriver driver, By by,boolean banderaAssert) {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
+            return true;
+        } catch (TimeoutException ignored) {
+            return false;
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
+            LogsJB.fatal("*");
+            LogsJB.fatal(" " + e);
+            LogsJB.fatal(" Tipo de Excepción : " + e.getClass());
+            LogsJB.fatal(" Causa de la Excepción : " + e.getCause());
+            LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
+            LogsJB.fatal("*");
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(banderaAssert){
+                Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
+            }
             return false;
         }
     }
@@ -1589,7 +1644,34 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            return false;
+        }
+    }
+
+    /***
+     * Presiona la tecla indicada en él condigo numerico indicado
+     * @param driver  Driver que está manipulando el navegador
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
+     * @param codigo Codigo numerico de la tecla que queremos presionar
+     * @return
+     */
+    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo,boolean banderaAssert) {
+        try {
+            for (int i = 0; i < repeticiones; i++) {
+                threadslepp(100);
+                Actions actions = new Actions(driver);
+                actions.keyDown(Keys.CONTROL).keyDown(codigo).keyUp(codigo).keyUp(Keys.CONTROL).perform();
+                LogsJB.info("Presiona la tecla: " + codigo);
+                LogsJB.info("Suelta la tecla: " + codigo);
+                threadslepp(100);
+            }
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(banderaAssert){
             Assert.fail("Error inesperado al presionar una tecla: ");
+            }
             return false;
         }
     }
@@ -1616,7 +1698,36 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
+            return false;
+        }
+    }
+
+    /***
+     * Presiona la tecla indicada en él condigo numerico indicado
+     * @param driver  Driver que está manipulando el navegador
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
+     * @param codigo Codigo numerico de la tecla que queremos presionar
+     * @return
+     */
+    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, int codigo,boolean banderaAssert) {
+        try {
+            for (int i = 0; i < repeticiones; i++) {
+                threadslepp(100);
+                char asciiValue = (char) codigo;
+                Actions actions = new Actions(driver);
+                actions.keyDown(Keys.CONTROL).keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).keyUp(Keys.CONTROL).perform();
+                LogsJB.info("Presiona la tecla: " + codigo);
+                LogsJB.info("Suelta la tecla: " + codigo);
+                threadslepp(100);
+            }
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(banderaAssert){
+                Assert.fail("Error inesperado al presionar una tecla: ");
+
+            }
             return false;
         }
     }
@@ -1635,7 +1746,28 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
+            return false;
+        }
+    }
+
+    /***
+     * Presiona la tecla indicada en él codigo numerico indicado
+     * @param driver  Driver que está manipulando el navegador
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
+     *
+     * @return
+     */
+    public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones,boolean banderaAssert) {
+        try {
+            cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(banderaAssert){
+                Assert.fail("Error inesperado al presionar una tecla: ");
+
+            }
             return false;
         }
     }
@@ -1654,7 +1786,28 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al presionar una tecla: ");
+            return false;
+        }
+    }
+
+    /***
+     * Presiona la tecla indicada en él codigo numerico indicado
+     * @param driver  Driver que está manipulando el navegador
+     * @param repeticiones Cantidad de veces que deseamos se repita el cambio de Zoom
+     *
+     * @return
+     */
+    public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones,boolean banderaAssert) {
+        try {
+            cambiarZOOM(driver, repeticiones, Keys.ADD);
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(banderaAssert){
+                Assert.fail("Error inesperado al presionar una tecla: ");
+
+            }
             return false;
         }
     }
@@ -1679,7 +1832,34 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al intentar realizar el scroll: ");
+            return false;
+        }
+    }
+
+    /**
+     * Mueve el scroll del mouse
+     *
+     * @param cantidad Si el número es positivo, el desplazamiento es hacia abajo en la pantalla, si el número es negativo
+     *                 el desplazamiento es hacia arriba.
+     */
+    public static boolean scrollMouse(int cantidad,boolean banderaAssert) {
+        try {
+            Robot robot = new Robot();
+            int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
+            int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height / 2;
+            LogsJB.info("Altura de la pantalla " + alto * 2 + " ancho de la pantalla " + ancho * 2);
+            robot.mouseMove(ancho, alto);
+            robot.mouseWheel(cantidad);
+            LogsJB.info("Se realizo el movimiento del scroll: ");
+            threadslepp(100);
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(banderaAssert){
+                Assert.fail("Error inesperado al intentar realizar el scroll: ");
+
+            }
             return false;
         }
     }
@@ -1700,7 +1880,30 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al intentar realizar el scroll: ");
+            return false;
+        }
+    }
+
+    /**
+     * Mueve el escrol del mouse
+     *
+     * @param driver          Driver que está manipulando el navegador
+     * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
+     */
+    public static boolean scrollMouseDown(WebDriver driver, int cantidadScrolls,boolean banderaAssert) {
+        try {
+            Actions actions = new Actions(driver);
+            for (int i = 0; i < cantidadScrolls; i++) {
+                actions.sendKeys(Keys.PAGE_DOWN).build().perform();
+            }
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(banderaAssert){
+                Assert.fail("Error inesperado al intentar realizar el scroll: ");
+
+            }
             return false;
         }
     }
@@ -1721,7 +1924,30 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al intentar realizar el scroll: ");
+            return false;
+        }
+    }
+
+    /**
+     * Mueve el escrol del mouse
+     *
+     * @param driver          Driver que está manipulando el navegador
+     * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
+     */
+    public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls,boolean banderaAssert) {
+        try {
+            Actions actions = new Actions(driver);
+            for (int i = 0; i < cantidadScrolls; i++) {
+                actions.sendKeys(Keys.PAGE_UP).build().perform();
+            }
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if(banderaAssert){
+                Assert.fail("Error inesperado al intentar realizar el scroll: ");
+
+            }
             return false;
         }
     }
@@ -1734,7 +1960,7 @@ public class SeleniumUtils {
      * @param opcion Opcion del elemento que queremos seleccionar
      * @param comment Comentario que será colocado sobre la imagen capturada si el Elemento indicado existe
      */
-    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment) {
+    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment,boolean banderaAssert) {
         try {
             WebElement elemento = obtenerWebElementx2(driver, searchcontext, element);
             if (!Objects.isNull(elemento)) {
@@ -1758,7 +1984,10 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            Assert.fail("Error inesperado al seleccionar el elemento: " + element);
+            if(banderaAssert){
+                Assert.fail("Error inesperado al seleccionar el elemento: " + element);
+
+            }
             return false;
         }
     }
