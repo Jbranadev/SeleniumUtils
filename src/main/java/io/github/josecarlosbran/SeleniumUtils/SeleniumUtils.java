@@ -232,22 +232,24 @@ public class SeleniumUtils {
      * @param elemento WebElement el elemento al que se desea posicionarse
      */
     public static void posicionarmeEn(WebDriver driver, WebElement elemento) {
+        if (Objects.isNull(elemento)) {
+            return;
+        }
+        LogsJB.debug("Posicionandonos en el elemento con scrollIntoViewIfNeeded.");
         try {
-            if (Objects.isNull(elemento)) {
-                return;
-            }
+            // Opción 3: Usar scrollIntoViewIfNeeded (obsoleto en algunos navegadores)
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoViewIfNeeded(true);", elemento);
+        } catch (WebDriverException e3) {
+            LogsJB.warning("Fallo con scrollIntoViewIfNeeded, intentando con Actions perform.");
             try {
-                // Crear un objeto Actions
+                // Último recurso: Usar Actions para desplazarse al elemento
                 Actions actions = new Actions(driver);
-                // Desplazar el scroll hasta el elemento
                 actions.moveToElement(elemento).perform();
-            } catch (WebDriverException e) {
-                // Desplazar el scroll hasta el elemento
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elemento);
+            } catch (WebDriverException e5) {
+                // Capturar la excepción final si todas las opciones fallan
+                LogsJB.fatal("Todas las opciones de scroll han fallado para el elemento: " + elemento.toString());
+                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e5));
             }
-        } catch (Exception e) {
-            LogsJB.fatal("Excepción capturada al intentar hacer scroll en el elemento: " + elemento.toString());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -311,7 +313,6 @@ public class SeleniumUtils {
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
-
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No Existe el elemento especificado: " + element);
         } else {
@@ -383,7 +384,6 @@ public class SeleniumUtils {
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
-
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No logro limpiar el elemento especificado: " + element);
         } else {
@@ -628,7 +628,6 @@ public class SeleniumUtils {
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
-
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No logro encontrar y setear el Texto: " + Arrays.toString(Texto) +
                     " en el elemento especificado: " + element);
@@ -723,7 +722,6 @@ public class SeleniumUtils {
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
-
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No pudo hacer obtener el texto del elemento especificado, ya que no existe: " + element);
         } else {
@@ -881,7 +879,6 @@ public class SeleniumUtils {
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
-
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No pudo hacer click en el elemento especificado, ya que no existe: " + element);
         } else {
@@ -947,16 +944,15 @@ public class SeleniumUtils {
         }
     }
 
-
     /**
      * Espera implícita de 30 segundos, luego de los 30 segundos lanzara excepción
      *
-     * @param driver Driver que está manipulando el navegador
-     * @param by     Identificador del tipo By
+     * @param driver        Driver que está manipulando el navegador
+     * @param by            Identificador del tipo By
      * @param banderaAssert bandera para decidir si se quiere manejar o no, el assertFail
      * @return retorna verdadero si se da la espera de manera correcta
      */
-    public static boolean waitImplicity(WebDriver driver, By by,boolean banderaAssert) {
+    public static boolean waitImplicity(WebDriver driver, By by, boolean banderaAssert) {
         boolean bandera = false;
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
@@ -966,9 +962,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
-
             }
         } finally {
             return bandera;
@@ -1046,7 +1041,6 @@ public class SeleniumUtils {
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
-
         if (System.currentTimeMillis() >= endTime || elementos.isEmpty()) {
             LogsJB.warning(" No pudo obtener los elementos especificados, ya que no existen: " + elementos);
         }
@@ -1164,7 +1158,6 @@ public class SeleniumUtils {
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
-
         if (System.currentTimeMillis() >= endTime || Objects.isNull(elemento)) {
             LogsJB.warning(" No pudo obtener el elemento especificado, ya que no existe: " + element);
         }
@@ -1440,7 +1433,7 @@ public class SeleniumUtils {
                     double newZoomValue = (zoomActualValue < 100.0) ? (zoomActualValue - 15.0) : 100.0;
                     js.executeScript("document.body.style.zoom = '" + newZoomValue + "%'");
                 } catch (NumberFormatException e) {
-                    LogsJB.info("El valor de zoomActual no es numérico: "+zoomActual);
+                    LogsJB.info("El valor de zoomActual no es numérico: " + zoomActual);
                 }
             }
             File scrFile = SeleniumUtils.getImageScreeenshotWebElement(driver, elementScreenshot);
@@ -1489,11 +1482,11 @@ public class SeleniumUtils {
     /**
      * Espera implícita de 5 segundos o menos si el elemento desaparece del DOM, luego de los 5 segundos lanzara excepción
      *
-     * @param driver Variable que manipula el navegador
-     * @param by     Identificador del tipo By
+     * @param driver        Variable que manipula el navegador
+     * @param by            Identificador del tipo By
      * @param banderaAssert Bandera para preguntar si se quiere el assertFail
      */
-    public static boolean waitImplicityForElementNotExist(WebDriver driver, By by,boolean banderaAssert) {
+    public static boolean waitImplicityForElementNotExist(WebDriver driver, By by, boolean banderaAssert) {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
             wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
@@ -1509,7 +1502,7 @@ public class SeleniumUtils {
             LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
             LogsJB.fatal("*");
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
             }
             return false;
@@ -1597,7 +1590,7 @@ public class SeleniumUtils {
      * @param codigo Codigo numerico de la tecla que queremos presionar
      * @return
      */
-    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo,boolean banderaAssert) {
+    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo, boolean banderaAssert) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
@@ -1611,8 +1604,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
-            Assert.fail("Error inesperado al presionar una tecla: ");
+            if (banderaAssert) {
+                Assert.fail("Error inesperado al presionar una tecla: ");
             }
             return false;
         }
@@ -1651,7 +1644,7 @@ public class SeleniumUtils {
      * @param codigo Codigo numerico de la tecla que queremos presionar
      * @return
      */
-    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, int codigo,boolean banderaAssert) {
+    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, int codigo, boolean banderaAssert) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
@@ -1666,9 +1659,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al presionar una tecla: ");
-
             }
             return false;
         }
@@ -1699,16 +1691,15 @@ public class SeleniumUtils {
      *
      * @return
      */
-    public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones,boolean banderaAssert) {
+    public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones, boolean banderaAssert) {
         try {
             cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
             return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al presionar una tecla: ");
-
             }
             return false;
         }
@@ -1739,16 +1730,15 @@ public class SeleniumUtils {
      *
      * @return
      */
-    public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones,boolean banderaAssert) {
+    public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones, boolean banderaAssert) {
         try {
             cambiarZOOM(driver, repeticiones, Keys.ADD);
             return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al presionar una tecla: ");
-
             }
             return false;
         }
@@ -1784,7 +1774,7 @@ public class SeleniumUtils {
      * @param cantidad Si el número es positivo, el desplazamiento es hacia abajo en la pantalla, si el número es negativo
      *                 el desplazamiento es hacia arriba.
      */
-    public static boolean scrollMouse(int cantidad,boolean banderaAssert) {
+    public static boolean scrollMouse(int cantidad, boolean banderaAssert) {
         try {
             Robot robot = new Robot();
             int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
@@ -1798,9 +1788,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al intentar realizar el scroll: ");
-
             }
             return false;
         }
@@ -1832,7 +1821,7 @@ public class SeleniumUtils {
      * @param driver          Driver que está manipulando el navegador
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
      */
-    public static boolean scrollMouseDown(WebDriver driver, int cantidadScrolls,boolean banderaAssert) {
+    public static boolean scrollMouseDown(WebDriver driver, int cantidadScrolls, boolean banderaAssert) {
         try {
             Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
@@ -1842,9 +1831,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al intentar realizar el scroll: ");
-
             }
             return false;
         }
@@ -1876,7 +1864,7 @@ public class SeleniumUtils {
      * @param driver          Driver que está manipulando el navegador
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
      */
-    public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls,boolean banderaAssert) {
+    public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls, boolean banderaAssert) {
         try {
             Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
@@ -1886,9 +1874,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al intentar realizar el scroll: ");
-
             }
             return false;
         }
@@ -1902,7 +1889,7 @@ public class SeleniumUtils {
      * @param opcion Opcion del elemento que queremos seleccionar
      * @param comment Comentario que será colocado sobre la imagen capturada si el Elemento indicado existe
      */
-    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment,boolean banderaAssert) {
+    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment, boolean banderaAssert) {
         try {
             WebElement elemento = obtenerWebElementx2(driver, searchcontext, element);
             if (!Objects.isNull(elemento)) {
@@ -1926,9 +1913,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al seleccionar el elemento: " + element);
-
             }
             return false;
         }
@@ -2171,10 +2157,10 @@ public class SeleniumUtils {
      * @param element elemento al que se envÃ­ara el texto
      * @param value   Valor que se validara no sea null o vacio
      */
-    public void sendKeystoElementvalidValueX2(WebDriver driver,SearchContext searchContext, String element, String value) {
+    public void sendKeystoElementvalidValueX2(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!SeleniumUtils.cadenaNulaoVacia(value)) {
             if (!value.equalsIgnoreCase(inespecific)) {
-                sendkeystoelementX2(driver,searchContext, element, value);
+                sendkeystoelementX2(driver, searchContext, element, value);
             }
         }
     }
@@ -2186,10 +2172,10 @@ public class SeleniumUtils {
      * @param element elemento al que se envÃ­ara el texto
      * @param value   Valor que se validara no sea null o vacio
      */
-    public void sendKeystoElementvalidValue(WebDriver driver,SearchContext searchContext, String element, String value) {
+    public void sendKeystoElementvalidValue(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!SeleniumUtils.cadenaNulaoVacia(value)) {
             if (!value.equalsIgnoreCase(inespecific)) {
-                sendKeystoElement(driver, searchContext,element, false);
+                sendKeystoElement(driver, searchContext, element, false);
             }
         }
     }
@@ -2202,10 +2188,10 @@ public class SeleniumUtils {
      * @param texto   Texto que deseamos envíar al elmento
      * @return True si logra envíar el texto, de lo contrario false
      */
-    private Boolean sendKeystoElementx2intents(WebDriver driver,SearchContext searchContext, String element, CharSequence... texto) {
+    private Boolean sendKeystoElementx2intents(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
         int i = 0;
         while (i < 2) {
-            if (SeleniumUtils.sendKeysIfElementExist(driver,searchContext, element, texto)) {
+            if (SeleniumUtils.sendKeysIfElementExist(driver, searchContext, element, texto)) {
                 return true;
             }
             i++;
@@ -2219,10 +2205,10 @@ public class SeleniumUtils {
      * @param elemento Atributo por medio del cual identificaremos el elemento a modificar
      * @param texto Texto que deseamos envíar al elmento
      */
-    public void sendkeystoelementX2(WebDriver driver,SearchContext searchContext, String elemento, String texto) {
-        sendKeystoElement(driver,searchContext,elemento,false,texto);
+    public void sendkeystoelementX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
+        sendKeystoElement(driver, searchContext, elemento, false, texto);
         SeleniumUtils.keyPress(driver, Keys.ENTER);
-        sendKeystoElement(driver,searchContext, elemento,false, texto);
+        sendKeystoElement(driver, searchContext, elemento, false, texto);
         SeleniumUtils.keyPress(driver, Keys.ENTER);
     }
 
@@ -2232,7 +2218,7 @@ public class SeleniumUtils {
      * @param element Atributo del elemento a buscar
      * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
      */
-    public String obtenerTextWebElementx2(WebDriver driver,SearchContext searchContext, String element) {
+    public String obtenerTextWebElementx2(WebDriver driver, SearchContext searchContext, String element) {
         int i = 0;
         String texto = null;
         while (Objects.isNull(texto) && i < 2) {
@@ -2250,7 +2236,7 @@ public class SeleniumUtils {
      * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
      * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
      */
-    public String obtenerTextWebElementx2(WebDriver driver,SearchContext searchContext, String element, int timeduration, int timerepetition) {
+    public String obtenerTextWebElementx2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
         int i = 0;
         String texto = null;
         while (Objects.isNull(texto) && i < 2) {
@@ -2263,16 +2249,16 @@ public class SeleniumUtils {
     /**
      * Envía un texto al elemento indicado, si este existe en el contexto actual.
      *
-     * @param driver  Driver que está manipulando el navegador
-     * @param element Atributo del elemento, por medio del cual se realizara la busqueda
-     * @param Texto   Texto a envíar al elemento indicado
+     * @param driver        Driver que está manipulando el navegador
+     * @param element       Atributo del elemento, por medio del cual se realizara la busqueda
+     * @param Texto         Texto a envíar al elemento indicado
      * @param banderaAssert Bandera para controlar si se quiere controlar el Assert.fail
      */
-    public Boolean sendKeystoElement(WebDriver driver,SearchContext searchContext, String element, String Texto, boolean banderaAssert) {
+    public Boolean sendKeystoElement(WebDriver driver, SearchContext searchContext, String element, String Texto, boolean banderaAssert) {
         try {
-            if (sendKeystoElementx2intents(driver, searchContext,element, Texto)) {
-                WebElement elemento=obtenerWebElementx2(driver,searchContext,element);
-                getImageScreeenshotWebElement(driver,elemento);
+            if (sendKeystoElementx2intents(driver, searchContext, element, Texto)) {
+                WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
+                getImageScreeenshotWebElement(driver, elemento);
                 return true;
             } else {
                 LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se envío el Texto y no se tomo la captura");
@@ -2281,7 +2267,7 @@ public class SeleniumUtils {
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
             LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             }
         }
@@ -2297,7 +2283,7 @@ public class SeleniumUtils {
      */
     public Boolean sendKeystoElement(WebDriver driver, SearchContext searchContext, String element, boolean banderaAssert, CharSequence... Texto) {
         try {
-            if (sendKeystoElementx2intents(driver, searchContext,element, Texto)) {
+            if (sendKeystoElementx2intents(driver, searchContext, element, Texto)) {
                 return true;
             } else {
                 LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se envío el Texto");
@@ -2306,13 +2292,10 @@ public class SeleniumUtils {
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
             LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
-
             }
         }
         return false;
     }
-
-
 }
