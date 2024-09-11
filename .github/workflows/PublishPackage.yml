@@ -62,12 +62,5 @@ jobs:
           USER_NAME: ${{ secrets.USER_NAME }}
           DEPLOY_ACTIONS_GITHUB: ${{ secrets.DEPLOY_ACTIONS_GITHUB }}
 
-#      - name: Close and Release Staging Repository
-#        run: ./gradlew closeAndReleaseRepository
-#        env:
-#          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-#          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
-
-
       - name: Clean up GPG
         run: rm -rf ~/.gnupg
