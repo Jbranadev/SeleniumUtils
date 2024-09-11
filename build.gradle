@@ -6,7 +6,7 @@ plugins {
     id 'io.codearte.nexus-staging' version '0.30.0'
 }
 group = 'io.github.josecarlosbran'
-version = '1.1.1'
+version = '1.1.2'
 //Publicación en maven
 // ./gradlew clean build javadocJar sourcesJar publish
 repositories {
