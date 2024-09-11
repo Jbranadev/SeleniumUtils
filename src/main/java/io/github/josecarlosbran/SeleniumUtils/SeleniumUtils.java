@@ -1921,6 +1921,11 @@ public class SeleniumUtils {
         }
     }
 
+    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment) {
+        // Llamamos al método original y pasamos banderaAssert = false
+        return selectOption(driver, searchcontext, element, opcion, comment, false);
+    }
+
     /***
      *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
      * @param driver Driver que está manipulando el navegador
@@ -2154,7 +2159,7 @@ public class SeleniumUtils {
      * @param texto Texto que deseamos envíar al elmento
      */
 
-    public void enviarTextoX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
+    public static void enviarTextoX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
         enviarTexto(driver,searchContext,elemento,false,texto);
         keyPress(driver, Keys.ENTER);
         enviarTexto(driver, searchContext, elemento,false,texto);
@@ -2331,19 +2336,7 @@ public class SeleniumUtils {
         return false;
     }
 
-    /***
-     * Envía dos veces el texto indicado al elemento indicado
-     * @param driver driver que interactúa con el navegador
-     * @param searchContext Driver que funciona como searchContext
-     * @param elemento Atributo por medio del cual identificaremos el elemento a modificar
-     * @param texto Texto que deseamos envíar al elmento
-     */
-    public static void sendkeystoelementX2(WebDriver driver,SearchContext searchContext, String elemento, String texto) {
-        enviarTexto(driver,searchContext, elemento,false, texto);
-        SeleniumUtils.keyPress(driver, Keys.ENTER);
-        enviarTexto(driver,searchContext, elemento,false, texto);
-        SeleniumUtils.keyPress(driver, Keys.ENTER);
-    }
+
 
 
     /****
