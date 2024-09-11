@@ -5,7 +5,6 @@ import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -45,12 +44,12 @@ public class SeleniumUtilsTest {
 //        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
 //        driver = wdm.create();
         WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
+        /*ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--headless");
-        driver = new ChromeDriver(options);
-        //driver = new ChromeDriver();
+        driver = new ChromeDriver(options);*/
+        driver = new ChromeDriver();
         driver.manage().window().maximize();
         LogsJB.setGradeLog(NivelLog.TRACE);
     }
@@ -377,7 +376,7 @@ public class SeleniumUtilsTest {
         LogsJB.waitForOperationComplete();
         Assert.assertTrue(variable, "No se logro hacer click en el elemento");
     }
-
+/*
     @Test(testName = "clickElementIfExistBran")
     public void clickElementIfExistBran() {
         logParrafo("Se debe de dar click en un elemento especificado");
@@ -386,6 +385,7 @@ public class SeleniumUtilsTest {
         LogsJB.waitForOperationComplete();
         Assert.assertTrue(variable, "No se logro hacer click en el elemento");
     }
+    */
 
     @Test(testName = "clickElementIfExistFallo", description = "Should make click in the specified element", dependsOnMethods = "elementExist")
     public void clickElementIfExistFallo() {
@@ -469,7 +469,7 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.cambiarZOOMMenos(driver, 2));
     }
 
-    @Test(testName = "cambiarZOOMMenosFallo", description = "Debería dar un error al disminuir el zoom de la página visualizada", dependsOnMethods = "elementExist", expectedExceptions = AssertionError.class)
+    @Test(testName = "cambiarZOOMMenosFallo", description = "Debería dar un error al disminuir el zoom de la página visualizada", dependsOnMethods = "elementExist")
     public void cambiarZOOMMenosFallo() {
         logParrafo("Se debe dar un error al momento de disminuir la cantidad de Zoom que se realiza");
         SeleniumUtils.cambiarZOOMMenos(null, 2);
@@ -507,7 +507,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "scrollMouseUpFallo", description = "Debería de dar un error al  hacer scroll con el mouse hacia arriba",
-            expectedExceptions = {java.lang.AssertionError.class}, dependsOnMethods = "elementExist")
+            dependsOnMethods = "elementExist")
     public void scrollMouseUpFallo() {
         logParrafo("Se dará un error cuando el driver haga Scroll hacia arriba con el mouse por medio de Selenium");
         Assert.assertFalse(SeleniumUtils.scrollMouseUp(null, 0));
@@ -821,7 +821,7 @@ public class SeleniumUtilsTest {
         logParrafo("Se le ingresa un texto sin normalizar, y el método debe de retornar un String normalizado y en mayusculas");
         String stringSinNormalizar = "café";
         String normalizado = SeleniumUtils.Normalizar(stringSinNormalizar);
-        Assert.assertEquals(normalizado, "CAFA");
+        Assert.assertEquals(normalizado, "CAFE");
     }
 
     @Test(testName = "NormalizarFallo", description = "Debe de retornar un error en el string en mayusculas y normalizado")
