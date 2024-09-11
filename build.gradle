@@ -104,6 +104,11 @@ jacocoTestReport {
     }
 }
 
+// Define the sourceJar task
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier.set('sources')
+}
 
 publishing {
     publications {
