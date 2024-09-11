@@ -52,7 +52,7 @@ public class SeleniumUtilsTest {
         driver = new ChromeDriver(options);
         //driver = new ChromeDriver();
         driver.manage().window().maximize();
-        LogsJB.setGradeLog(NivelLog.INFO);
+        LogsJB.setGradeLog(NivelLog.WARNING);
     }
 
     @Test(testName = "Element Exist Google"
