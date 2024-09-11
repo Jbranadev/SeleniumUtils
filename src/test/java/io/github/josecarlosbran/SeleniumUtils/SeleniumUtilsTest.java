@@ -52,6 +52,7 @@ public class SeleniumUtilsTest {
         driver = new ChromeDriver(options);
         //driver = new ChromeDriver();
         driver.manage().window().maximize();
+        driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.WARNING);
     }
 
@@ -75,7 +76,6 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.sendKeysToElement(driver, elemento, "Prueba de escritura"));
     }
 
-
     @Test(testName = "Clear Element Search Google"
             , description = "Limpia el elemento de busqueda de Google",
             dependsOnMethods = "sendKeysToElement")
@@ -90,11 +90,11 @@ public class SeleniumUtilsTest {
     public void threadSleep() {
         logParrafo("Se debe de tener un tiempo dormido");
         long startTime = System.currentTimeMillis(); // Hora de inicio
-        SeleniumUtils.threadslepp(5000);//Dormir el hilo
+        SeleniumUtils.threadslepp(1000);//Dormir el hilo
         long endTime = System.currentTimeMillis(); // Hora de fin
         long duration = endTime - startTime; // Calcular duración
         // Verifica que la duración está dentro de un rango aceptable (por ejemplo, +/- 100 ms)
-        Assert.assertTrue(duration >= 5000 && duration <= 5100, "El método no durmió el hilo el tiempo esperado");
+        Assert.assertTrue(duration >= 1000 && duration <= 1100, "El método no durmió el hilo el tiempo esperado");
     }
 
     @Test(testName = "KeyPress Using Keys",
@@ -519,7 +519,7 @@ public class SeleniumUtilsTest {
     public void selectOptionWithComment() {
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
         boolean respuesta = false;
-        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario",false);
+        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario", false);
         Assert.assertTrue(respuesta);
     }
 
@@ -847,7 +847,7 @@ public class SeleniumUtilsTest {
     public void ValidarNullFallo() {
         String campo = "NoVacio";
         String nombre = "Nombre";
-        boolean respuesta = SeleniumUtils.validarNull(campo,nombre);
+        boolean respuesta = SeleniumUtils.validarNull(campo, nombre);
         Assert.assertFalse(respuesta);
     }
 
@@ -896,7 +896,7 @@ public class SeleniumUtilsTest {
     public void JsComandoExito() {
         logParrafo("Debe de ejecutar un comando determinado de javascript por medio de un JavascriptExecutor ");
         String comando = "console.log('Comando ejecutado');";
-        boolean respuesta=SeleniumUtils.ejecutarJsComando(driver,comando);
+        boolean respuesta = SeleniumUtils.ejecutarJsComando(driver, comando);
         Assert.assertTrue(respuesta);
     }
 

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
@@ -58,7 +59,7 @@ public class SeleniumParallel {
      * @return Retorna un Future<Boolean> con el resultado de la limpieza, true si limpia el elemento, false si
      * no logra limpiar el elemento o sucede un error durante la limpieza
      */
-    static Future<Boolean> clearElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador) {
+    static Future<Boolean> clearElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CountDownLatch latch) {
         Callable<Boolean> run = () -> {
             boolean exist = false;
             try {
@@ -66,10 +67,11 @@ public class SeleniumParallel {
                 exist = wait.until(new Function<>() {
                     public Boolean apply(WebDriver driver) {
                         if (SeleniumUtils.ElementoDeshabilitado(searchContext.findElement(identificador))) {
-                            LogsJB.warning(" El elemento no se encuentra habilitado para su limpieza " + identificador.toString());
-                            return false;
+                            LogsJB.warning(" El elemento no se encuentra habilitado para su limpieza " + identificador);
+                            return true;
                         }
-                        LogsJB.info(" Limpiando el elemento por medio de " + identificador.toString());
+                        LogsJB.info(" Limpiando el elemento por medio de " + identificador);
+                        latch.countDown(); // Marcar la tarea como completada
                         boolean result = SeleniumUtils.cleanElement(driver, searchContext.findElement(identificador));
                         if (!result) {
                             LogsJB.warning(" No pudo limpiar el elemento, " + identificador +
@@ -101,7 +103,7 @@ public class SeleniumParallel {
      * @return Retorna un Future<Boolean> con el resultado del envio de texto, true si envia el texto, false si
      * no logra enviar el texto o sucede un error durante el envio
      */
-    static Future<Boolean> sendKeysIfElementExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CharSequence... Texto) {
+    static Future<Boolean> sendKeysIfElementExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CountDownLatch latch, CharSequence... Texto) {
         Callable<Boolean> run = () -> {
             boolean exist = false;
             try {
@@ -109,12 +111,13 @@ public class SeleniumParallel {
                 exist = wait.until(new Function<>() {
                     public Boolean apply(WebDriver driver) {
                         if (!searchContext.findElement(identificador).isEnabled()) {
-                            LogsJB.warning(" El elemento " + identificador.toString() +
+                            LogsJB.warning(" El elemento " + identificador +
                                     " no se encuentra habilitado");
                             return true;
                         }
-                        LogsJB.info(" Enviando Texto al elemento por medio de " + identificador.toString() +
+                        LogsJB.info(" Enviando Texto al elemento por medio de " + identificador +
                                 " : " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
+                        latch.countDown(); // Marcar la tarea como completada
                         boolean result = SeleniumUtils.sendKeysToElement(driver, searchContext.findElement(identificador), Texto);
                         if (!result) {
                             LogsJB.warning(" No pudo enviar el texto a el elemento, " + identificador +
@@ -153,10 +156,10 @@ public class SeleniumParallel {
                 result = wait.until(new Function<>() {
                     public String apply(WebDriver driver) {
                         if (!searchContext.findElement(identificador).isEnabled()) {
-                            LogsJB.warning(" El elemento no se encuentra habilitado para obtener su texto " + identificador.toString());
+                            LogsJB.warning(" El elemento no se encuentra habilitado para obtener su texto " + identificador);
                             return "";
                         }
-                        LogsJB.info(" Obteniendo el Texto del elemento por medio de " + identificador.toString());
+                        LogsJB.info(" Obteniendo el Texto del elemento por medio de " + identificador);
                         return SeleniumUtils.getTextOfWebElement(driver, searchContext.findElement(identificador));
                     }
                 });
@@ -182,7 +185,7 @@ public class SeleniumParallel {
      * @return Retorna un Future<Boolean> con el resultado del click, true si hace click en el elemento, false si
      * no logra hacer click en el elemento o sucede un error durante el click
      */
-    static Future<Boolean> clickElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador) {
+    static Future<Boolean> clickElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CountDownLatch latch) {
         Callable<Boolean> run = () -> {
             boolean exist = false;
             try {
@@ -190,10 +193,11 @@ public class SeleniumParallel {
                 exist = wait.until(new Function<>() {
                     public Boolean apply(WebDriver driver) {
                         if (SeleniumUtils.ElementoDeshabilitado(searchContext.findElement(identificador))) {
-                            LogsJB.warning(" El elemento no se encuentra habilitado para hacer click en el " + identificador.toString());
-                            return false;
+                            LogsJB.warning(" El elemento no se encuentra habilitado para hacer click en el " + identificador);
+                            return true;
                         }
-                        LogsJB.info(" Hace click en el elemento por medio de " + identificador.toString());
+                        LogsJB.info(" Hace click en el elemento por medio de " + identificador);
+                        latch.countDown(); // Marcar la tarea como completada
                         boolean result = SeleniumUtils.clickToElement(driver, searchContext.findElement(identificador));
                         if (!result) {
                             LogsJB.warning(" No pudo hacer click en el elemento, comuniquese con los administradores ");
