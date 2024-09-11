@@ -2368,6 +2368,81 @@ public class SeleniumUtils {
 
 
 
+    //Cuarto lote de métodos
+    /*
+    *
+    *
+    *
+    * */
+
+
+    /**
+     * Función para cambiar el contexto del WebDriver para interactuar con un marco (frame) especifico en la BERediseño
+     *
+     * @param driver WebDriver es el que cambiará el contexto al marco especificado
+     * @param frame  Identificador del marco al que se desea cambiar
+     */
+    public void switchFrame(WebDriver driver,SearchContext searchContext ,String frame) {
+        String cadena="#"+frame;
+        WebElement iframe=obtenerWebElementx2(driver,searchContext,cadena);
+        driver.switchTo().frame(iframe);
+    }
+
+
+    public void capturar500ServerError(WebDriver driver,SearchContext searchContext, int timeduration, int timerepetition) {
+        String element = "/html/body/div[2]/div/fieldset/h2";
+        String comment = "Ha sucedido un error en el servidor, comunicarse con el equipo de integración ";
+        String mesajeerror=obtenerTextWebElementx2(driver,searchContext,element,timeduration,timerepetition);
+
+        WebElement elemento=getElementIfExist(driver,searchContext,element);
+        if (!Objects.isNull(mesajeerror)) {
+            if (StringUtils.equalsIgnoreCase(mesajeerror, "500 - Internal server error.") || StringUtils.containsIgnoreCase(mesajeerror, "Internal server error")) {
+                LogsJB.fatal("Se encontro un mensaje de Error");
+                LogsJB.info("*");
+                LogsJB.info("*");
+                LogsJB.info("Mensaje de Error Capturado: " + mesajeerror);
+                getImageScrennshot(driver, elemento);
+                LogsJB.info("*");
+                LogsJB.info("*");
+                Assert.fail(comment + mesajeerror);
+            }
+        } else {
+            LogsJB.info("*");
+            LogsJB.error("El servicio si está habilitado");
+            LogsJB.info("*");
+        }
+    }
+
+
+    /***
+     * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
+     * @param driver Web Driver que manipula el navegador
+     * @param texto Texto a ingresar en el prompt
+     */
+    public void handlePrompt(WebDriver driver, String texto) {
+        try {
+            // Intentar interactuar con el prompt usando Selenium
+            Alert alert = driver.switchTo().alert();
+            alert.sendKeys(texto);
+            alert.accept();
+        } catch (Exception seleniumException) {
+            try {
+                // Intentar interactuar con el prompt usando JavaScript en caso de falla con Selenium
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("window.promptResult = prompt(arguments[0]);", texto);
+                String promptResult = (String) jsExecutor.executeScript("return window.promptResult;");
+                if (promptResult == null) {
+                    throw new Exception("No se pudo manejar el prompt ni con Selenium ni con JavaScript.");
+                }
+            } catch (Exception javascriptException) {
+                // Lanzar excepción si no se puede manejar el prompt ni con Selenium ni con JavaScript
+                throw new RuntimeException("Error al manejar el prompt: " + javascriptException.getMessage());
+            }
+        }
+    }
+
+
+
 
 
 
