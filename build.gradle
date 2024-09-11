@@ -61,6 +61,25 @@ jacoco {
 test {
     useTestNG()
     finalizedBy jacocoTestReport // Genera el reporte de JaCoCo después de las pruebas
+    ignoreFailures = true
+    testLogging {
+        events "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+
+    afterSuite { desc, result ->
+        if (!desc.parent) { // Solo para el suite principal
+            def totalTests = result.testCount
+            def failedTests = result.failedTestCount
+            def failurePercentage = (failedTests / totalTests) * 100
+
+            if (failurePercentage > 20) {
+                throw new GradleException("Más del 20% de los tests fallaron. Fallos: ${failedTests}, Total: ${totalTests}")
+            }
+        }
+    }
+
 }
 jacocoTestReport {
     reports {

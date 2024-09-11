@@ -52,7 +52,7 @@ public class SeleniumUtilsTest {
         driver = new ChromeDriver(options);
         //driver = new ChromeDriver();
         driver.manage().window().maximize();
-        LogsJB.setGradeLog(NivelLog.TRACE);
+        LogsJB.setGradeLog(NivelLog.INFO);
     }
 
     @Test(testName = "Element Exist Google"
@@ -60,9 +60,9 @@ public class SeleniumUtilsTest {
     public void elementExist() {
         logParrafo("Irá a la pagina principal de Google");
         driver.get("https://www.google.com");
-        logParrafo("Verifica que el elemento 'textarea[name='q']' exista en la pagina");
-        Assert.assertTrue(SeleniumUtils.ElementoExistente(driver, driver, "textarea[name='q']"),
-                "No fue posible encontrar el elemento 'textarea[name='q']' en la pagina," +
+        logParrafo("Verifica que el elemento 'textarea[id='APjFqb']' exista en la pagina");
+        Assert.assertTrue(SeleniumUtils.ElementoExistente(driver, driver, "textarea[id='APjFqb']"),
+                "No fue posible encontrar el elemento 'textarea[id='APjFqb']' en la pagina," +
                         "valide el identificador del elemento");
     }
 
@@ -75,13 +75,14 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.sendKeysToElement(driver, elemento, "Prueba de escritura"));
     }
 
+
     @Test(testName = "Clear Element Search Google"
             , description = "Limpia el elemento de busqueda de Google",
             dependsOnMethods = "sendKeysToElement")
     public void clearElementIfExists() {
         logParrafo("Limpia el elemento de busqueda de Google");
-        Assert.assertTrue(SeleniumUtils.LimpiarElementoExistente(driver, driver, "textarea[name='q']"),
-                "No fue posible limpiar el elemento 'textarea[name='q']' en la pagina," +
+        Assert.assertTrue(SeleniumUtils.LimpiarElementoExistente(driver, driver, "textarea[id='APjFqb']"),
+                "No fue posible limpiar el elemento 'textarea[id='APjFqb']' en la pagina," +
                         "valide el identificador del elemento");
     }
 
@@ -343,7 +344,7 @@ public class SeleniumUtilsTest {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[3]/form/div[1]/div[1]/div[4]/center/input[2]");
         String respuesta = SeleniumUtils.getTextOfWebElement(driver, elemento);
         condicion = SeleniumUtils.cadenaNulaoVacia(respuesta);
-        Assert.assertTrue(!condicion);
+        Assert.assertFalse(condicion);
     }
 
     @Test(testName = "getTextNullOfWebElement", description = "Obtiene el texto nulo de un elemento web", dependsOnMethods = "elementExist")
