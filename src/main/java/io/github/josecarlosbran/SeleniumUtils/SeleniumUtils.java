@@ -3,9 +3,10 @@ package io.github.josecarlosbran.SeleniumUtils;
 import com.josebran.LogsJB.LogsJB;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
@@ -19,24 +20,52 @@ import java.text.Normalizer;
 import java.time.Duration;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class SeleniumUtils {
+    private static final String inespecific = "N/E";
+    private static final Integer searchTime = 2500;
+    private static final Integer searchRepetitionTime = 50;
     @Getter(AccessLevel.PACKAGE)
-    @Setter(AccessLevel.PACKAGE)
-    static ExecutorService seleniumEjecutor = Executors.newVirtualThreadPerTaskExecutor();
-    @Getter
-    @Setter
-    private static String inespecific = "N/E";
-    @Getter
-    @Setter
-    private static Integer searchTime = 2500;
-    @Getter
-    @Setter
-    private static Integer searchRepetitionTime = 50;
+    static ExecutorService seleniumEjecutor = Executors.newCachedThreadPool();
+
+    // Métodos para obtener los valores actuales
+    public static String getInespecific() {
+        return inespecific;
+    }
+
+    // Método para cambiar el valor de 'inespecific' usando Reflection
+    public static void setInespecific(String newInespecific) {
+        setFieldValue("inespecific", newInespecific);
+    }
+
+    public static Integer getSearchTime() {
+        return searchTime;
+    }
+
+    // Método para cambiar el valor de 'searchTime' usando Reflection
+    public static void setSearchTime(Integer newSearchTime) {
+        setFieldValue("searchTime", newSearchTime);
+    }
+
+    public static Integer getSearchRepetitionTime() {
+        return searchRepetitionTime;
+    }
+
+    // Método para cambiar el valor de 'searchRepetitionTime' usando Reflection
+    public static void setSearchRepetitionTime(Integer newSearchRepetitionTime) {
+        setFieldValue("searchRepetitionTime", newSearchRepetitionTime);
+    }
+
+    // Método privado que maneja la lógica de cambio de cualquier campo usando Reflection
+    private static void setFieldValue(String fieldName, Object newValue) {
+        try {
+            FieldUtils.writeDeclaredStaticField(SeleniumUtils.class, fieldName, newValue, true);
+        } catch (IllegalAccessException e) {
+            LogsJB.fatal("Error inesperado al Cambiar el valor de: " + fieldName + "valor: " + e.getMessage());
+            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+        }
+    }
 
     /***
      * Método que presiona una tecla del teclado simulado por selenium
@@ -247,7 +276,7 @@ public class SeleniumUtils {
                 actions.moveToElement(elemento).perform();
             } catch (WebDriverException e5) {
                 // Capturar la excepción final si todas las opciones fallan
-                LogsJB.fatal("Todas las opciones de scroll han fallado para el elemento: " + elemento.toString());
+                LogsJB.fatal("Todas las opciones de scroll han fallado para el elemento: " + elemento);
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e5));
             }
         }
@@ -280,7 +309,7 @@ public class SeleniumUtils {
         Future<Boolean> futureXpath = SeleniumParallel.elementExist(wait, searchContext, By.xpath(element));
         Future<Boolean> futureName = SeleniumParallel.elementExist(wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
+        while (System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && futureId.get()) {
                     return true;
@@ -336,46 +365,54 @@ public class SeleniumUtils {
         LogsJB.debug("* ");
         LogsJB.debug(" Si existe el elemento indicado, lo limpiara: " + element);
         LogsJB.debug("* ");
+        CountDownLatch latchId = new CountDownLatch(1);
+        CountDownLatch latchClassName = new CountDownLatch(1);
+        CountDownLatch latchCss = new CountDownLatch(1);
+        CountDownLatch latchTagName = new CountDownLatch(1);
+        CountDownLatch latchLinkText = new CountDownLatch(1);
+        CountDownLatch latchPartialLinkText = new CountDownLatch(1);
+        CountDownLatch latchXpath = new CountDownLatch(1);
+        CountDownLatch latchName = new CountDownLatch(1);
+        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
+        // Declaración de features para obtener el resultado de buscar los elementos en cuestión
+        Future<Boolean> futureId = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.id(element), latchId);
+        Future<Boolean> futureClassName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.className(element), latchClassName);
+        Future<Boolean> futureCss = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.cssSelector(element), latchCss);
+        Future<Boolean> futureTagName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.tagName(element), latchTagName);
+        Future<Boolean> futureLinkText = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.linkText(element), latchLinkText);
+        Future<Boolean> futurePartialLinkText = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.partialLinkText(element), latchPartialLinkText);
+        Future<Boolean> futureXpath = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.xpath(element), latchXpath);
+        Future<Boolean> futureName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.name(element), latchName);
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
-        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
-        //Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<Boolean> futureId = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.id(element));
-        Future<Boolean> futureClassName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.className(element));
-        Future<Boolean> futureCss = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.cssSelector(element));
-        Future<Boolean> futureTagName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.tagName(element));
-        Future<Boolean> futureLinkText = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.linkText(element));
-        Future<Boolean> futurePartialLinkText = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.partialLinkText(element));
-        Future<Boolean> futureXpath = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.xpath(element));
-        Future<Boolean> futureName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
+        while (System.currentTimeMillis() < endTime) {
             try {
-                if (futureId.isDone() && futureId.get()) {
-                    return true;
+                if (latchId.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureId.get();
                 }
-                if (futureClassName.isDone() && futureClassName.get()) {
-                    return true;
+                if (latchClassName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureClassName.get();
                 }
-                if (futureCss.isDone() && futureCss.get()) {
-                    return true;
+                if (latchCss.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureCss.get();
                 }
-                if (futureTagName.isDone() && futureTagName.get()) {
-                    return true;
+                if (latchTagName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureTagName.get();
                 }
-                if (futureLinkText.isDone() && futureLinkText.get()) {
-                    return true;
+                if (latchLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureLinkText.get();
                 }
-                if (futurePartialLinkText.isDone() && futurePartialLinkText.get()) {
-                    return true;
+                if (latchPartialLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futurePartialLinkText.get();
                 }
-                if (futureXpath.isDone() && futureXpath.get()) {
-                    return true;
+                if (latchXpath.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureXpath.get();
                 }
-                if (futureName.isDone() && futureName.get()) {
-                    return true;
+                if (latchName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureName.get();
                 }
             } catch (Exception e) {
                 LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
@@ -482,7 +519,7 @@ public class SeleniumUtils {
                 if (term.endsWith("]}")) {
                     // Eliminar los últimos dos carácteres
                     term = term.substring(0, term.length() - 2);
-                }else if (term.endsWith("]]") && StringUtils.equalsIgnoreCase(locator, "xpath")) {
+                } else if (term.endsWith("]]") && StringUtils.equalsIgnoreCase(locator, "xpath")) {
                     // Eliminar los últimos dos carácteres
                     term = term.substring(0, term.length() - 1);
                 }
@@ -583,46 +620,54 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existe el elemento " + element +
                 ", enviara el texto: " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
         LogsJB.debug("* ");
+        CountDownLatch latchId = new CountDownLatch(1);
+        CountDownLatch latchClassName = new CountDownLatch(1);
+        CountDownLatch latchCss = new CountDownLatch(1);
+        CountDownLatch latchTagName = new CountDownLatch(1);
+        CountDownLatch latchLinkText = new CountDownLatch(1);
+        CountDownLatch latchPartialLinkText = new CountDownLatch(1);
+        CountDownLatch latchXpath = new CountDownLatch(1);
+        CountDownLatch latchName = new CountDownLatch(1);
+        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
+// Declaración de features para obtener el resultado de buscar los elementos en cuestión
+        Future<Boolean> futureId = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.id(element), latchId, Texto);
+        Future<Boolean> futureClassName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.className(element), latchClassName, Texto);
+        Future<Boolean> futureCss = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.cssSelector(element), latchCss, Texto);
+        Future<Boolean> futureTagName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.tagName(element), latchTagName, Texto);
+        Future<Boolean> futureLinkText = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.linkText(element), latchLinkText, Texto);
+        Future<Boolean> futurePartialLinkText = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.partialLinkText(element), latchPartialLinkText, Texto);
+        Future<Boolean> futureXpath = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.xpath(element), latchXpath, Texto);
+        Future<Boolean> futureName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.name(element), latchName, Texto);
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
-        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
-        //Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<Boolean> futureId = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.id(element), Texto);
-        Future<Boolean> futureClassName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.className(element), Texto);
-        Future<Boolean> futureCss = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.cssSelector(element), Texto);
-        Future<Boolean> futureTagName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.tagName(element), Texto);
-        Future<Boolean> futureLinkText = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.linkText(element), Texto);
-        Future<Boolean> futurePartialLinkText = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.partialLinkText(element), Texto);
-        Future<Boolean> futureXpath = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.xpath(element), Texto);
-        Future<Boolean> futureName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.name(element), Texto);
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
+        while (System.currentTimeMillis() < endTime) {
             try {
-                if (futureId.isDone() && futureId.get()) {
-                    return true;
+                if (latchId.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureId.get();
                 }
-                if (futureClassName.isDone() && futureClassName.get()) {
-                    return true;
+                if (latchClassName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureClassName.get();
                 }
-                if (futureCss.isDone() && futureCss.get()) {
-                    return true;
+                if (latchCss.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureCss.get();
                 }
-                if (futureTagName.isDone() && futureTagName.get()) {
-                    return true;
+                if (latchTagName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureTagName.get();
                 }
-                if (futureLinkText.isDone() && futureLinkText.get()) {
-                    return true;
+                if (latchLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureLinkText.get();
                 }
-                if (futurePartialLinkText.isDone() && futurePartialLinkText.get()) {
-                    return true;
+                if (latchPartialLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futurePartialLinkText.get();
                 }
-                if (futureXpath.isDone() && futureXpath.get()) {
-                    return true;
+                if (latchXpath.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureXpath.get();
                 }
-                if (futureName.isDone() && futureName.get()) {
-                    return true;
+                if (latchName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureName.get();
                 }
             } catch (Exception e) {
                 LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
@@ -684,7 +729,7 @@ public class SeleniumUtils {
         Future<String> futureXpath = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.xpath(element));
         Future<String> futureName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
+        while (System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && !futureId.get().isEmpty()) {
                     texto = futureId.get();
@@ -834,46 +879,69 @@ public class SeleniumUtils {
         LogsJB.debug("* ");
         LogsJB.debug(" Si existe el elemento indicado, hará click en el elemento: " + element);
         LogsJB.debug("* ");
+        CountDownLatch latchId = new CountDownLatch(1);
+        CountDownLatch latchClassName = new CountDownLatch(1);
+        CountDownLatch latchCss = new CountDownLatch(1);
+        CountDownLatch latchTagName = new CountDownLatch(1);
+        CountDownLatch latchLinkText = new CountDownLatch(1);
+        CountDownLatch latchPartialLinkText = new CountDownLatch(1);
+        CountDownLatch latchXpath = new CountDownLatch(1);
+        CountDownLatch latchName = new CountDownLatch(1);
+        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
+        //Declaración de features para obtener el resultado de buscar los elementos en cuestión
+        Future<Boolean> futureId = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.id(element), latchId);
+        Future<Boolean> futureClassName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.className(element), latchClassName);
+        Future<Boolean> futureCss = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.cssSelector(element), latchCss);
+        Future<Boolean> futureTagName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.tagName(element), latchTagName);
+        Future<Boolean> futureLinkText = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.linkText(element), latchLinkText);
+        Future<Boolean> futurePartialLinkText = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.partialLinkText(element), latchPartialLinkText);
+        Future<Boolean> futureXpath = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.xpath(element), latchXpath);
+        Future<Boolean> futureName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.name(element), latchName);        // Esperará saber si existe el elemento en alguno de los tipos usando Future
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
-        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
-        //Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<Boolean> futureId = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.id(element));
-        Future<Boolean> futureClassName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.className(element));
-        Future<Boolean> futureCss = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.cssSelector(element));
-        Future<Boolean> futureTagName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.tagName(element));
-        Future<Boolean> futureLinkText = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.linkText(element));
-        Future<Boolean> futurePartialLinkText = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.partialLinkText(element));
-        Future<Boolean> futureXpath = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.xpath(element));
-        Future<Boolean> futureName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.name(element));
-        // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
+        while (System.currentTimeMillis() < endTime) {
             try {
-                if (futureId.isDone() && futureId.get()) {
-                    return true;
+                if (latchId.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    if (futureId.get()) {
+                        return true;
+                    }
                 }
-                if (futureClassName.isDone() && futureClassName.get()) {
-                    return true;
+                if (latchClassName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    if (futureClassName.get()) {
+                        return true;
+                    }
                 }
-                if (futureCss.isDone() && futureCss.get()) {
-                    return true;
+                if (latchCss.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    if (futureCss.get()) {
+                        return true;
+                    }
                 }
-                if (futureTagName.isDone() && futureTagName.get()) {
-                    return true;
+                if (latchTagName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    if (futureTagName.get()) {
+                        return true;
+                    }
                 }
-                if (futureLinkText.isDone() && futureLinkText.get()) {
-                    return true;
+                if (latchLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    if (futureLinkText.get()) {
+                        return true;
+                    }
                 }
-                if (futurePartialLinkText.isDone() && futurePartialLinkText.get()) {
-                    return true;
+                if (latchPartialLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    if (futurePartialLinkText.get()) {
+                        return true;
+                    }
                 }
-                if (futureXpath.isDone() && futureXpath.get()) {
-                    return true;
+                if (latchXpath.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    if (futureXpath.get()) {
+                        return true;
+                    }
                 }
-                if (futureName.isDone() && futureName.get()) {
-                    return true;
+                if (latchName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    if (futureName.get()) {
+                        return true;
+                    }
                 }
             } catch (Exception e) {
                 LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
@@ -2094,40 +2162,6 @@ public class SeleniumUtils {
         }
     }
 
-    public void moverATabAnterior(WebDriver driver, String previousTab) {
-        if (esValorValido(previousTab)) {
-            for (String windowHandle : driver.getWindowHandles()) {
-                if (previousTab.equals(windowHandle)) {
-                    LogsJB.info("Moviendo a la pestaña solicitada");
-                    driver.switchTo().window(windowHandle);
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter
-     *
-     * @param driver  driver que manipula el navegador
-     * @param element elemento al que se envÃ­ara el texto
-     * @param value   Valor que se validara no sea null o vacio
-     */
-    public void enviarTextoSiValidoX2(WebDriver driver, SearchContext searchContext, String element, String value) {
-        if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
-            enviarTextoX2(driver, searchContext, element, value);
-        }
-    }
-
-
-
-    public void enviarTextoSiValido(WebDriver driver, SearchContext searchContext, String element, String value) {
-        if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
-            enviarTexto(driver, searchContext, element, false, value);
-        }
-    }
-
-
     /**
      * Trata de envíar el texto al elemento especificado en mas de una ocasión
      *
@@ -2141,94 +2175,6 @@ public class SeleniumUtils {
             if (sendKeysIfElementExist(driver, searchContext, element, texto)) {
                 return true;
             }
-        }
-        return false;
-    }
-
-
-
-    /***
-     * Envía dos veces el texto indicado al elemento indicado
-     * @param searchContext Driver que está manipulando el navegador
-     * @param elemento Atributo por medio del cual identificaremos el elemento a modificar
-     * @param texto Texto que deseamos envíar al elmento
-     */
-
-    public void enviarTextoX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
-        enviarTexto(driver,searchContext,elemento,false,texto);
-        keyPress(driver, Keys.ENTER);
-        enviarTexto(driver, searchContext, elemento,false,texto);
-        keyPress(driver, Keys.ENTER);
-    }
-
-    /***
-     * Realiza 2 veces la busquedad de el texto de un elemento
-     * @param driver Driver que controla el navegador
-     * @param element Atributo del elemento a buscar
-     * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
-     */
-    public String obtenerTextWebElementx2(WebDriver driver, SearchContext searchContext, String element) {
-        int i = 0;
-        String texto = null;
-        while (Objects.isNull(texto) && i < 2) {
-            texto = SeleniumUtils.getTextIfElementExist(driver, searchContext, element);
-            i++;
-        }
-        return texto;
-    }
-    public String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element) {
-        for (int i = 0; i < 2; i++) {
-            String texto = getTextIfElementExist(driver, searchContext, element);
-            if (texto != null) {
-                return texto;
-            }
-        }
-        return null;
-    }
-
-    /****
-     * Realiza 2 veces la busquedad de el texto de un elemento
-     * @param driver Driver que controla el navegador
-     * @param element Atributo del elemento a buscar
-     * @param timeduration Duración de la busquedad del texto del elemento especificado
-     * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
-     * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
-     */
-
-    public String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
-        for (int i = 0; i < 2; i++) {
-            String texto = getTextIfElementExist(driver, searchContext, element, timeduration, timerepetition);
-            if (texto != null) {
-                return texto;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Envía un texto al elemento indicado, si este existe en el contexto actual.
-     *
-     * @param driver        Driver que está manipulando el navegador
-     * @param element       Atributo del elemento, por medio del cual se realizara la busqueda
-     * @param texto         Texto a envíar al elemento indicado
-     * @param assertFail Bandera para controlar si se quiere controlar el Assert.fail
-     */
-    public boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
-        try {
-            if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
-                WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
-                getImageScreeenshotWebElement(driver,elemento);
-                return true;
-            }
-            LogsJB.info("No se encontró el elemento: " + element);
-        } catch (Exception e) {
-            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
-            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
-            LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if (assertFail) {
-                Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
-            }
-            manejarErrorEnvioTexto(element, e, assertFail);
         }
         return false;
     }
@@ -2261,19 +2207,18 @@ public class SeleniumUtils {
         }
     }
 
-//Tercer lote de métodos
     /**
      * Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter
      *
-     * @param driver driver para interactuar con el navegador
-     * @param searchContext  driver que actúa como searchContext
-     * @param element elemento al que se envÃ­ara el texto
-     * @param value   Valor que se validara no sea null o vacio
+     * @param driver        driver para interactuar con el navegador
+     * @param searchContext driver que actúa como searchContext
+     * @param element       elemento al que se envÃ­ara el texto
+     * @param value         Valor que se validara no sea null o vacio
      */
-    public static void sendKeystoElementvalidValueX2(WebDriver driver,SearchContext searchContext, String element, String value) {
+    public static void sendKeystoElementvalidValueX2(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!SeleniumUtils.cadenaNulaoVacia(value)) {
             if (!value.equalsIgnoreCase(inespecific)) {
-                enviarTextoX2Intentos(driver,searchContext,element,value);
+                enviarTextoX2Intentos(driver, searchContext, element, value);
             }
         }
     }
@@ -2281,15 +2226,15 @@ public class SeleniumUtils {
     /**
      * Envia el texto al elemento especificado
      *
-     * @param driver driver para interactuar con la página
-     * @param searchContext  driver que funciona como searchContext
-     * @param element elemento al que se envÃ­ara el texto
-     * @param value   Valor que se validara no sea null o vacio
+     * @param driver        driver para interactuar con la página
+     * @param searchContext driver que funciona como searchContext
+     * @param element       elemento al que se envÃ­ara el texto
+     * @param value         Valor que se validara no sea null o vacio
      */
-    public static void sendKeystoElementvalidValueForMap(WebDriver driver,SearchContext searchContext, String element, String value) {
+    public static void sendKeystoElementvalidValueForMap(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!SeleniumUtils.cadenaNulaoVacia(value)) {
             if (!value.equalsIgnoreCase(inespecific)) {
-                enviarTexto(driver,searchContext,element,false,value);
+                enviarTexto(driver, searchContext, element, false, value);
                 SeleniumUtils.keyPress(driver, Keys.ENTER);
             }
         }
@@ -2298,15 +2243,15 @@ public class SeleniumUtils {
     /**
      * Envia el texto al elemento especificado
      *
-     * @param driver driver que interactúa con el navegador
-     * @param searchContext  driver que funciona como searchContext
-     * @param element elemento al que se envÃ­ara el texto
-     * @param value   Valor que se validara no sea null o vacio
+     * @param driver        driver que interactúa con el navegador
+     * @param searchContext driver que funciona como searchContext
+     * @param element       elemento al que se envÃ­ara el texto
+     * @param value         Valor que se validara no sea null o vacio
      */
-    public static void sendKeystoElementvalidValue(WebDriver driver,SearchContext searchContext, String element, String value) {
+    public static void sendKeystoElementvalidValue(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!SeleniumUtils.cadenaNulaoVacia(value)) {
             if (!value.equalsIgnoreCase(inespecific)) {
-                enviarTexto(driver, searchContext,element,false,value);
+                enviarTexto(driver, searchContext, element, false, value);
             }
         }
     }
@@ -2314,16 +2259,16 @@ public class SeleniumUtils {
     /**
      * Trata de envíar el texto al elemento especificado en mas de una ocasión
      *
-     * @param driver Driver que interactúa con el navegador
-     * @param searchContext  Driver que funciona como searchContext
-     * @param element Atributo por medio del cual identificaremos el elemento a modificar
-     * @param texto   Texto que deseamos envíar al elmento
+     * @param driver        Driver que interactúa con el navegador
+     * @param searchContext Driver que funciona como searchContext
+     * @param element       Atributo por medio del cual identificaremos el elemento a modificar
+     * @param texto         Texto que deseamos envíar al elmento
      * @return True si logra envíar el texto, de lo contrario false
      */
-    private static Boolean sendKeystoElementx2intents(WebDriver driver,SearchContext searchContext, String element, CharSequence... texto) {
+    private static Boolean sendKeystoElementx2intents(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
         int i = 0;
         while (i < 2) {
-            if (SeleniumUtils.sendKeysIfElementExist( driver,searchContext, element, texto)) {
+            if (SeleniumUtils.sendKeysIfElementExist(driver, searchContext, element, texto)) {
                 return true;
             }
             i++;
@@ -2338,13 +2283,12 @@ public class SeleniumUtils {
      * @param elemento Atributo por medio del cual identificaremos el elemento a modificar
      * @param texto Texto que deseamos envíar al elmento
      */
-    public static void sendkeystoelementX2(WebDriver driver,SearchContext searchContext, String elemento, String texto) {
-        enviarTexto(driver,searchContext, elemento,false, texto);
+    public static void sendkeystoelementX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
+        enviarTexto(driver, searchContext, elemento, false, texto);
         SeleniumUtils.keyPress(driver, Keys.ENTER);
-        enviarTexto(driver,searchContext, elemento,false, texto);
+        enviarTexto(driver, searchContext, elemento, false, texto);
         SeleniumUtils.keyPress(driver, Keys.ENTER);
     }
-
 
     /****
      * Realiza 2 veces la busquedad de el texto de un elemento
@@ -2356,7 +2300,7 @@ public class SeleniumUtils {
      * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
      * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
      */
-    public static String obtenerTextWebElementx2(WebDriver driver,SearchContext searchContext, String element, int timeduration, int timerepetition) {
+    public static String obtenerTextWebElementx2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
         int i = 0;
         String texto = null;
         while (Objects.isNull(texto) && i < 2) {
@@ -2366,9 +2310,120 @@ public class SeleniumUtils {
         return texto;
     }
 
+    public void moverATabAnterior(WebDriver driver, String previousTab) {
+        if (esValorValido(previousTab)) {
+            for (String windowHandle : driver.getWindowHandles()) {
+                if (previousTab.equals(windowHandle)) {
+                    LogsJB.info("Moviendo a la pestaña solicitada");
+                    driver.switchTo().window(windowHandle);
+                    break;
+                }
+            }
+        }
+    }
 
+    /**
+     * Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter
+     *
+     * @param driver  driver que manipula el navegador
+     * @param element elemento al que se envÃ­ara el texto
+     * @param value   Valor que se validara no sea null o vacio
+     */
+    public void enviarTextoSiValidoX2(WebDriver driver, SearchContext searchContext, String element, String value) {
+        if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
+            enviarTextoX2(driver, searchContext, element, value);
+        }
+    }
+//Tercer lote de métodos
 
+    public void enviarTextoSiValido(WebDriver driver, SearchContext searchContext, String element, String value) {
+        if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
+            enviarTexto(driver, searchContext, element, false, value);
+        }
+    }
 
+    /***
+     * Envía dos veces el texto indicado al elemento indicado
+     * @param searchContext Driver que está manipulando el navegador
+     * @param elemento Atributo por medio del cual identificaremos el elemento a modificar
+     * @param texto Texto que deseamos envíar al elmento
+     */
+    public void enviarTextoX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
+        enviarTexto(driver, searchContext, elemento, false, texto);
+        keyPress(driver, Keys.ENTER);
+        enviarTexto(driver, searchContext, elemento, false, texto);
+        keyPress(driver, Keys.ENTER);
+    }
 
+    /***
+     * Realiza 2 veces la busquedad de el texto de un elemento
+     * @param driver Driver que controla el navegador
+     * @param element Atributo del elemento a buscar
+     * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
+     */
+    public String obtenerTextWebElementx2(WebDriver driver, SearchContext searchContext, String element) {
+        int i = 0;
+        String texto = null;
+        while (Objects.isNull(texto) && i < 2) {
+            texto = SeleniumUtils.getTextIfElementExist(driver, searchContext, element);
+            i++;
+        }
+        return texto;
+    }
 
+    public String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element) {
+        for (int i = 0; i < 2; i++) {
+            String texto = getTextIfElementExist(driver, searchContext, element);
+            if (texto != null) {
+                return texto;
+            }
+        }
+        return null;
+    }
+
+    /****
+     * Realiza 2 veces la busquedad de el texto de un elemento
+     * @param driver Driver que controla el navegador
+     * @param element Atributo del elemento a buscar
+     * @param timeduration Duración de la busquedad del texto del elemento especificado
+     * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
+     * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
+     */
+    public String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
+        for (int i = 0; i < 2; i++) {
+            String texto = getTextIfElementExist(driver, searchContext, element, timeduration, timerepetition);
+            if (texto != null) {
+                return texto;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Envía un texto al elemento indicado, si este existe en el contexto actual.
+     *
+     * @param driver     Driver que está manipulando el navegador
+     * @param element    Atributo del elemento, por medio del cual se realizara la busqueda
+     * @param texto      Texto a envíar al elemento indicado
+     * @param assertFail Bandera para controlar si se quiere controlar el Assert.fail
+     */
+    public boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
+        try {
+            if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
+                WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
+                getImageScreeenshotWebElement(driver, elemento);
+                return true;
+            }
+            LogsJB.info("No se encontró el elemento: " + element);
+        } catch (Exception e) {
+            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
+            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
+            LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if (assertFail) {
+                Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
+            }
+            manejarErrorEnvioTexto(element, e, assertFail);
+        }
+        return false;
+    }
 }

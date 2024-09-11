@@ -6,9 +6,11 @@ plugins {
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 group = 'io.github.josecarlosbran'
-version = '1.1.2'
+version = '1.1.3'
 //Publicación en maven
 // ./gradlew clean build javadocJar sourcesJar publish
+//Publicación local
+//./gradlew clean build javadocJar sourcesJar publishToMavenLocal
 repositories {
     mavenCentral()
 }
@@ -34,15 +36,29 @@ dependencies {
     implementation 'commons-io:commons-io:2.16.1'
     implementation 'commons-codec:commons-codec:1.17.1'
 }
+
+// Apply a specific Java toolchain to ease working on different environments.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+
 javadoc {
     options {
         encoding 'UTF-8'
         links 'https://docs.oracle.com/javase/8/docs/api/'
     }
 }
+
+
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
 }
+
 tasks.register('javadocJar', Jar) {
     archiveClassifier.set('javadoc')
     from tasks.javadoc
@@ -87,15 +103,7 @@ jacocoTestReport {
         html.required = true // También puedes mantener el HTML si lo necesitas
     }
 }
-/*
-nexusStaging {
-    packageGroup = 'io.github.josecarlosbran'  // Cambia esto a tu grupo de paquetes
-    stagingProfileId = '2b684156014a8' // Obtén esto desde Sonatype Nexus
-    username = 'Ik71qZci'
-    password = 'k5+3rMERJxq8fW5XENm6bdBq3GmCRSzBV41FE7b7Ic1r'
-    numberOfRetries = 50 // Configura el número de intentos en caso de fallo
-    delayBetweenRetriesInMillis = 3000 // Intervalo entre intentos
-}*/
+
 
 publishing {
     publications {
@@ -104,7 +112,8 @@ publishing {
             from components.java
             // Añade los artefactos javadoc y sources
             artifact(tasks.named('javadocJar'))
-            artifact(tasks.named('sourcesJar'))
+            //artifact(tasks.named('sourcesJar'))
+            artifact sourceJar
             pom {
                 name = 'seleniumutils'
                 description = 'Utilidades de Selenium'
