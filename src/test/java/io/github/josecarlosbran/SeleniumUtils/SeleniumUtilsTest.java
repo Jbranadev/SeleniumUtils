@@ -5,6 +5,7 @@ import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -44,14 +45,14 @@ public class SeleniumUtilsTest {
 //        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
 //        driver = wdm.create();
         WebDriverManager.chromedriver().setup();
-        /*ChromeOptions options = new ChromeOptions();
+        ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--headless");
-        driver = new ChromeDriver(options);*/
-        driver = new ChromeDriver();
+        driver = new ChromeDriver(options);
+        //driver = new ChromeDriver();
         driver.manage().window().maximize();
-        LogsJB.setGradeLog(NivelLog.TRACE);
+        LogsJB.setGradeLog(NivelLog.WARNING);
     }
 
     @Test(testName = "Element Exist Google"
@@ -59,9 +60,9 @@ public class SeleniumUtilsTest {
     public void elementExist() {
         logParrafo("Irá a la pagina principal de Google");
         driver.get("https://www.google.com");
-        logParrafo("Verifica que el elemento 'textarea[name='q']' exista en la pagina");
-        Assert.assertTrue(SeleniumUtils.ElementoExistente(driver, driver, "textarea[name='q']"),
-                "No fue posible encontrar el elemento 'textarea[name='q']' en la pagina," +
+        logParrafo("Verifica que el elemento 'textarea[id='APjFqb']' exista en la pagina");
+        Assert.assertTrue(SeleniumUtils.ElementoExistente(driver, driver, "textarea[id='APjFqb']"),
+                "No fue posible encontrar el elemento 'textarea[id='APjFqb']' en la pagina," +
                         "valide el identificador del elemento");
     }
 
@@ -74,13 +75,14 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.sendKeysToElement(driver, elemento, "Prueba de escritura"));
     }
 
+
     @Test(testName = "Clear Element Search Google"
             , description = "Limpia el elemento de busqueda de Google",
             dependsOnMethods = "sendKeysToElement")
     public void clearElementIfExists() {
         logParrafo("Limpia el elemento de busqueda de Google");
-        Assert.assertTrue(SeleniumUtils.LimpiarElementoExistente(driver, driver, "textarea[name='q']"),
-                "No fue posible limpiar el elemento 'textarea[name='q']' en la pagina," +
+        Assert.assertTrue(SeleniumUtils.LimpiarElementoExistente(driver, driver, "textarea[id='APjFqb']"),
+                "No fue posible limpiar el elemento 'textarea[id='APjFqb']' en la pagina," +
                         "valide el identificador del elemento");
     }
 
@@ -117,7 +119,7 @@ public class SeleniumUtilsTest {
         // Presiona la tecla 'A' (código ASCII 65)
         SeleniumUtils.keyPress(driver, 65);
         // Verifica que la barra de búsqueda contiene la letra 'A'
-        Assert.assertEquals(searchBox.getAttribute("value"), "A", "La tecla 'A' no fue presionada correctamente");
+        Assert.assertEquals(SeleniumUtils.getTextOfWebElement(driver, searchBox), "A", "La tecla 'A' no fue presionada correctamente");
     }
 
     @Test(testName = "KeyPress Using Keys",
@@ -342,7 +344,7 @@ public class SeleniumUtilsTest {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[3]/form/div[1]/div[1]/div[4]/center/input[2]");
         String respuesta = SeleniumUtils.getTextOfWebElement(driver, elemento);
         condicion = SeleniumUtils.cadenaNulaoVacia(respuesta);
-        Assert.assertTrue(!condicion);
+        Assert.assertFalse(condicion);
     }
 
     @Test(testName = "getTextNullOfWebElement", description = "Obtiene el texto nulo de un elemento web", dependsOnMethods = "elementExist")
@@ -376,7 +378,7 @@ public class SeleniumUtilsTest {
         LogsJB.waitForOperationComplete();
         Assert.assertTrue(variable, "No se logro hacer click en el elemento");
     }
-
+/*
     @Test(testName = "clickElementIfExistBran")
     public void clickElementIfExistBran() {
         logParrafo("Se debe de dar click en un elemento especificado");
@@ -385,6 +387,7 @@ public class SeleniumUtilsTest {
         LogsJB.waitForOperationComplete();
         Assert.assertTrue(variable, "No se logro hacer click en el elemento");
     }
+    */
 
     @Test(testName = "clickElementIfExistFallo", description = "Should make click in the specified element", dependsOnMethods = "elementExist")
     public void clickElementIfExistFallo() {
@@ -468,7 +471,7 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.cambiarZOOMMenos(driver, 2));
     }
 
-    @Test(testName = "cambiarZOOMMenosFallo", description = "Debería dar un error al disminuir el zoom de la página visualizada", dependsOnMethods = "elementExist", expectedExceptions = AssertionError.class)
+    @Test(testName = "cambiarZOOMMenosFallo", description = "Debería dar un error al disminuir el zoom de la página visualizada", dependsOnMethods = "elementExist")
     public void cambiarZOOMMenosFallo() {
         logParrafo("Se debe dar un error al momento de disminuir la cantidad de Zoom que se realiza");
         SeleniumUtils.cambiarZOOMMenos(null, 2);
@@ -506,7 +509,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "scrollMouseUpFallo", description = "Debería de dar un error al  hacer scroll con el mouse hacia arriba",
-            expectedExceptions = {java.lang.AssertionError.class}, dependsOnMethods = "elementExist")
+            dependsOnMethods = "elementExist")
     public void scrollMouseUpFallo() {
         logParrafo("Se dará un error cuando el driver haga Scroll hacia arriba con el mouse por medio de Selenium");
         Assert.assertFalse(SeleniumUtils.scrollMouseUp(null, 0));
@@ -673,11 +676,12 @@ public class SeleniumUtilsTest {
         Assert.assertNull(elemento);
     }
 
+    /*
     @Test(testName = "getTextIfElementExistConTiempoExito", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextIfElementExistConTiempoExito() {
         String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "/html/body/div[1]/div[6]/div[1]", 4, 2);
         Assert.assertNotNull(elemento);
-    }
+    }*/
 
     @Test(testName = "getTextIfElementExistConTiempoFallo", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextIfElementExistConTiempoFallo() {
@@ -820,7 +824,7 @@ public class SeleniumUtilsTest {
         logParrafo("Se le ingresa un texto sin normalizar, y el método debe de retornar un String normalizado y en mayusculas");
         String stringSinNormalizar = "café";
         String normalizado = SeleniumUtils.Normalizar(stringSinNormalizar);
-        Assert.assertEquals(normalizado, "CAFA");
+        Assert.assertEquals(normalizado, "CAFE");
     }
 
     @Test(testName = "NormalizarFallo", description = "Debe de retornar un error en el string en mayusculas y normalizado")

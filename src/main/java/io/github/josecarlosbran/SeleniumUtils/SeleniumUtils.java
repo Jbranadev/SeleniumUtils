@@ -33,7 +33,7 @@ public class SeleniumUtils {
     private static String inespecific = "N/E";
     @Getter
     @Setter
-    private static Integer searchTime = 3000;
+    private static Integer searchTime = 2500;
     @Getter
     @Setter
     private static Integer searchRepetitionTime = 50;
@@ -482,6 +482,9 @@ public class SeleniumUtils {
                 if (term.endsWith("]}")) {
                     // Eliminar los últimos dos carácteres
                     term = term.substring(0, term.length() - 2);
+                }else if (term.endsWith("]]") && StringUtils.equalsIgnoreCase(locator, "xpath")) {
+                    // Eliminar los últimos dos carácteres
+                    term = term.substring(0, term.length() - 1);
                 }
                 switch (locator) {
                     case "xpath":
@@ -1410,9 +1413,7 @@ public class SeleniumUtils {
         if (!Objects.isNull(elementScreenshot)) {
             WebElement element = RefreshReferenceToElement(driver, elementScreenshot);
             // Desplazarse hasta el elemento
-            Actions actions = new Actions(driver);
-            actions.moveToElement(element);
-            actions.perform();
+            SeleniumUtils.posicionarmeEn(driver, element);
             // Tomar la altura del elemento después de desplazarse
             int elementHeight = element.getSize().getHeight();
             // Calcular porcentaje de Zoom necesario
