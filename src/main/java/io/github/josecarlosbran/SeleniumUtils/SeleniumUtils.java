@@ -2192,14 +2192,11 @@ public class SeleniumUtils {
         }
     }
 
-
-
     public static void enviarTextoSiValido(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
             enviarTexto(driver, searchContext, element, false, value);
         }
     }
-
 
     /**
      * Trata de envíar el texto al elemento especificado en mas de una ocasión
@@ -2218,19 +2215,16 @@ public class SeleniumUtils {
         return false;
     }
 
-
-
     /***
      * Envía dos veces el texto indicado al elemento indicado
      * @param searchContext Driver que está manipulando el navegador
      * @param elemento Atributo por medio del cual identificaremos el elemento a modificar
      * @param texto Texto que deseamos envíar al elmento
      */
-
     public static void enviarTextoX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
-        enviarTexto(driver,searchContext,elemento,false,texto);
+        enviarTexto(driver, searchContext, elemento, false, texto);
         keyPress(driver, Keys.ENTER);
-        enviarTexto(driver, searchContext, elemento,false,texto);
+        enviarTexto(driver, searchContext, elemento, false, texto);
         keyPress(driver, Keys.ENTER);
     }
 
@@ -2249,6 +2243,7 @@ public class SeleniumUtils {
         }
         return texto;
     }
+
     public static String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element) {
         for (int i = 0; i < 2; i++) {
             String texto = getTextIfElementExist(driver, searchContext, element);
@@ -2267,7 +2262,6 @@ public class SeleniumUtils {
      * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
      * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
      */
-
     public static String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
         for (int i = 0; i < 2; i++) {
             String texto = getTextIfElementExist(driver, searchContext, element, timeduration, timerepetition);
@@ -2281,16 +2275,16 @@ public class SeleniumUtils {
     /**
      * Envía un texto al elemento indicado, si este existe en el contexto actual.
      *
-     * @param driver        Driver que está manipulando el navegador
-     * @param element       Atributo del elemento, por medio del cual se realizara la busqueda
-     * @param texto         Texto a envíar al elemento indicado
+     * @param driver     Driver que está manipulando el navegador
+     * @param element    Atributo del elemento, por medio del cual se realizara la busqueda
+     * @param texto      Texto a envíar al elemento indicado
      * @param assertFail Bandera para controlar si se quiere controlar el Assert.fail
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
         try {
             if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
                 WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
-                getImageScreeenshotWebElement(driver,elemento);
+                getImageScreeenshotWebElement(driver, elemento);
                 return true;
             }
             LogsJB.info("No se encontró el elemento: " + element);
@@ -2333,8 +2327,8 @@ public class SeleniumUtils {
             Assert.fail("Error enviando texto al elemento: " + element);
         }
     }
-
 //Tercer lote de métodos
+
     /**
      * Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter
      *
@@ -2393,18 +2387,16 @@ public class SeleniumUtils {
      * @param texto         Texto que deseamos envíar al elmento
      * @return True si logra envíar el texto, de lo contrario false
      */
-    public static Boolean sendKeystoElementx2intents(WebDriver driver,SearchContext searchContext, String element, CharSequence... texto) {
+    public static Boolean sendKeystoElementx2intents(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
         int i = 0;
         while (i < 2) {
-            if (SeleniumUtils.sendKeysIfElementExist( driver,searchContext, element, texto)) {
+            if (SeleniumUtils.sendKeysIfElementExist(driver, searchContext, element, texto)) {
                 return true;
             }
             i++;
         }
         return false;
     }
-
-
 
     /****
      * Realiza 2 veces la busquedad de el texto de un elemento
@@ -2425,16 +2417,12 @@ public class SeleniumUtils {
         }
         return texto;
     }
-
-
-
     //Cuarto lote de métodos
     /*
-    *
-    *
-    *
-    * */
-
+     *
+     *
+     *
+     * */
 
     /**
      * Función para cambiar el contexto del WebDriver para interactuar con un marco (frame) especifico en la BERediseño
@@ -2442,19 +2430,17 @@ public class SeleniumUtils {
      * @param driver WebDriver es el que cambiará el contexto al marco especificado
      * @param frame  Identificador del marco al que se desea cambiar
      */
-    public static void switchFrame(WebDriver driver,SearchContext searchContext ,String frame) {
-        String cadena="#"+frame;
-        WebElement iframe=obtenerWebElementx2(driver,searchContext,cadena);
+    public static void switchFrame(WebDriver driver, SearchContext searchContext, String frame) {
+        String cadena = "#" + frame;
+        WebElement iframe = obtenerWebElementx2(driver, searchContext, cadena);
         driver.switchTo().frame(iframe);
     }
 
-
-    public static void capturar500ServerError(WebDriver driver,SearchContext searchContext, int timeduration, int timerepetition) {
+    public static void capturar500ServerError(WebDriver driver, SearchContext searchContext, int timeduration, int timerepetition) {
         String element = "/html/body/div[2]/div/fieldset/h2";
         String comment = "Ha sucedido un error en el servidor, comunicarse con el equipo de integración ";
-        String mesajeerror=obtenerTextWebElementx2(driver,searchContext,element,timeduration,timerepetition);
-
-        WebElement elemento=getElementIfExist(driver,searchContext,element);
+        String mesajeerror = obtenerTextWebElementx2(driver, searchContext, element, timeduration, timerepetition);
+        WebElement elemento = getElementIfExist(driver, searchContext, element);
         if (!Objects.isNull(mesajeerror)) {
             if (StringUtils.equalsIgnoreCase(mesajeerror, "500 - Internal server error.") || StringUtils.containsIgnoreCase(mesajeerror, "Internal server error")) {
                 LogsJB.fatal("Se encontro un mensaje de Error");
@@ -2472,7 +2458,6 @@ public class SeleniumUtils {
             LogsJB.info("*");
         }
     }
-
 
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
@@ -2500,10 +2485,4 @@ public class SeleniumUtils {
             }
         }
     }
-
-
-
-
-
-
 }

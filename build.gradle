@@ -203,7 +203,7 @@ nexusPublishing {
         sonatype {
             nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
             snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            stagingProfileId='2b684156014a8'
+            stagingProfileId = '2b684156014a8'
             username = System.getenv("OSSRH_USERNAME")
             password = System.getenv("OSSRH_TOKEN")
         }
