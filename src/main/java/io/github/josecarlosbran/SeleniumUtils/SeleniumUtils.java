@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.logging.Logs;
 import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
 
@@ -34,7 +33,7 @@ public class SeleniumUtils {
     private static String inespecific = "N/E";
     @Getter
     @Setter
-    private static Integer searchTime = 3000;
+    private static Integer searchTime = 2500;
     @Getter
     @Setter
     private static Integer searchRepetitionTime = 50;
@@ -233,23 +232,24 @@ public class SeleniumUtils {
      * @param elemento WebElement el elemento al que se desea posicionarse
      */
     public static void posicionarmeEn(WebDriver driver, WebElement elemento) {
+        if (Objects.isNull(elemento)) {
+            return;
+        }
+        LogsJB.debug("Posicionandonos en el elemento con scrollIntoViewIfNeeded.");
         try {
-            if (Objects.isNull(elemento)) {
-                return;
-            }
+            // Opción 3: Usar scrollIntoViewIfNeeded (obsoleto en algunos navegadores)
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoViewIfNeeded(true);", elemento);
+        } catch (WebDriverException e3) {
+            LogsJB.warning("Fallo con scrollIntoViewIfNeeded, intentando con Actions perform.");
             try {
-                // Crear un objeto Actions
+                // Último recurso: Usar Actions para desplazarse al elemento
                 Actions actions = new Actions(driver);
-                // Desplazar el scroll hasta el elemento
-                actions.moveToElement(elemento);
-                actions.perform();
-            } catch (WebDriverException e) {
-                // Desplazar el scroll hasta el elemento
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elemento);
+                actions.moveToElement(elemento).perform();
+            } catch (WebDriverException e5) {
+                // Capturar la excepción final si todas las opciones fallan
+                LogsJB.fatal("Todas las opciones de scroll han fallado para el elemento: " + elemento.toString());
+                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e5));
             }
-        } catch (Exception e) {
-            LogsJB.fatal("Excepción capturada al intentar hacer scroll en el elemento: " + elemento.toString());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -266,13 +266,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Buscara si existe el elemento indicado: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.elementExist(wait, searchContext, By.id(element));
@@ -284,8 +280,7 @@ public class SeleniumUtils {
         Future<Boolean> futureXpath = SeleniumParallel.elementExist(wait, searchContext, By.xpath(element));
         Future<Boolean> futureName = SeleniumParallel.elementExist(wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && !fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && futureId.get()) {
                     return true;
@@ -316,13 +311,9 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+        if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No Existe el elemento especificado: " + element);
         } else {
             LogsJB.info(" Logro encontrar el elemento especificado: " + element);
@@ -346,13 +337,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existe el elemento indicado, lo limpiara: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.id(element));
@@ -364,8 +351,7 @@ public class SeleniumUtils {
         Future<Boolean> futureXpath = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.xpath(element));
         Future<Boolean> futureName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && !fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && futureId.get()) {
                     return true;
@@ -396,13 +382,9 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+        if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No logro limpiar el elemento especificado: " + element);
         } else {
             LogsJB.info(" Logro limpiar el elemento especificado: " + element);
@@ -500,6 +482,9 @@ public class SeleniumUtils {
                 if (term.endsWith("]}")) {
                     // Eliminar los últimos dos carácteres
                     term = term.substring(0, term.length() - 2);
+                }else if (term.endsWith("]]") && StringUtils.equalsIgnoreCase(locator, "xpath")) {
+                    // Eliminar los últimos dos carácteres
+                    term = term.substring(0, term.length() - 1);
                 }
                 switch (locator) {
                     case "xpath":
@@ -599,13 +584,9 @@ public class SeleniumUtils {
                 ", enviara el texto: " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.id(element), Texto);
@@ -617,8 +598,7 @@ public class SeleniumUtils {
         Future<Boolean> futureXpath = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.xpath(element), Texto);
         Future<Boolean> futureName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.name(element), Texto);
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && !fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && futureId.get()) {
                     return true;
@@ -649,13 +629,9 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+        if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No logro encontrar y setear el Texto: " + Arrays.toString(Texto) +
                     " en el elemento especificado: " + element);
         } else {
@@ -694,13 +670,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Obtendrá el texto del elemento si este existe: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + timeDuration + " mili segundos: " + timeRepetition);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, timeDuration, timeRepetition);
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<String> futureId = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.id(element));
@@ -712,8 +684,7 @@ public class SeleniumUtils {
         Future<String> futureXpath = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.xpath(element));
         Future<String> futureName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && !fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && !futureId.get().isEmpty()) {
                     texto = futureId.get();
@@ -752,13 +723,9 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+        if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No pudo hacer obtener el texto del elemento especificado, ya que no existe: " + element);
         } else {
             LogsJB.info(" Logro encontrar y obtener el texto: " + texto + " del elemento especificado: " + element);
@@ -868,13 +835,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existe el elemento indicado, hará click en el elemento: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<Boolean> futureId = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.id(element));
@@ -886,8 +849,7 @@ public class SeleniumUtils {
         Future<Boolean> futureXpath = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.xpath(element));
         Future<Boolean> futureName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && !fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (!(futureId.isDone() && futureClassName.isDone() && futureCss.isDone() && futureTagName.isDone() && futureLinkText.isDone() && futurePartialLinkText.isDone() && futureXpath.isDone() && futureName.isDone()) && System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && futureId.get()) {
                     return true;
@@ -918,13 +880,9 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if (fecha2.after(fecha)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+        if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No pudo hacer click en el elemento especificado, ya que no existe: " + element);
         } else {
             LogsJB.info(" Logro encontrar y hacer click en el elemento especificado: " + element);
@@ -989,16 +947,15 @@ public class SeleniumUtils {
         }
     }
 
-
     /**
      * Espera implícita de 30 segundos, luego de los 30 segundos lanzara excepción
      *
-     * @param driver Driver que está manipulando el navegador
-     * @param by     Identificador del tipo By
+     * @param driver        Driver que está manipulando el navegador
+     * @param by            Identificador del tipo By
      * @param banderaAssert bandera para decidir si se quiere manejar o no, el assertFail
      * @return retorna verdadero si se da la espera de manera correcta
      */
-    public static boolean waitImplicity(WebDriver driver, By by,boolean banderaAssert) {
+    public static boolean waitImplicity(WebDriver driver, By by, boolean banderaAssert) {
         boolean bandera = false;
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
@@ -1008,9 +965,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
-
             }
         } finally {
             return bandera;
@@ -1033,13 +989,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existen los elementos que corresponden al identificador: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<List<WebElement>> futureId = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.id(element));
@@ -1051,8 +1003,7 @@ public class SeleniumUtils {
         Future<List<WebElement>> futureXpath = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.xpath(element));
         Future<List<WebElement>> futureName = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone() && !futureId.get().isEmpty()) {
                     LogsJB.info("Elementos encontrados por ID: " + futureId.get());
@@ -1091,13 +1042,9 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if ((fecha2.after(fecha)) || elementos.isEmpty()) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+        if (System.currentTimeMillis() >= endTime || elementos.isEmpty()) {
             LogsJB.warning(" No pudo obtener los elementos especificados, ya que no existen: " + elementos);
         }
         //Retorna null si el elemento no Existe
@@ -1135,13 +1082,9 @@ public class SeleniumUtils {
         LogsJB.debug(" Si existen los elementos que corresponden al identificador: " + element);
         LogsJB.debug("* ");
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
-        java.util.Date fecha = Calendar.getInstance().getTime();
-        Calendar addseconds = Calendar.getInstance();
-        addseconds.setTime(fecha);
-        addseconds.add(Calendar.MILLISECOND, SeleniumUtils.getSearchTime());
-        fecha = addseconds.getTime();
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + fecha);
-        java.util.Date fecha2 = Calendar.getInstance().getTime();
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         // Declaración de features para obtener el resultado de buscar los elementos en cuestión
         Future<WebElement> futureId = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.id(element));
@@ -1153,8 +1096,7 @@ public class SeleniumUtils {
         Future<WebElement> futureXpath = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.xpath(element));
         Future<WebElement> futureName = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.name(element));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (!fecha2.after(fecha)) {
-            fecha2 = Calendar.getInstance().getTime();
+        while (System.currentTimeMillis() < endTime) {
             try {
                 if (futureId.isDone()) {
                     elemento = futureId.get();
@@ -1217,13 +1159,9 @@ public class SeleniumUtils {
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-        LogsJB.debug(" Fecha contra la que se comparara si transcurren los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha);
-        LogsJB.debug(" Fecha contra la que se comparo si transcurrieron los " +
-                SeleniumUtils.getSearchTime() +
-                " mili segundos: " + fecha2);
-        if ((fecha2.after(fecha)) || Objects.isNull(elemento)) {
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+        if (System.currentTimeMillis() >= endTime || Objects.isNull(elemento)) {
             LogsJB.warning(" No pudo obtener el elemento especificado, ya que no existe: " + element);
         }
         //Retorna null si el elemento no Existe
@@ -1475,9 +1413,7 @@ public class SeleniumUtils {
         if (!Objects.isNull(elementScreenshot)) {
             WebElement element = RefreshReferenceToElement(driver, elementScreenshot);
             // Desplazarse hasta el elemento
-            Actions actions = new Actions(driver);
-            actions.moveToElement(element);
-            actions.perform();
+            SeleniumUtils.posicionarmeEn(driver, element);
             // Tomar la altura del elemento después de desplazarse
             int elementHeight = element.getSize().getHeight();
             // Calcular porcentaje de Zoom necesario
@@ -1498,7 +1434,7 @@ public class SeleniumUtils {
                     double newZoomValue = (zoomActualValue < 100.0) ? (zoomActualValue - 15.0) : 100.0;
                     js.executeScript("document.body.style.zoom = '" + newZoomValue + "%'");
                 } catch (NumberFormatException e) {
-                    LogsJB.info("El valor de zoomActual no es numérico: "+zoomActual);
+                    LogsJB.info("El valor de zoomActual no es numérico: " + zoomActual);
                 }
             }
             File scrFile = SeleniumUtils.getImageScreeenshotWebElement(driver, elementScreenshot);
@@ -1547,11 +1483,11 @@ public class SeleniumUtils {
     /**
      * Espera implícita de 5 segundos o menos si el elemento desaparece del DOM, luego de los 5 segundos lanzara excepción
      *
-     * @param driver Variable que manipula el navegador
-     * @param by     Identificador del tipo By
+     * @param driver        Variable que manipula el navegador
+     * @param by            Identificador del tipo By
      * @param banderaAssert Bandera para preguntar si se quiere el assertFail
      */
-    public static boolean waitImplicityForElementNotExist(WebDriver driver, By by,boolean banderaAssert) {
+    public static boolean waitImplicityForElementNotExist(WebDriver driver, By by, boolean banderaAssert) {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
             wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
@@ -1567,7 +1503,7 @@ public class SeleniumUtils {
             LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
             LogsJB.fatal("*");
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
             }
             return false;
@@ -1655,7 +1591,7 @@ public class SeleniumUtils {
      * @param codigo Codigo numerico de la tecla que queremos presionar
      * @return
      */
-    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo,boolean banderaAssert) {
+    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo, boolean banderaAssert) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
@@ -1669,8 +1605,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
-            Assert.fail("Error inesperado al presionar una tecla: ");
+            if (banderaAssert) {
+                Assert.fail("Error inesperado al presionar una tecla: ");
             }
             return false;
         }
@@ -1709,7 +1645,7 @@ public class SeleniumUtils {
      * @param codigo Codigo numerico de la tecla que queremos presionar
      * @return
      */
-    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, int codigo,boolean banderaAssert) {
+    public static boolean cambiarZOOM(WebDriver driver, int repeticiones, int codigo, boolean banderaAssert) {
         try {
             for (int i = 0; i < repeticiones; i++) {
                 threadslepp(100);
@@ -1724,9 +1660,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al presionar una tecla: ");
-
             }
             return false;
         }
@@ -1757,16 +1692,15 @@ public class SeleniumUtils {
      *
      * @return
      */
-    public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones,boolean banderaAssert) {
+    public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones, boolean banderaAssert) {
         try {
             cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
             return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al presionar una tecla: ");
-
             }
             return false;
         }
@@ -1797,16 +1731,15 @@ public class SeleniumUtils {
      *
      * @return
      */
-    public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones,boolean banderaAssert) {
+    public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones, boolean banderaAssert) {
         try {
             cambiarZOOM(driver, repeticiones, Keys.ADD);
             return true;
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al presionar una tecla: ");
-
             }
             return false;
         }
@@ -1842,7 +1775,7 @@ public class SeleniumUtils {
      * @param cantidad Si el número es positivo, el desplazamiento es hacia abajo en la pantalla, si el número es negativo
      *                 el desplazamiento es hacia arriba.
      */
-    public static boolean scrollMouse(int cantidad,boolean banderaAssert) {
+    public static boolean scrollMouse(int cantidad, boolean banderaAssert) {
         try {
             Robot robot = new Robot();
             int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
@@ -1856,9 +1789,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al intentar realizar el scroll: ");
-
             }
             return false;
         }
@@ -1890,7 +1822,7 @@ public class SeleniumUtils {
      * @param driver          Driver que está manipulando el navegador
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
      */
-    public static boolean scrollMouseDown(WebDriver driver, int cantidadScrolls,boolean banderaAssert) {
+    public static boolean scrollMouseDown(WebDriver driver, int cantidadScrolls, boolean banderaAssert) {
         try {
             Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
@@ -1900,9 +1832,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al intentar realizar el scroll: ");
-
             }
             return false;
         }
@@ -1934,7 +1865,7 @@ public class SeleniumUtils {
      * @param driver          Driver que está manipulando el navegador
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
      */
-    public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls,boolean banderaAssert) {
+    public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls, boolean banderaAssert) {
         try {
             Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
@@ -1944,9 +1875,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al intentar realizar el scroll: ");
-
             }
             return false;
         }
@@ -1960,7 +1890,7 @@ public class SeleniumUtils {
      * @param opcion Opcion del elemento que queremos seleccionar
      * @param comment Comentario que será colocado sobre la imagen capturada si el Elemento indicado existe
      */
-    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment,boolean banderaAssert) {
+    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment, boolean banderaAssert) {
         try {
             WebElement elemento = obtenerWebElementx2(driver, searchcontext, element);
             if (!Objects.isNull(elemento)) {
@@ -1984,9 +1914,8 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
             LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if(banderaAssert){
+            if (banderaAssert) {
                 Assert.fail("Error inesperado al seleccionar el elemento: " + element);
-
             }
             return false;
         }
@@ -2180,24 +2109,71 @@ public class SeleniumUtils {
     public void enviarTextoSiValidoX2(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
             enviarTextoX2(driver, searchContext, element, value);
+    /**
+     * Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter
+     *
+     * @param driver  driver que manipula el navegador
+     * @param element elemento al que se envÃ­ara el texto
+     * @param value   Valor que se validara no sea null o vacio
+     */
+    public void sendKeystoElementvalidValueX2(WebDriver driver, SearchContext searchContext, String element, String value) {
+        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
+            if (!value.equalsIgnoreCase(inespecific)) {
+                sendkeystoelementX2(driver, searchContext, element, value);
+            }
         }
     }
 
     public void enviarTextoSiValido(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
             enviarTexto(driver,searchContext,element,false,value);
+    /**
+     * Envia el texto al elemento especificado
+     *
+     * @param driver  driver que manipula el navegador
+     * @param element elemento al que se envÃ­ara el texto
+     * @param value   Valor que se validara no sea null o vacio
+     */
+    public void sendKeystoElementvalidValue(WebDriver driver, SearchContext searchContext, String element, String value) {
+        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
+            if (!value.equalsIgnoreCase(inespecific)) {
+                sendKeystoElement(driver, searchContext, element, false);
+            }
         }
     }
 
     private boolean enviarTextoX2Intentos(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
         for (int i = 0; i < 2; i++) {
             if (sendKeysIfElementExist(driver, searchContext, element, texto)) {
+    /**
+     * Trata de envíar el texto al elemento especificado en mas de una ocasión
+     *
+     * @param driver  Driver que está manipulando el navegador
+     * @param element Atributo por medio del cual identificaremos el elemento a modificar
+     * @param texto   Texto que deseamos envíar al elmento
+     * @return True si logra envíar el texto, de lo contrario false
+     */
+    private Boolean sendKeystoElementx2intents(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
+        int i = 0;
+        while (i < 2) {
+            if (SeleniumUtils.sendKeysIfElementExist(driver, searchContext, element, texto)) {
                 return true;
             }
         }
         return false;
     }
 
+    /***
+     * Envía dos veces el texto indicado al elemento indicado
+     * @param searchContext Driver que está manipulando el navegador
+     * @param elemento Atributo por medio del cual identificaremos el elemento a modificar
+     * @param texto Texto que deseamos envíar al elmento
+     */
+    public void sendkeystoelementX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
+        sendKeystoElement(driver, searchContext, elemento, false, texto);
+        SeleniumUtils.keyPress(driver, Keys.ENTER);
+        sendKeystoElement(driver, searchContext, elemento, false, texto);
+        SeleniumUtils.keyPress(driver, Keys.ENTER);
     public void enviarTextoX2(WebDriver driver, SearchContext searchContext, String element, String texto) {
         enviarTexto(driver,searchContext,element,false,texto);
         keyPress(driver, Keys.ENTER);
@@ -2205,6 +2181,20 @@ public class SeleniumUtils {
         keyPress(driver, Keys.ENTER);
     }
 
+    /***
+     * Realiza 2 veces la busquedad de el texto de un elemento
+     * @param driver Driver que controla el navegador
+     * @param element Atributo del elemento a buscar
+     * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
+     */
+    public String obtenerTextWebElementx2(WebDriver driver, SearchContext searchContext, String element) {
+        int i = 0;
+        String texto = null;
+        while (Objects.isNull(texto) && i < 2) {
+            texto = SeleniumUtils.getTextIfElementExist(driver, searchContext, element);
+            i++;
+        }
+        return texto;
     public String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element) {
         for (int i = 0; i < 2; i++) {
             String texto = getTextIfElementExist(driver, searchContext, element);
@@ -2215,6 +2205,22 @@ public class SeleniumUtils {
         return null;
     }
 
+    /****
+     * Realiza 2 veces la busquedad de el texto de un elemento
+     * @param driver Driver que controla el navegador
+     * @param element Atributo del elemento a buscar
+     * @param timeduration Duración de la busquedad del texto del elemento especificado
+     * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
+     * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
+     */
+    public String obtenerTextWebElementx2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
+        int i = 0;
+        String texto = null;
+        while (Objects.isNull(texto) && i < 2) {
+            texto = SeleniumUtils.getTextIfElementExist(driver, searchContext, element, timeduration, timerepetition);
+            i++;
+        }
+        return texto;
     public String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
         for (int i = 0; i < 2; i++) {
             String texto = getTextIfElementExist(driver, searchContext, element, timeduration, timerepetition);
@@ -2225,8 +2231,20 @@ public class SeleniumUtils {
         return null;
     }
 
+    /**
+     * Envía un texto al elemento indicado, si este existe en el contexto actual.
+     *
+     * @param driver        Driver que está manipulando el navegador
+     * @param element       Atributo del elemento, por medio del cual se realizara la busqueda
+     * @param Texto         Texto a envíar al elemento indicado
+     * @param banderaAssert Bandera para controlar si se quiere controlar el Assert.fail
+     */
+    public Boolean sendKeystoElement(WebDriver driver, SearchContext searchContext, String element, String Texto, boolean banderaAssert) {
     public boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
         try {
+            if (sendKeystoElementx2intents(driver, searchContext, element, Texto)) {
+                WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
+                getImageScreeenshotWebElement(driver, elemento);
             if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
                 WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
                 getImageScreeenshotWebElement(driver,elemento);
@@ -2234,6 +2252,12 @@ public class SeleniumUtils {
             }
             LogsJB.info("No se encontró el elemento: " + element);
         } catch (Exception e) {
+            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
+            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
+            LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if (banderaAssert) {
+                Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
+            }
             manejarErrorEnvioTexto(element, e, assertFail);
         }
         return false;
@@ -2241,8 +2265,19 @@ public class SeleniumUtils {
 
     public boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
         try {
+            if (sendKeystoElementx2intents(driver, searchContext, element, Texto)) {
+                return true;
+            } else {
+                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se envío el Texto");
+            }
             return enviarTextoX2Intentos(driver, searchContext, element, texto);
         } catch (Exception e) {
+            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
+            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
+            LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            if (banderaAssert) {
+                Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
+            }
             manejarErrorEnvioTexto(element, e, assertFail);
         }
         return false;
