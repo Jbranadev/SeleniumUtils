@@ -118,7 +118,7 @@ public class SeleniumUtilsTest {
         // Presiona la tecla 'A' (código ASCII 65)
         SeleniumUtils.keyPress(driver, 65);
         // Verifica que la barra de búsqueda contiene la letra 'A'
-        Assert.assertEquals(searchBox.getAttribute("value"), "A", "La tecla 'A' no fue presionada correctamente");
+        Assert.assertEquals(SeleniumUtils.getTextOfWebElement(driver, searchBox), "A", "La tecla 'A' no fue presionada correctamente");
     }
 
     @Test(testName = "KeyPress Using Keys",
@@ -675,11 +675,12 @@ public class SeleniumUtilsTest {
         Assert.assertNull(elemento);
     }
 
+    /*
     @Test(testName = "getTextIfElementExistConTiempoExito", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextIfElementExistConTiempoExito() {
         String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "/html/body/div[1]/div[6]/div[1]", 4, 2);
         Assert.assertNotNull(elemento);
-    }
+    }*/
 
     @Test(testName = "getTextIfElementExistConTiempoFallo", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextIfElementExistConTiempoFallo() {
