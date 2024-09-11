@@ -2106,9 +2106,6 @@ public class SeleniumUtils {
         }
     }
 
-    public void enviarTextoSiValidoX2(WebDriver driver, SearchContext searchContext, String element, String value) {
-        if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
-            enviarTextoX2(driver, searchContext, element, value);
     /**
      * Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter
      *
@@ -2116,35 +2113,21 @@ public class SeleniumUtils {
      * @param element elemento al que se envÃ­ara el texto
      * @param value   Valor que se validara no sea null o vacio
      */
-    public void sendKeystoElementvalidValueX2(WebDriver driver, SearchContext searchContext, String element, String value) {
-        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
-            if (!value.equalsIgnoreCase(inespecific)) {
-                sendkeystoelementX2(driver, searchContext, element, value);
-            }
+    public void enviarTextoSiValidoX2(WebDriver driver, SearchContext searchContext, String element, String value) {
+        if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
+            enviarTextoX2(driver, searchContext, element, value);
         }
     }
+
+
 
     public void enviarTextoSiValido(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
-            enviarTexto(driver,searchContext,element,false,value);
-    /**
-     * Envia el texto al elemento especificado
-     *
-     * @param driver  driver que manipula el navegador
-     * @param element elemento al que se envÃ­ara el texto
-     * @param value   Valor que se validara no sea null o vacio
-     */
-    public void sendKeystoElementvalidValue(WebDriver driver, SearchContext searchContext, String element, String value) {
-        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
-            if (!value.equalsIgnoreCase(inespecific)) {
-                sendKeystoElement(driver, searchContext, element, false);
-            }
+            enviarTexto(driver, searchContext, element, false, value);
         }
     }
 
-    private boolean enviarTextoX2Intentos(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
-        for (int i = 0; i < 2; i++) {
-            if (sendKeysIfElementExist(driver, searchContext, element, texto)) {
+
     /**
      * Trata de envíar el texto al elemento especificado en mas de una ocasión
      *
@@ -2153,15 +2136,16 @@ public class SeleniumUtils {
      * @param texto   Texto que deseamos envíar al elmento
      * @return True si logra envíar el texto, de lo contrario false
      */
-    private Boolean sendKeystoElementx2intents(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
-        int i = 0;
-        while (i < 2) {
-            if (SeleniumUtils.sendKeysIfElementExist(driver, searchContext, element, texto)) {
+    private static boolean enviarTextoX2Intentos(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
+        for (int i = 0; i < 2; i++) {
+            if (sendKeysIfElementExist(driver, searchContext, element, texto)) {
                 return true;
             }
         }
         return false;
     }
+
+
 
     /***
      * Envía dos veces el texto indicado al elemento indicado
@@ -2169,15 +2153,11 @@ public class SeleniumUtils {
      * @param elemento Atributo por medio del cual identificaremos el elemento a modificar
      * @param texto Texto que deseamos envíar al elmento
      */
-    public void sendkeystoelementX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
-        sendKeystoElement(driver, searchContext, elemento, false, texto);
-        SeleniumUtils.keyPress(driver, Keys.ENTER);
-        sendKeystoElement(driver, searchContext, elemento, false, texto);
-        SeleniumUtils.keyPress(driver, Keys.ENTER);
-    public void enviarTextoX2(WebDriver driver, SearchContext searchContext, String element, String texto) {
-        enviarTexto(driver,searchContext,element,false,texto);
+
+    public void enviarTextoX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
+        enviarTexto(driver,searchContext,elemento,false,texto);
         keyPress(driver, Keys.ENTER);
-        enviarTexto(driver, searchContext, element,false,texto);
+        enviarTexto(driver, searchContext, elemento,false,texto);
         keyPress(driver, Keys.ENTER);
     }
 
@@ -2195,6 +2175,7 @@ public class SeleniumUtils {
             i++;
         }
         return texto;
+    }
     public String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element) {
         for (int i = 0; i < 2; i++) {
             String texto = getTextIfElementExist(driver, searchContext, element);
@@ -2213,14 +2194,7 @@ public class SeleniumUtils {
      * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
      * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
      */
-    public String obtenerTextWebElementx2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
-        int i = 0;
-        String texto = null;
-        while (Objects.isNull(texto) && i < 2) {
-            texto = SeleniumUtils.getTextIfElementExist(driver, searchContext, element, timeduration, timerepetition);
-            i++;
-        }
-        return texto;
+
     public String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element, int timeduration, int timerepetition) {
         for (int i = 0; i < 2; i++) {
             String texto = getTextIfElementExist(driver, searchContext, element, timeduration, timerepetition);
@@ -2236,15 +2210,11 @@ public class SeleniumUtils {
      *
      * @param driver        Driver que está manipulando el navegador
      * @param element       Atributo del elemento, por medio del cual se realizara la busqueda
-     * @param Texto         Texto a envíar al elemento indicado
-     * @param banderaAssert Bandera para controlar si se quiere controlar el Assert.fail
+     * @param texto         Texto a envíar al elemento indicado
+     * @param assertFail Bandera para controlar si se quiere controlar el Assert.fail
      */
-    public Boolean sendKeystoElement(WebDriver driver, SearchContext searchContext, String element, String Texto, boolean banderaAssert) {
     public boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
         try {
-            if (sendKeystoElementx2intents(driver, searchContext, element, Texto)) {
-                WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
-                getImageScreeenshotWebElement(driver, elemento);
             if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
                 WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
                 getImageScreeenshotWebElement(driver,elemento);
@@ -2255,7 +2225,7 @@ public class SeleniumUtils {
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
             LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if (banderaAssert) {
+            if (assertFail) {
                 Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             }
             manejarErrorEnvioTexto(element, e, assertFail);
@@ -2263,9 +2233,9 @@ public class SeleniumUtils {
         return false;
     }
 
-    public boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
+    public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
         try {
-            if (sendKeystoElementx2intents(driver, searchContext, element, Texto)) {
+            if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
                 return true;
             } else {
                 LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se envío el Texto");
@@ -2275,7 +2245,7 @@ public class SeleniumUtils {
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
             LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if (banderaAssert) {
+            if (assertFail) {
                 Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
             }
             manejarErrorEnvioTexto(element, e, assertFail);
@@ -2283,13 +2253,122 @@ public class SeleniumUtils {
         return false;
     }
 
-    private void manejarErrorEnvioTexto(String element, Exception e, boolean assertFail) {
+    private static void manejarErrorEnvioTexto(String element, Exception e, boolean assertFail) {
         LogsJB.error("Error enviando texto al elemento: " + element + ". " + e.getMessage());
         LogsJB.error("Stacktrace: " + ExceptionUtils.getStackTrace(e));
         if (assertFail) {
             Assert.fail("Error enviando texto al elemento: " + element);
         }
     }
+
+//Tercer lote de métodos
+    /**
+     * Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter
+     *
+     * @param driver driver para interactuar con el navegador
+     * @param searchContext  driver que actúa como searchContext
+     * @param element elemento al que se envÃ­ara el texto
+     * @param value   Valor que se validara no sea null o vacio
+     */
+    public static void sendKeystoElementvalidValueX2(WebDriver driver,SearchContext searchContext, String element, String value) {
+        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
+            if (!value.equalsIgnoreCase(inespecific)) {
+                enviarTextoX2Intentos(driver,searchContext,element,value);
+            }
+        }
+    }
+
+    /**
+     * Envia el texto al elemento especificado
+     *
+     * @param driver driver para interactuar con la página
+     * @param searchContext  driver que funciona como searchContext
+     * @param element elemento al que se envÃ­ara el texto
+     * @param value   Valor que se validara no sea null o vacio
+     */
+    public static void sendKeystoElementvalidValueForMap(WebDriver driver,SearchContext searchContext, String element, String value) {
+        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
+            if (!value.equalsIgnoreCase(inespecific)) {
+                enviarTexto(driver,searchContext,element,false,value);
+                SeleniumUtils.keyPress(driver, Keys.ENTER);
+            }
+        }
+    }
+
+    /**
+     * Envia el texto al elemento especificado
+     *
+     * @param driver driver que interactúa con el navegador
+     * @param searchContext  driver que funciona como searchContext
+     * @param element elemento al que se envÃ­ara el texto
+     * @param value   Valor que se validara no sea null o vacio
+     */
+    public static void sendKeystoElementvalidValue(WebDriver driver,SearchContext searchContext, String element, String value) {
+        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
+            if (!value.equalsIgnoreCase(inespecific)) {
+                enviarTexto(driver, searchContext,element,false,value);
+            }
+        }
+    }
+
+    /**
+     * Trata de envíar el texto al elemento especificado en mas de una ocasión
+     *
+     * @param driver Driver que interactúa con el navegador
+     * @param searchContext  Driver que funciona como searchContext
+     * @param element Atributo por medio del cual identificaremos el elemento a modificar
+     * @param texto   Texto que deseamos envíar al elmento
+     * @return True si logra envíar el texto, de lo contrario false
+     */
+    private static Boolean sendKeystoElementx2intents(WebDriver driver,SearchContext searchContext, String element, CharSequence... texto) {
+        int i = 0;
+        while (i < 2) {
+            if (SeleniumUtils.sendKeysIfElementExist( driver,searchContext, element, texto)) {
+                return true;
+            }
+            i++;
+        }
+        return false;
+    }
+
+    /***
+     * Envía dos veces el texto indicado al elemento indicado
+     * @param driver driver que interactúa con el navegador
+     * @param searchContext Driver que funciona como searchContext
+     * @param elemento Atributo por medio del cual identificaremos el elemento a modificar
+     * @param texto Texto que deseamos envíar al elmento
+     */
+    public static void sendkeystoelementX2(WebDriver driver,SearchContext searchContext, String elemento, String texto) {
+        enviarTexto(driver,searchContext, elemento,false, texto);
+        SeleniumUtils.keyPress(driver, Keys.ENTER);
+        enviarTexto(driver,searchContext, elemento,false, texto);
+        SeleniumUtils.keyPress(driver, Keys.ENTER);
+    }
+
+
+    /****
+     * Realiza 2 veces la busquedad de el texto de un elemento
+     *
+     * @param driver driver que interactúa con el navegador
+     * @param searchContext Driver que funciona como searchContext
+     * @param element Atributo del elemento a buscar
+     * @param timeduration Duración de la busquedad del texto del elemento especificado
+     * @param timerepetition Tiempo de repeticion para realizar la busquedad del elemento y obtener el texto
+     * @return Si logra obtener el texto del elemento especifícado, lo retorna, de lo contrario retorna NULL
+     */
+    public static String obtenerTextWebElementx2(WebDriver driver,SearchContext searchContext, String element, int timeduration, int timerepetition) {
+        int i = 0;
+        String texto = null;
+        while (Objects.isNull(texto) && i < 2) {
+            texto = SeleniumUtils.getTextIfElementExist(driver, searchContext, element, timeduration, timerepetition);
+            i++;
+        }
+        return texto;
+    }
+
+
+
+
 
 
 }
