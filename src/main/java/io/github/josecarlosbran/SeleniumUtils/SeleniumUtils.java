@@ -2300,6 +2300,18 @@ public class SeleniumUtils {
         return false;
     }
 
+    /**
+     * Envía un texto al elemento indicado, si este existe en el contexto actual.
+     *
+     * @param driver     Driver que está manipulando el navegador
+     * @param element    Atributo del elemento, por medio del cual se realizara la busqueda
+     * @param texto      Texto a envíar al elemento indicado
+     * @param assertFail Bandera para controlar si se quiere controlar el Assert.fail
+     */
+    public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto) {
+        return enviarTexto(driver,searchContext,element,texto,false);
+    }
+
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
         try {
             if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
@@ -2318,6 +2330,10 @@ public class SeleniumUtils {
             manejarErrorEnvioTexto(element, e, assertFail);
         }
         return false;
+    }
+
+    public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element,  CharSequence... texto) {
+        return enviarTexto(driver,searchContext,element,false,texto);
     }
 
     public static void manejarErrorEnvioTexto(String element, Exception e, boolean assertFail) {
