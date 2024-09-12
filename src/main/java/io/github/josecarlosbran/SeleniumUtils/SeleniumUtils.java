@@ -2305,9 +2305,7 @@ public class SeleniumUtils {
      *
      * @param driver     Driver que está manipulando el navegador
      * @param element    Atributo del elemento, por medio del cual se realizara la busqueda
-     * @param texto      Texto a envíar al elemento indicado
-     * @param assertFail Bandera para controlar si se quiere controlar el Assert.fail
-     */
+     * @param texto      Texto a envíar al elemento indicad*/
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto) {
         return enviarTexto(driver,searchContext,element,texto,false);
     }
