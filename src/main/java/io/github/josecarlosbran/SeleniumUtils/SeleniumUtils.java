@@ -2436,13 +2436,11 @@ public class SeleniumUtils {
         driver.switchTo().frame(iframe);
     }
 
-    public static void capturar500ServerError(WebDriver driver, SearchContext searchContext, int timeduration, int timerepetition) {
-        String element = "/html/body/div[2]/div/fieldset/h2";
-        String comment = "Ha sucedido un error en el servidor, comunicarse con el equipo de integración ";
+    public static void capturar500ServerError(WebDriver driver, SearchContext searchContext, String element, String messageWait, String comment, int timeduration, int timerepetition) {
         String mesajeerror = obtenerTextWebElementx2(driver, searchContext, element, timeduration, timerepetition);
         WebElement elemento = getElementIfExist(driver, searchContext, element);
         if (!Objects.isNull(mesajeerror)) {
-            if (StringUtils.equalsIgnoreCase(mesajeerror, "500 - Internal server error.") || StringUtils.containsIgnoreCase(mesajeerror, "Internal server error")) {
+            if (StringUtils.equalsIgnoreCase(mesajeerror, messageWait) || StringUtils.containsIgnoreCase(mesajeerror, "Internal server error")) {
                 LogsJB.fatal("Se encontro un mensaje de Error");
                 LogsJB.info("*");
                 LogsJB.info("*");
