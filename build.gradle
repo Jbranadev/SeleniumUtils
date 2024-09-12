@@ -117,8 +117,8 @@ publishing {
             from components.java
             // Añade los artefactos javadoc y sources
             artifact(tasks.named('javadocJar'))
-            //artifact(tasks.named('sourcesJar'))
-            artifact sourceJar
+            artifact(tasks.named('sourcesJar'))
+            //artifact sourceJar
             pom {
                 name = 'seleniumutils'
                 description = 'Utilidades de Selenium'
