@@ -2450,6 +2450,18 @@ public class SeleniumUtils {
         driver.switchTo().frame(iframe);
     }
 
+    /**
+     *
+     * Captura y registra un error 500 (Internal Server Error) en la aplicación si el texto de error es encontrado.
+     *
+     * @param driver         El controlador de WebDriver utilizado para interactuar con la página web.
+     * @param searchContext  El contexto de búsqueda (puede ser un WebDriver o WebElement) donde se buscará el elemento.
+     * @param element        El selector o identificador del elemento donde se buscará el mensaje de error.
+     * @param messageWait    El mensaje de error esperado que se debe buscar.
+     * @param comment        El comentario personalizado que se incluirá en caso de que se capture el error.
+     * @param timeduration   La duración máxima en segundos que se debe esperar al buscar el mensaje de error.
+     * @param timerepetition El número de repeticiones para intentar buscar el mensaje de error en el elemento.
+     */
     public static void capturar500ServerError(WebDriver driver, SearchContext searchContext, String element, String messageWait, String comment, int timeduration, int timerepetition) {
         String mesajeerror = obtenerTextWebElementx2(driver, searchContext, element, timeduration, timerepetition);
         WebElement elemento = getElementIfExist(driver, searchContext, element);
