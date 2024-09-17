@@ -1957,6 +1957,7 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @param opcion Opcion del elemento que queremos seleccionar
      * @param comment Comentario que será colocado sobre la imagen capturada si el Elemento indicado existe
+     * @param banderaAssert Bandera con la cual se va a controlar si se desea un assert o no
      */
     public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment, boolean banderaAssert) {
         try {
@@ -1989,6 +1990,15 @@ public class SeleniumUtils {
         }
     }
 
+    /**
+     *
+     * @param driver
+     * @param searchcontext
+     * @param element
+     * @param opcion
+     * @param comment
+     * @return
+     */
     public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment) {
         // Llamamos al método original y pasamos banderaAssert = false
         return selectOption(driver, searchcontext, element, opcion, comment, false);
@@ -2115,6 +2125,13 @@ public class SeleniumUtils {
     }
     //SEGUNDO LOTE DE MÉTODOS
 
+    /**
+     * Valida si una cadena es nula o vacía y genera un log de error si es así.
+     *
+     * @param campo  El valor de la cadena a validar.
+     * @param nombre El nombre del campo asociado con la cadena, utilizado en el mensaje de error.
+     * @return true si la cadena es nula o vacía, false en caso contrario.
+     */
     public static boolean validarNull(String campo, String nombre) {
         if (cadenaNulaoVacia(campo)) {
             LogsJB.error("Debe ingresar el valor del campo: " + nombre);
@@ -2123,6 +2140,14 @@ public class SeleniumUtils {
         return false;
     }
 
+    /**
+     * Sube un archivo a un elemento de tipo file en una página web utilizando WebDriver.
+     *
+     * @param driver       El WebDriver que controla el navegador.
+     * @param elementoFile El selector del elemento de tipo file donde se subirá el archivo.
+     * @param path         La ruta del archivo que se va a subir.
+     * @return true si el archivo se sube correctamente, false en caso de error.
+     */
     public static boolean subirArchivo(WebDriver driver, String elementoFile, String path) {
         try {
             WebElement subirArchivo = obtenerWebElementx2(driver, driver, elementoFile);
@@ -2136,6 +2161,12 @@ public class SeleniumUtils {
         }
     }
 
+    /**
+     * Regresa al frame principal de la página actual en el navegador.
+     *
+     * @param driver El WebDriver que controla el navegador.
+     * @return true si el cambio de frame fue exitoso, false en caso de error.
+     */
     public static boolean regresarFramePrincipal(WebDriver driver) {
         try {
             driver.switchTo().defaultContent();
@@ -2147,6 +2178,12 @@ public class SeleniumUtils {
         }
     }
 
+    /**
+     * Convierte una dirección IP en formato decimal a su representación en formato hexadecimal.
+     *
+     * @param ipDecimal La dirección IP en formato decimal (ejemplo: "192.168.1.1").
+     * @return La representación hexadecimal de la dirección IP.
+     */
     public static String convertirIpDecimalAHexadecimal(String ipDecimal) {
         StringBuilder hex = new StringBuilder();
         for (String octeto : ipDecimal.split("\\.")) {
@@ -2156,6 +2193,13 @@ public class SeleniumUtils {
         return hex.toString().toUpperCase();
     }
 
+    /**
+     * Ejecuta un comando de JavaScript en el contexto actual de la página utilizando WebDriver.
+     *
+     * @param driver    El WebDriver que controla el navegador.
+     * @param comandoJs El comando JavaScript que se va a ejecutar.
+     * @return true si el comando se ejecuta correctamente, false en caso de error.
+     */
     public static boolean ejecutarJsComando(WebDriver driver, String comandoJs) {
         try {
             ((JavascriptExecutor) driver).executeScript(comandoJs);
@@ -2167,6 +2211,12 @@ public class SeleniumUtils {
         }
     }
 
+    /**
+     * Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña.
+     *
+     * @param driver      El WebDriver que controla el navegador.
+     * @param previousTab El identificador de la pestaña anterior a la que se desea cambiar.
+     */
     public static void moverATabAnterior(WebDriver driver, String previousTab) {
         if (esValorValido(previousTab)) {
             for (String windowHandle : driver.getWindowHandles()) {
@@ -2178,6 +2228,7 @@ public class SeleniumUtils {
             }
         }
     }
+
 
     /**
      * Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter
@@ -2191,7 +2242,14 @@ public class SeleniumUtils {
             enviarTextoX2(driver, searchContext, element, value);
         }
     }
-
+    /**
+     * Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico.
+     *
+     * @param driver        El WebDriver que controla el navegador.
+     * @param searchContext El contexto de búsqueda para encontrar el elemento (puede ser una página o un marco).
+     * @param element       El selector del elemento al que se enviará el texto.
+     * @param value         El texto que se enviará al elemento, si es válido.
+     */
     public static void enviarTextoSiValido(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
             enviarTexto(driver, searchContext, element, false, value);
@@ -2243,7 +2301,14 @@ public class SeleniumUtils {
         }
         return texto;
     }
-
+    /**
+     * Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna.
+     *
+     * @param driver        El WebDriver que controla el navegador.
+     * @param searchContext El contexto de búsqueda para encontrar el elemento (puede ser una página o un marco).
+     * @param element       El selector del elemento del cual se intentará obtener el texto.
+     * @return El texto del elemento si es encontrado, o null si no se encuentra después de dos intentos.
+     */
     public static String obtenerTextoElementoX2(WebDriver driver, SearchContext searchContext, String element) {
         for (int i = 0; i < 2; i++) {
             String texto = getTextIfElementExist(driver, searchContext, element);
@@ -2309,7 +2374,17 @@ public class SeleniumUtils {
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto) {
         return enviarTexto(driver,searchContext,element,texto,false);
     }
-
+    /**
+     * Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.
+     * Si el envío de texto falla, puede opcionalmente generar un fallo en la prueba.
+     *
+     * @param driver       El WebDriver que controla el navegador.
+     * @param searchContext El contexto de búsqueda para encontrar el elemento (puede ser una página o un marco).
+     * @param element      El selector del elemento al que se enviará el texto.
+     * @param assertFail   Indica si la prueba debe fallar (con Assert.fail) en caso de error al enviar el texto.
+     * @param texto        El texto o secuencia de caracteres que se enviará al elemento.
+     * @return true si el texto fue enviado correctamente, false si falló después de los intentos.
+     */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
         try {
             if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
@@ -2329,11 +2404,27 @@ public class SeleniumUtils {
         }
         return false;
     }
-
+    /**
+     * Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.
+     * Si el envío de texto falla, puede opcionalmente generar un fallo en la prueba.
+     *
+     * @param driver       El WebDriver que controla el navegador.
+     * @param searchContext El contexto de búsqueda para encontrar el elemento (puede ser una página o un marco).
+     * @param element      El selector del elemento al que se enviará el texto.
+     * @param texto        El texto o secuencia de caracteres que se enviará al elemento.
+     * @return true si el texto fue enviado correctamente, false si falló después de los intentos.
+     */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element,  CharSequence... texto) {
         return enviarTexto(driver,searchContext,element,false,texto);
     }
-
+    /**
+     * Maneja los errores ocurridos durante el envío de texto a un elemento, registrando los detalles del error y
+     * opcionalmente fallando la prueba.
+     *
+     * @param element    El selector del elemento al que no se pudo enviar el texto.
+     * @param e          La excepción que fue lanzada durante el intento de envío de texto.
+     * @param assertFail Indica si la prueba debe fallar (con Assert.fail) en caso de error.
+     */
     public static void manejarErrorEnvioTexto(String element, Exception e, boolean assertFail) {
         LogsJB.error("Error enviando texto al elemento: " + element + ". " + e.getMessage());
         LogsJB.error("Stacktrace: " + ExceptionUtils.getStackTrace(e));
