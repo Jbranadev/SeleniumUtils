@@ -1991,7 +1991,6 @@ public class SeleniumUtils {
     }
 
     /**
-     *
      * @param driver
      * @param searchcontext
      * @param element
@@ -2229,7 +2228,6 @@ public class SeleniumUtils {
         }
     }
 
-
     /**
      * Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter
      *
@@ -2242,6 +2240,7 @@ public class SeleniumUtils {
             enviarTextoX2(driver, searchContext, element, value);
         }
     }
+
     /**
      * Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico.
      *
@@ -2301,6 +2300,7 @@ public class SeleniumUtils {
         }
         return texto;
     }
+
     /**
      * Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna.
      *
@@ -2368,21 +2368,23 @@ public class SeleniumUtils {
     /**
      * Envía un texto al elemento indicado, si este existe en el contexto actual.
      *
-     * @param driver     Driver que está manipulando el navegador
-     * @param element    Atributo del elemento, por medio del cual se realizara la busqueda
-     * @param texto      Texto a envíar al elemento indicad*/
+     * @param driver  Driver que está manipulando el navegador
+     * @param element Atributo del elemento, por medio del cual se realizara la busqueda
+     * @param texto   Texto a envíar al elemento indicad
+     */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto) {
-        return enviarTexto(driver,searchContext,element,texto,false);
+        return enviarTexto(driver, searchContext, element, texto, false);
     }
+
     /**
      * Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.
      * Si el envío de texto falla, puede opcionalmente generar un fallo en la prueba.
      *
-     * @param driver       El WebDriver que controla el navegador.
+     * @param driver        El WebDriver que controla el navegador.
      * @param searchContext El contexto de búsqueda para encontrar el elemento (puede ser una página o un marco).
-     * @param element      El selector del elemento al que se enviará el texto.
-     * @param assertFail   Indica si la prueba debe fallar (con Assert.fail) en caso de error al enviar el texto.
-     * @param texto        El texto o secuencia de caracteres que se enviará al elemento.
+     * @param element       El selector del elemento al que se enviará el texto.
+     * @param assertFail    Indica si la prueba debe fallar (con Assert.fail) en caso de error al enviar el texto.
+     * @param texto         El texto o secuencia de caracteres que se enviará al elemento.
      * @return true si el texto fue enviado correctamente, false si falló después de los intentos.
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
@@ -2404,19 +2406,21 @@ public class SeleniumUtils {
         }
         return false;
     }
+
     /**
      * Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.
      * Si el envío de texto falla, puede opcionalmente generar un fallo en la prueba.
      *
-     * @param driver       El WebDriver que controla el navegador.
+     * @param driver        El WebDriver que controla el navegador.
      * @param searchContext El contexto de búsqueda para encontrar el elemento (puede ser una página o un marco).
-     * @param element      El selector del elemento al que se enviará el texto.
-     * @param texto        El texto o secuencia de caracteres que se enviará al elemento.
+     * @param element       El selector del elemento al que se enviará el texto.
+     * @param texto         El texto o secuencia de caracteres que se enviará al elemento.
      * @return true si el texto fue enviado correctamente, false si falló después de los intentos.
      */
-    public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element,  CharSequence... texto) {
-        return enviarTexto(driver,searchContext,element,false,texto);
+    public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
+        return enviarTexto(driver, searchContext, element, false, texto);
     }
+
     /**
      * Maneja los errores ocurridos durante el envío de texto a un elemento, registrando los detalles del error y
      * opcionalmente fallando la prueba.
@@ -2542,7 +2546,6 @@ public class SeleniumUtils {
     }
 
     /**
-     *
      * Captura y registra un error 500 (Internal Server Error) en la aplicación si el texto de error es encontrado.
      *
      * @param driver         El controlador de WebDriver utilizado para interactuar con la página web.
