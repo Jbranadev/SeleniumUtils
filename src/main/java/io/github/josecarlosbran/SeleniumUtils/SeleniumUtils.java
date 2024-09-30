@@ -39,6 +39,7 @@ public class SeleniumUtils {
         setFieldValue("inespecific", newInespecific);
     }
 
+    // Metodo para obtener el valor searchTime
     public static Integer getSearchTime() {
         return searchTime;
     }
@@ -48,6 +49,7 @@ public class SeleniumUtils {
         setFieldValue("searchTime", newSearchTime);
     }
 
+    // Metodo para obtener el valor searchRepetitionTime
     public static Integer getSearchRepetitionTime() {
         return searchRepetitionTime;
     }
