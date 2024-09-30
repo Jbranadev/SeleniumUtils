@@ -1116,10 +1116,6 @@ public class SeleniumUtilsTest {
         SeleniumUtils.sendKeystoElementvalidValue(driver,driver,"textarea[id='APjFqb']","hola");
     }
 
-
-
-
-
     @AfterClass
     public void tearDown() {
         if (driver != null) {
