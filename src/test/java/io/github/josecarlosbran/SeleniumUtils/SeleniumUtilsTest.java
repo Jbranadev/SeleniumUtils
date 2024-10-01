@@ -5,7 +5,6 @@ import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -341,7 +340,8 @@ public class SeleniumUtilsTest {
     @Test(testName = "getTextOfWebElement", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextOfWebElement() {
         Boolean condicion = false;
-        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[3]/form/div[1]/div[1]/div[4]/center/input[2]");
+        SeleniumUtils.enviarTexto(driver, driver, "textarea[id='APjFqb']", "texto");
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");
         String respuesta = SeleniumUtils.getTextOfWebElement(driver, elemento);
         condicion = SeleniumUtils.cadenaNulaoVacia(respuesta);
         Assert.assertFalse(condicion);
@@ -349,6 +349,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "getTextNullOfWebElement", description = "Obtiene el texto nulo de un elemento web", dependsOnMethods = "elementExist")
     public void getTextNullOfWebElement() {
+        SeleniumUtils.LimpiarElementoExistente(driver, driver, "textarea[id='APjFqb']");
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
         String respuesta = SeleniumUtils.getTextOfWebElement(driver, elemento);
         Assert.assertTrue(SeleniumUtils.cadenaNulaoVacia(respuesta));
@@ -357,6 +358,8 @@ public class SeleniumUtilsTest {
     @Test(testName = "getTextOfWebElement", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextOfWebElementJavaScript() {
         Boolean condicion = false;
+        SeleniumUtils.LimpiarElementoExistente(driver, driver, "textarea[id='APjFqb']");
+        SeleniumUtils.enviarTexto(driver, driver, "textarea[id='APjFqb']", "texto");
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
         String respuesta = SeleniumUtils.getTextUsingJavaScript(driver, elemento);
         condicion = SeleniumUtils.cadenaNulaoVacia(respuesta);
@@ -526,7 +529,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "getElementIfExist", description = "Debería de obtener un elemento web si existe", dependsOnMethods = "elementExist")
     public void getElementIfExist() {
         logParrafo("Se busca un elemento web para verificar si existe. Si existe, se obtiene su información");
-        List<WebElement> respuesta = SeleniumUtils.getElementsIfExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
+        List<WebElement> respuesta = SeleniumUtils.getElementsIfExist(driver, driver, "div");
         Boolean exito = false;
         if (!respuesta.isEmpty()) {
             exito = true;
@@ -616,7 +619,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "getElementIfExistExito", description = "Se debe de obtener un elemento, si es que existe", dependsOnMethods = "elementExist")
     public void getElementIfExistExito() {
-        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[2]/div/img");
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "div#tophf");
         Assert.assertNotNull(elemento);
     }
 
@@ -666,7 +669,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "getTextIfElementExistSinTiempoExito", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextIfElementExistSinTiempoExito() {
-        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
+        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "#APjFqb");
         Assert.assertNotNull(elemento);
     }
 
@@ -950,7 +953,8 @@ public class SeleniumUtilsTest {
         SeleniumUtils.keyPress(driver, null);
     }
 
-    @Test(testName = "KeyPress - Keys - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist")
+    @Test(testName = "KeyPress - Keys - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist"
+            , expectedExceptions = {AssertionError.class})
     public void KeyPress_Keys_Overdrive_Error() {
         SeleniumUtils.keyPress(driver, null,true);
     }
@@ -970,7 +974,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "getElementIfExist_By", description = "Debería de obtener un elemento By si existe", dependsOnMethods = "elementExist")
     public void getElementIfExist_By() {
         logParrafo("Se busca un elemento web By para verificar si existe. Si existe, se obtiene su información");
-        By elemento = By.xpath("/html/body/div[1]/div[6]/div[1]");
+        By elemento = By.xpath("div.Q3DXx");
         List<WebElement> respuesta = SeleniumUtils.getElementsIfExist(driver, driver, elemento);
         Boolean exito = false;
         if (!respuesta.isEmpty()) {
