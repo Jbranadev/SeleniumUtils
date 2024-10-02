@@ -930,8 +930,7 @@ public class SeleniumUtilsTest {
         SeleniumUtils.setInespecific(inespecific);
         Integer SearchRepetitionTime = SeleniumUtils.getSearchRepetitionTime();
         SeleniumUtils.setSearchRepetitionTime(SearchRepetitionTime);
-
-        boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"),true);
+        boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"), true);
         Assert.assertFalse(condicion);
     }
 
@@ -955,21 +954,19 @@ public class SeleniumUtilsTest {
         SeleniumUtils.keyPress(driver, null);
     }
 
-    @Test(testName = "KeyPress - Keys - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist",expectedExceptions = {AssertionError.class})
+    @Test(testName = "KeyPress - Keys - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist", expectedExceptions = {AssertionError.class})
     public void KeyPress_Keys_Overdrive_Error() {
-        SeleniumUtils.keyPress(driver, null,true);
+        SeleniumUtils.keyPress(driver, null, true);
     }
 
     @Test(testName = "KeyPress - Int - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist")
     public void KeyPress_Int_Error() {
         SeleniumUtils.keyPress(driver, -1);
-
     }
 
     @Test(testName = "KeyPress - Int - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist")
     public void KeyPress_Int_Overdrive_Error() {
-        SeleniumUtils.keyPress(driver, -1,true);
-
+        SeleniumUtils.keyPress(driver, -1, true);
     }
 
     @Test(testName = "getElementIfExist_By", description = "Debería de obtener un elemento By si existe", dependsOnMethods = "elementExist")
@@ -985,10 +982,10 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(exito);
     }
 
-    @Test(testName = "SendKeys Element Search Google",description = "Envia carácter por carácter al elemento especificado", dependsOnMethods = "elementExist")
+    @Test(testName = "SendKeys Element Search Google", description = "Envia carácter por carácter al elemento especificado", dependsOnMethods = "elementExist")
     public void enviarTxtforKeyPress() {
         logParrafo("Envia carácter por carácter al elemento especificado");
-        SeleniumUtils.enviarTxtforKeyPress(driver,driver,"textarea[id='APjFqb']","hola");
+        SeleniumUtils.enviarTxtforKeyPress(driver, driver, "textarea[id='APjFqb']", "hola");
     }
 
     @Test(testName = "waitImplicityForElementNotExist - Error", description = "Debería de hacer un wait Implicity para elementos que no existan pero dara error", dependsOnMethods = "elementExist")
@@ -1000,56 +997,56 @@ public class SeleniumUtilsTest {
     @Test(testName = "waitImplicityForElementNotExist OverDrive", description = "Debería de hacer un wait Implicity para elementos que no existan,tomando en cuenta la bandera para el assert", dependsOnMethods = "elementExist")
     public void waitImplicityForElementNotExist_Overdrive() {
         logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe ");
-        Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"),true)
+        Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"), true)
         );
     }
 
     @Test(testName = "waitImplicityForElementNotExist OverDrive - Error", description = "Debería de hacer un wait Implicity para elementos que no existan,tomando en cuenta la bandera para el assert", dependsOnMethods = "elementExist")
     public void waitImplicityForElementNotExist_Overdrive_Error() {
         logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe");
-        Assert.assertFalse(SeleniumUtils.waitImplicityForElementNotExist(driver, null,false));
+        Assert.assertFalse(SeleniumUtils.waitImplicityForElementNotExist(driver, null, false));
     }
 
     @Test(testName = "cambiarZoomPlus OverDrive", description = "Debería de aumentar el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void cambiarZoomPlus_OverDrive() {
         logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
-        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, Keys.ADD,true));
+        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, Keys.ADD, true));
     }
 
     @Test(testName = "cambiarZoomLess Overdrive", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void cambiarZoomLessCodigoEntero_Overdrive() {
         logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
-        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, 2,true));
+        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, 2, true));
     }
 
     @Test(testName = "cambiarZOOMMenos Overdrive", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void cambiarZOOMMenos_Overdrive() {
         logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
-        Assert.assertTrue(SeleniumUtils.cambiarZOOMMenos(driver, 2,true));
+        Assert.assertTrue(SeleniumUtils.cambiarZOOMMenos(driver, 2, true));
     }
 
     @Test(testName = "cambiarZOOMMas Overdrive", description = "Debería de aumentar el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void cambiarZoomMas_Overdrive() {
         logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
-        Assert.assertTrue(SeleniumUtils.cambiarZOOMMas(driver, 2,true));
+        Assert.assertTrue(SeleniumUtils.cambiarZOOMMas(driver, 2, true));
     }
 
     @Test(testName = "scrollMouse Overdrive", description = "Debería de hacer scroll con el mouse, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void scrollMouse_Overdrive() {
         logParrafo("Se hará Scroll con el mouse por medio de Selenium");
-        Assert.assertTrue(SeleniumUtils.scrollMouse(2,true));
+        Assert.assertTrue(SeleniumUtils.scrollMouse(2, true));
     }
 
     @Test(testName = "scrollMouseDown Overdrive", description = "Debería de hacer scroll con el mouse hacia abajo, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void scrollMouseDown_Overdrive() {
         logParrafo("Se hará Scroll hacia abajo con el mouse por medio de Selenium");
-        Assert.assertTrue(SeleniumUtils.scrollMouseDown(driver, 2,true));
+        Assert.assertTrue(SeleniumUtils.scrollMouseDown(driver, 2, true));
     }
 
     @Test(testName = "scrollMouseUp Overdrive", description = "Debería de hacer scroll con el mouse hacia arriba, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void scrollMouseUp_Overdrive() {
         logParrafo("Se hará Scroll hacia arriba con el mouse por medio de Selenium");
-        Assert.assertTrue(SeleniumUtils.scrollMouseUp(driver, 2,true));
+        Assert.assertTrue(SeleniumUtils.scrollMouseUp(driver, 2, true));
     }
 
     @Test(testName = "selectOptionWithComment -Overdrive seteo", description = "Debería de seleccionar la opcion de un select", dependsOnMethods = "elementExist")
@@ -1063,13 +1060,13 @@ public class SeleniumUtilsTest {
     @Test(testName = "obtenerTextWebElementx2", description = "Realiza 2 veces la busquedad de el texto de un elemento", dependsOnMethods = "elementExist")
     public void obtenerTextWebElementx2() {
         logParrafo("Realiza 2 veces la busquedad de el texto de un elemento");
-        SeleniumUtils.obtenerTextWebElementx2(driver,driver,"textarea[id='APjFqb']");
+        SeleniumUtils.obtenerTextWebElementx2(driver, driver, "textarea[id='APjFqb']");
     }
 
     @Test(testName = "obtenerTextoElementoX2", description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna", dependsOnMethods = "elementExist")
     public void obtenerTextoElementoX2() {
         logParrafo("Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna");
-        SeleniumUtils.obtenerTextoElementoX2(driver,driver,"textarea[id='APjFqb']");
+        SeleniumUtils.obtenerTextoElementoX2(driver, driver, "textarea[id='APjFqb']");
     }
 
     @Test(testName = "obtenerTextoElementoX2 - Time Controller", description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna, controlado por tiempo de duracion de espera", dependsOnMethods = "elementExist")
@@ -1083,45 +1080,44 @@ public class SeleniumUtilsTest {
         logParrafo("Envía un texto al elemento indicado, si este existe en el contexto actual");
         driver.navigate().refresh();
         SeleniumUtils.threadslepp(2000);
-        SeleniumUtils.enviarTexto(driver,driver,"textarea[id='APjFqb']","hola");
+        SeleniumUtils.enviarTexto(driver, driver, "textarea[id='APjFqb']", "hola");
     }
 
     @Test(testName = "enviarTexto Overdrive", description = "Envía un texto al elemento indicado, si este existe en el contexto actual", dependsOnMethods = "enviarTexto")
     public void enviarTexto_Overdrive() {
         logParrafo("Envía un texto al elemento indicado, si este existe en el contexto actual");
-        SeleniumUtils.enviarTexto(driver,driver,"textarea[id='APjFqb']","hola",true);
+        SeleniumUtils.enviarTexto(driver, driver, "textarea[id='APjFqb']", "hola", true);
     }
 
-    @Test(testName = "sendKeystoElementvalidValueX2", description = "Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter", dependsOnMethods = "enviarTexto_Overdrive",priority = 1)
+    @Test(testName = "sendKeystoElementvalidValueX2", description = "Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter", dependsOnMethods = "enviarTexto_Overdrive", priority = 1)
     public void sendKeystoElementvalidValueX2() {
         logParrafo("Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter");
-        SeleniumUtils.sendKeystoElementvalidValueX2(driver,driver,"textarea[id='APjFqb']","hola");
+        SeleniumUtils.sendKeystoElementvalidValueX2(driver, driver, "textarea[id='APjFqb']", "hola");
     }
 
     @Test(testName = "sendKeystoElementvalidValueForMap", description = "Envia el texto al elemento especificado", dependsOnMethods = "sendKeystoElementvalidValueX2")
     public void sendKeystoElementvalidValueForMap() {
         logParrafo("Envia el texto al elemento especificado");
-        SeleniumUtils.sendKeystoElementvalidValueForMap(driver,driver,"textarea[id='APjFqb']","hola");
+        SeleniumUtils.sendKeystoElementvalidValueForMap(driver, driver, "textarea[id='APjFqb']", "hola");
     }
 
     @Test(testName = "sendKeystoElementvalidValue", description = "Envia el texto al elemento especificado", dependsOnMethods = "sendKeystoElementvalidValueForMap")
     public void sendKeystoElementvalidValue() {
         logParrafo("Envia el texto al elemento especificado");
-        SeleniumUtils.sendKeystoElementvalidValue(driver,driver,"textarea[id='APjFqb']","hola");
+        SeleniumUtils.sendKeystoElementvalidValue(driver, driver, "textarea[id='APjFqb']", "hola");
     }
 
     @Test(testName = "enviarTextoSiValido", description = "Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico.", dependsOnMethods = "sendKeystoElementvalidValue")
     public void enviarTextoSiValido() {
         logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
-        SeleniumUtils.enviarTextoSiValido(driver,driver,"textarea[id='APjFqb']","hola");
+        SeleniumUtils.enviarTextoSiValido(driver, driver, "textarea[id='APjFqb']", "hola");
     }
 
     @Test(testName = "enviarTextoSiValido", description = "Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico.", dependsOnMethods = "enviarTextoSiValido")
     public void enviarTextoSiValidoX2() {
         logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
-        SeleniumUtils.enviarTextoSiValidoX2(driver,driver,"textarea[id='APjFqb']","hola");
+        SeleniumUtils.enviarTextoSiValidoX2(driver, driver, "textarea[id='APjFqb']", "hola");
     }
-
 
     @AfterClass
     public void tearDown() {
