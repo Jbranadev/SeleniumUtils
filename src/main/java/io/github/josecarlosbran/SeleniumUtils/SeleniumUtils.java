@@ -26,6 +26,7 @@ public class SeleniumUtils {
     private static String inespecific = "N/E";
     private static Integer searchTime = 2500;
     private static Integer searchRepetitionTime = 50;
+
     @Getter(AccessLevel.PACKAGE)
     static ExecutorService seleniumEjecutor = Executors.newCachedThreadPool();
 
@@ -57,6 +58,15 @@ public class SeleniumUtils {
     // Método para cambiar el valor de 'searchRepetitionTime' usando Reflection
     public static void setSearchRepetitionTime(Integer newSearchRepetitionTime) {
         setFieldValue("searchRepetitionTime", newSearchRepetitionTime);
+    }
+
+    public static boolean setFieldValue_Error(String fieldName, Object newValue){
+        try{
+            SeleniumUtils.setFieldValue(fieldName,newValue);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     // Método privado que maneja la lógica de cambio de cualquier campo usando Reflection
@@ -2415,6 +2425,15 @@ public class SeleniumUtils {
         return enviarTexto(driver, searchContext, element, false, texto);
     }
 
+    public static boolean PmanejarErrorEnvioTexto (String element, Exception e, boolean assertFail){
+        try{
+            SeleniumUtils.manejarErrorEnvioTexto(element, e, assertFail);
+            return true;
+        }catch (Exception ee){
+            return false;
+        }
+    }
+
     /**
      * Maneja los errores ocurridos durante el envío de texto a un elemento, registrando los detalles del error y
      * opcionalmente fallando la prueba.
@@ -2528,7 +2547,7 @@ public class SeleniumUtils {
      * */
 
     /**
-     * Función para cambiar el contexto del WebDriver para interactuar con un marco (frame) especifico en la BERediseño
+     * Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)
      *
      * @param driver WebDriver es el que cambiará el contexto al marco especificado
      * @param frame  Identificador del marco al que se desea cambiar
@@ -2571,6 +2590,14 @@ public class SeleniumUtils {
         }
     }
 
+    public static boolean PhandlePrompt (WebDriver driver, String texto){
+        try{
+            SeleniumUtils.handlePrompt(driver,texto);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
      * @param driver Web Driver que manipula el navegador

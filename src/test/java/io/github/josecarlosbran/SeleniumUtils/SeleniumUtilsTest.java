@@ -2,6 +2,7 @@ package io.github.josecarlosbran.SeleniumUtils;
 
 import com.josebran.LogsJB.LogsJB;
 import com.josebran.LogsJB.Numeracion.NivelLog;
+import io.appium.java_client.ios.IOSDriver;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -446,7 +447,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "cambiarZoomPlusError", description = "Debería de dar un error al momento de aumentar el zoom de la pagina que se está visualizando",
-            expectedExceptions = {java.lang.AssertionError.class}, dependsOnMethods = "elementExist")
+            expectedExceptions = {AssertionError.class}, dependsOnMethods = "elementExist")
     public void cambiarZoomPlusError() {
         logParrafo("Se debe de dar un error al aumentar la cantidad de Zoom que se realiza");
         Assert.assertTrue(SeleniumUtils.cambiarZOOM(null, 2, Keys.ADD));
@@ -489,7 +490,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "cambiarZOOMMasFallo", description = "Debería de dar un error al aumentar el zoom de la pagina que se está visualizando",
-            expectedExceptions = {java.lang.AssertionError.class}, dependsOnMethods = "elementExist")
+            expectedExceptions = {AssertionError.class}, dependsOnMethods = "elementExist")
     public void cambiarZoomMasFallo() {
         logParrafo("Se debe de dar un error al momento de aumentar la cantidad de Zoom que se realiza");
         Assert.assertFalse(SeleniumUtils.cambiarZOOMMas(null, 2));
@@ -829,7 +830,7 @@ public class SeleniumUtilsTest {
         logParrafo("Se le ingresa un texto sin normalizar, y el método debe de retornar un String normalizado y en mayusculas");
         String stringSinNormalizar = "café";
         String normalizado = SeleniumUtils.Normalizar(stringSinNormalizar);
-        Assert.assertEquals(normalizado, "CAFE");
+        Assert.assertEquals(normalizado, "CAFA");
     }
 
     @Test(testName = "NormalizarFallo", description = "Debe de retornar un error en el string en mayusculas y normalizado")
@@ -961,12 +962,17 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "KeyPress - Int - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist")
     public void KeyPress_Int_Error() {
-        SeleniumUtils.keyPress(driver, -1);
+        SeleniumUtils.keyPress(null, -1);
     }
 
     @Test(testName = "KeyPress - Int - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist")
     public void KeyPress_Int_Overdrive_Error() {
-        SeleniumUtils.keyPress(driver, -1, true);
+        SeleniumUtils.keyPress(null, -1, false);
+    }
+
+    @Test(testName = "KeyPress - Int - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist")
+    public void KeyPress_Int_Overdrive_Error2() {
+        SeleniumUtils.keyPress(null, 65, false);
     }
 
     @Test(testName = "getElementIfExist_By", description = "Debería de obtener un elemento By si existe", dependsOnMethods = "elementExist")
@@ -1117,6 +1123,74 @@ public class SeleniumUtilsTest {
     public void enviarTextoSiValidoX2() {
         logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
         SeleniumUtils.enviarTextoSiValidoX2(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
+
+    @Test(testName = "enviarTexto2", description = "Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.", dependsOnMethods = "enviarTextoSiValidoX2")
+    public void enviarTexto2() {
+        logParrafo("Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir");
+        boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "q", "Texto de prueba","Texto de prueba 2");
+    }
+
+    @Test(testName = "sendKeystoElementx2intents", description = "Trata de envíar el texto al elemento especificado en mas de una ocasión", dependsOnMethods = "enviarTexto2")
+    public void sendKeystoElementx2intents() {
+        logParrafo("Trata de envíar el texto al elemento especificado en mas de una ocasión");
+        boolean resultado = SeleniumUtils.sendKeystoElementx2intents(driver, driver, "q", "Texto de prueba","Texto de prueba 2");
+    }
+
+    @Test(testName = "setFieldValue_Error", description = "Método privado que maneja la lógica de cambio de cualquier campo usando Reflection, saltando la excepcion", dependsOnMethods = "elementExist")
+    public void setFieldValue() {
+        logParrafo("Intenta asignar un valor a una variable inaccesible para saltar la exepcion");
+        Assert.assertTrue(SeleniumUtils.setFieldValue_Error("searchRepetitionTime", 50));
+    }
+
+    @Test(testName = "setFieldValue_Error", description = "Método privado que maneja la lógica de cambio de cualquier campo usando Reflection, saltando la excepcion", dependsOnMethods = "elementExist")
+    public void setFieldValue_Error() {
+        logParrafo("Intenta asignar un valor a una variable inaccesible para saltar la exepcion");
+        Assert.assertFalse(SeleniumUtils.setFieldValue_Error("secretField", "newValue"));
+    }
+
+    @Test(testName = "moverATabAnterior",description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña", priority = 2)
+    public void moverATabAnterior() {
+        logParrafo("Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña");
+        driver.switchTo().newWindow(WindowType.TAB);
+        driver.get("https://www.wikipedia.org");
+        String SecondTab = driver.getWindowHandle();
+
+        driver.switchTo().newWindow(WindowType.TAB);
+        driver.get("https://www.w3schools.com/");
+        String thirdTab = driver.getWindowHandle();
+
+        SeleniumUtils.moverATabAnterior(driver, SecondTab);
+        SeleniumUtils.moverATabAnterior(driver, thirdTab);
+    }
+
+    @Test(testName = "switchFrame", description = "Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)", dependsOnMethods = "moverATabAnterior")
+    public void switchFrame() {
+        logParrafo("Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)");
+        SeleniumUtils.switchFrame(driver,driver,"/html/body/iframe[1]");
+    }
+
+    @Test(testName = "capturar500ServerError", description = "Captura y registra un error 500 (Internal Server Error) en la aplicación si el texto de error es encontrado", dependsOnMethods = "switchFrame")
+    public void capturar500ServerError() {
+        logParrafo("Captura y registra un error 500 (Internal Server Error)");
+        SeleniumUtils.capturar500ServerError(driver, driver, "//body", "500", "Se ha encontrado un error 500 en la página.", 5, 2);
+    }
+
+    @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores", dependsOnMethods = "capturar500ServerError")
+    public void handlePrompt() {
+        logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
+        Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
+    }
+
+    @Test(testName = "manejarErrorEnvioTexto", description = "Maneja los errores ocurridos durante el envío de texto a un elemento", dependsOnMethods = "elementExist")
+    public void manejarErrorEnvioTexto() {
+        logParrafo("Maneja los errores ocurridos durante el envío de texto a un elemento, registrando los detalles del error y opcionalmente fallando la prueba");
+        WebElement element = null;
+        try {
+            element.sendKeys("texto");
+        } catch (Exception e) {
+            Assert.assertFalse(SeleniumUtils.PmanejarErrorEnvioTexto("textarea[id='APjFqb']",e, true));
+        }
     }
 
     @AfterClass
