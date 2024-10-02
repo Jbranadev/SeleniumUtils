@@ -2283,8 +2283,10 @@ public class SeleniumUtils {
     public static void enviarTextoX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
         enviarTexto(driver, searchContext, elemento, false, texto);
         keyPress(driver, Keys.ENTER);
+        SeleniumUtils.threadslepp(10);
         enviarTexto(driver, searchContext, elemento, false, texto);
         keyPress(driver, Keys.ENTER);
+        SeleniumUtils.threadslepp(100);
     }
 
     /***
