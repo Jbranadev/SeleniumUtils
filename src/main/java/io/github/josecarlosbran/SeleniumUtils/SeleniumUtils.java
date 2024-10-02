@@ -2349,12 +2349,7 @@ public class SeleniumUtils {
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
         try {
-            if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
-                WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
-                getImageScreeenshotWebElement(driver, elemento);
-                return true;
-            }
-            LogsJB.info("No se encontró el elemento: " + element);
+            return enviarTextoX2Intentos(driver, searchContext, element, texto);
         } catch (Exception e) {
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
