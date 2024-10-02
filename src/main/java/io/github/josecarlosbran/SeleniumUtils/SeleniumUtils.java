@@ -23,9 +23,9 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class SeleniumUtils {
-    private static final String inespecific = "N/E";
-    private static final Integer searchTime = 2500;
-    private static final Integer searchRepetitionTime = 50;
+    private static String inespecific = "N/E";
+    private static Integer searchTime = 2500;
+    private static Integer searchRepetitionTime = 50;
     @Getter(AccessLevel.PACKAGE)
     static ExecutorService seleniumEjecutor = Executors.newCachedThreadPool();
 
