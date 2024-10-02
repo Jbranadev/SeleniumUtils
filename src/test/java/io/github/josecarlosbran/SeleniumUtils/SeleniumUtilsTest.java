@@ -1075,7 +1075,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "obtenerTextoElementoX2 - Time Controller", description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna, controlado por tiempo de duracion de espera", dependsOnMethods = "elementExist")
     public void obtenerTextoElementoX2_TimeController() {
         logParrafo("Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna controlado por tiempo de duracion de espera");
-        SeleniumUtils.obtenerTextoElementoX2(driver,driver,"textarea[id='APjFqb']",5,5);
+        SeleniumUtils.obtenerTextoElementoX2(driver, driver, "textarea[id='APjFqb']", 1500, 50);
     }
 
     @Test(testName = "enviarTexto", description = "Envía un texto al elemento indicado, si este existe en el contexto actual", dependsOnMethods = "elementExist")

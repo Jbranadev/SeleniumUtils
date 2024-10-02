@@ -291,7 +291,7 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
      * @return Retorna True si el elemento Existe, caso contrario retorna False
      */
-    public static Boolean ElementoExistente(WebDriver driver, SearchContext searchContext, String element) {
+    public static boolean ElementoExistente(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Buscara si existe el elemento indicado: " + element);
@@ -362,7 +362,7 @@ public class SeleniumUtils {
      * @return Retorna True si logra limpiar el elemento, False si no logra limpiar el elemento o sucede un error en la ejecución de esta
      * instrucción.
      */
-    public static Boolean LimpiarElementoExistente(WebDriver driver, SearchContext searchContext, String element) {
+    public static boolean LimpiarElementoExistente(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Si existe el elemento indicado, lo limpiara: " + element);
@@ -616,7 +616,7 @@ public class SeleniumUtils {
      * @param Texto         Texto a envíar al elemento indicado
      * @return Retorna True si encontro el elemento y pudo setear el texto.
      */
-    public static Boolean sendKeysIfElementExist(WebDriver driver, SearchContext searchContext, String element, CharSequence... Texto) {
+    public static boolean sendKeysIfElementExist(WebDriver driver, SearchContext searchContext, String element, CharSequence... Texto) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Si existe el elemento " + element +
@@ -876,7 +876,7 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
      * @return Retorna True si logra hacer clic en el elemento, de lo contrario false
      */
-    public static Boolean clickElementIfExist(WebDriver driver, SearchContext searchContext, String element) {
+    public static boolean clickElementIfExist(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Si existe el elemento indicado, hará click en el elemento: " + element);
@@ -970,7 +970,7 @@ public class SeleniumUtils {
      * @param element       Atributo del elemento, por medio del cual se realizara la busqueda
      * @return Retorna True si logra hacer clic en el elemento, de lo contrario false
      */
-    public static Boolean clicktoElementx2intents(WebDriver driver, SearchContext searchContext, String element) {
+    public static boolean clicktoElementx2intents(WebDriver driver, SearchContext searchContext, String element) {
         int i = 0;
         while (i < 2) {
             if (SeleniumUtils.clickElementIfExist(driver, searchContext, element)) {
@@ -1005,7 +1005,7 @@ public class SeleniumUtils {
     public static boolean waitImplicity(WebDriver driver, By by) {
         boolean bandera = false;
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
             wait.until(driver1 -> !ElementoDeshabilitado(driver1.findElement(by)));
             bandera = true;
         } catch (TimeoutException ignored) {
@@ -1028,7 +1028,7 @@ public class SeleniumUtils {
     public static boolean waitImplicity(WebDriver driver, By by, boolean banderaAssert) {
         boolean bandera = false;
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
             wait.until(driver1 -> !ElementoDeshabilitado(driver1.findElement(by)));
             bandera = true;
         } catch (TimeoutException ignored) {
@@ -1532,7 +1532,7 @@ public class SeleniumUtils {
      */
     public static boolean waitImplicityForElementNotExist(WebDriver driver, By by) {
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
             wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
             return true;
         } catch (TimeoutException ignored) {
@@ -1559,7 +1559,7 @@ public class SeleniumUtils {
      */
     public static boolean waitImplicityForElementNotExist(WebDriver driver, By by, boolean banderaAssert) {
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
             wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
             return true;
         } catch (TimeoutException ignored) {
@@ -1607,7 +1607,7 @@ public class SeleniumUtils {
      */
     public static boolean acceptAlert(WebDriver driver) {
         try {
-            Wait wait = getFluentWait(driver, 5000, 100);
+            Wait wait = getFluentWait(driver, getSearchTime(), getSearchRepetitionTime());
             Alert alert = (Alert) wait.until(ExpectedConditions.alertIsPresent());
             String text = alert.getText();
             LogsJB.info(text);
@@ -2391,11 +2391,6 @@ public class SeleniumUtils {
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
         try {
-            if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
-                return true;
-            } else {
-                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se envío el Texto");
-            }
             return enviarTextoX2Intentos(driver, searchContext, element, texto);
         } catch (Exception e) {
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
@@ -2498,7 +2493,7 @@ public class SeleniumUtils {
      * @param texto         Texto que deseamos envíar al elmento
      * @return True si logra envíar el texto, de lo contrario false
      */
-    public static Boolean sendKeystoElementx2intents(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
+    public static boolean sendKeystoElementx2intents(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
         int i = 0;
         while (i < 2) {
             if (SeleniumUtils.sendKeysIfElementExist(driver, searchContext, element, texto)) {
