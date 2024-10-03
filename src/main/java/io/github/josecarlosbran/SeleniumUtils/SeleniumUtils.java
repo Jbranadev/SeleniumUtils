@@ -23,12 +23,11 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class SeleniumUtils {
+    @Getter(AccessLevel.PACKAGE)
+    static ExecutorService seleniumEjecutor = Executors.newCachedThreadPool();
     private static String inespecific = "N/E";
     private static Integer searchTime = 2500;
     private static Integer searchRepetitionTime = 50;
-
-    @Getter(AccessLevel.PACKAGE)
-    static ExecutorService seleniumEjecutor = Executors.newCachedThreadPool();
 
     // Métodos para obtener los valores actuales
     public static String getInespecific() {
@@ -60,9 +59,9 @@ public class SeleniumUtils {
         setFieldValue("searchRepetitionTime", newSearchRepetitionTime);
     }
 
-    public static boolean setFieldValue_Error(String fieldName, Object newValue){
-        try{
-            SeleniumUtils.setFieldValue(fieldName,newValue);
+    public static boolean setFieldValue_Error(String fieldName, Object newValue) {
+        try {
+            SeleniumUtils.setFieldValue(fieldName, newValue);
             return true;
         } catch (Exception e) {
             return false;
@@ -2425,11 +2424,11 @@ public class SeleniumUtils {
         return enviarTexto(driver, searchContext, element, false, texto);
     }
 
-    public static boolean PmanejarErrorEnvioTexto (String element, Exception e, boolean assertFail){
-        try{
+    public static boolean PmanejarErrorEnvioTexto(String element, Exception e, boolean assertFail) {
+        try {
             SeleniumUtils.manejarErrorEnvioTexto(element, e, assertFail);
             return true;
-        }catch (Exception ee){
+        } catch (Exception ee) {
             return false;
         }
     }
@@ -2590,14 +2589,15 @@ public class SeleniumUtils {
         }
     }
 
-    public static boolean PhandlePrompt (WebDriver driver, String texto){
-        try{
-            SeleniumUtils.handlePrompt(driver,texto);
+    public static boolean PhandlePrompt(WebDriver driver, String texto) {
+        try {
+            SeleniumUtils.handlePrompt(driver, texto);
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
+
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
      * @param driver Web Driver que manipula el navegador

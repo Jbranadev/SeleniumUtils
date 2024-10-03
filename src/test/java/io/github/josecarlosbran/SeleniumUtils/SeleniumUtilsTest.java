@@ -1127,13 +1127,13 @@ public class SeleniumUtilsTest {
     @Test(testName = "enviarTexto2", description = "Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.", dependsOnMethods = "enviarTextoSiValidoX2")
     public void enviarTexto2() {
         logParrafo("Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir");
-        boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "q", "Texto de prueba","Texto de prueba 2");
+        boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
     }
 
     @Test(testName = "sendKeystoElementx2intents", description = "Trata de envíar el texto al elemento especificado en mas de una ocasión", dependsOnMethods = "enviarTexto2")
     public void sendKeystoElementx2intents() {
         logParrafo("Trata de envíar el texto al elemento especificado en mas de una ocasión");
-        boolean resultado = SeleniumUtils.sendKeystoElementx2intents(driver, driver, "q", "Texto de prueba","Texto de prueba 2");
+        boolean resultado = SeleniumUtils.sendKeystoElementx2intents(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
     }
 
     @Test(testName = "setFieldValue_Error", description = "Método privado que maneja la lógica de cambio de cualquier campo usando Reflection, saltando la excepcion", dependsOnMethods = "elementExist")
@@ -1148,17 +1148,15 @@ public class SeleniumUtilsTest {
         Assert.assertFalse(SeleniumUtils.setFieldValue_Error("secretField", "newValue"));
     }
 
-    @Test(testName = "moverATabAnterior",description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña", priority = 2)
+    @Test(testName = "moverATabAnterior", description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña", priority = 2)
     public void moverATabAnterior() {
         logParrafo("Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña");
         driver.switchTo().newWindow(WindowType.TAB);
         driver.get("https://www.wikipedia.org");
         String SecondTab = driver.getWindowHandle();
-
         driver.switchTo().newWindow(WindowType.TAB);
         driver.get("https://www.w3schools.com/");
         String thirdTab = driver.getWindowHandle();
-
         SeleniumUtils.moverATabAnterior(driver, SecondTab);
         SeleniumUtils.moverATabAnterior(driver, thirdTab);
     }
@@ -1166,7 +1164,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "switchFrame", description = "Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)", dependsOnMethods = "moverATabAnterior")
     public void switchFrame() {
         logParrafo("Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)");
-        SeleniumUtils.switchFrame(driver,driver,"/html/body/iframe[1]");
+        SeleniumUtils.switchFrame(driver, driver, "/html/body/iframe[1]");
     }
 
     @Test(testName = "capturar500ServerError", description = "Captura y registra un error 500 (Internal Server Error) en la aplicación si el texto de error es encontrado", dependsOnMethods = "switchFrame")
@@ -1188,7 +1186,7 @@ public class SeleniumUtilsTest {
         try {
             element.sendKeys("texto");
         } catch (Exception e) {
-            Assert.assertFalse(SeleniumUtils.PmanejarErrorEnvioTexto("textarea[id='APjFqb']",e, true));
+            Assert.assertFalse(SeleniumUtils.PmanejarErrorEnvioTexto("textarea[id='APjFqb']", e, true));
         }
     }
 
