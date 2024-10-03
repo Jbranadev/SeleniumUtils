@@ -2362,13 +2362,12 @@ public class SeleniumUtils {
         try {
             return sendKeysIfElementExist(driver, searchContext, element, texto);
         } catch (Exception e) {
-            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
-            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
-            LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.error("Error enviando texto al elemento: " + element + ". " + e.getMessage());
+            LogsJB.error("Stacktrace: " + ExceptionUtils.getStackTrace(e));
+
             if (assertFail) {
-                Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
+                Assert.fail("Error enviando texto al elemento: " + element);
             }
-            manejarErrorEnvioTexto(element, e, assertFail);
         }
         return false;
     }
@@ -2399,13 +2398,12 @@ public class SeleniumUtils {
         try {
             return sendKeysIfElementExist(driver, searchContext, element, texto);
         } catch (Exception e) {
-            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
-            LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
-            LogsJB.error("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            LogsJB.error("Error enviando texto al elemento: " + element + ". " + e.getMessage());
+            LogsJB.error("Stacktrace: " + ExceptionUtils.getStackTrace(e));
+
             if (assertFail) {
-                Assert.fail("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
+                Assert.fail("Error enviando texto al elemento: " + element);
             }
-            manejarErrorEnvioTexto(element, e, assertFail);
         }
         return false;
     }
@@ -2424,30 +2422,6 @@ public class SeleniumUtils {
         return enviarTexto(driver, searchContext, element, false, texto);
     }
 
-    public static boolean PmanejarErrorEnvioTexto(String element, Exception e, boolean assertFail) {
-        try {
-            SeleniumUtils.manejarErrorEnvioTexto(element, e, assertFail);
-            return true;
-        } catch (Exception ee) {
-            return false;
-        }
-    }
-
-    /**
-     * Maneja los errores ocurridos durante el envío de texto a un elemento, registrando los detalles del error y
-     * opcionalmente fallando la prueba.
-     *
-     * @param element    El selector del elemento al que no se pudo enviar el texto.
-     * @param e          La excepción que fue lanzada durante el intento de envío de texto.
-     * @param assertFail Indica si la prueba debe fallar (con Assert.fail) en caso de error.
-     */
-    public static void manejarErrorEnvioTexto(String element, Exception e, boolean assertFail) {
-        LogsJB.error("Error enviando texto al elemento: " + element + ". " + e.getMessage());
-        LogsJB.error("Stacktrace: " + ExceptionUtils.getStackTrace(e));
-        if (assertFail) {
-            Assert.fail("Error enviando texto al elemento: " + element);
-        }
-    }
 //Tercer lote de métodos
 
     /**

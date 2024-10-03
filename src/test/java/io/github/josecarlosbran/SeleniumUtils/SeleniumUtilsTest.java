@@ -829,7 +829,7 @@ public class SeleniumUtilsTest {
         logParrafo("Se le ingresa un texto sin normalizar, y el método debe de retornar un String normalizado y en mayusculas");
         String stringSinNormalizar = "café";
         String normalizado = SeleniumUtils.Normalizar(stringSinNormalizar);
-        Assert.assertEquals(normalizado, "CAFE");
+        Assert.assertEquals(normalizado, "CAFA");
     }
 
     @Test(testName = "NormalizarFallo", description = "Debe de retornar un error en el string en mayusculas y normalizado")
@@ -946,6 +946,12 @@ public class SeleniumUtilsTest {
     public void obtenerWebElementx2() {
         By elementoBusqueda = By.xpath("//select[@class='mi-select-clase']");
         SeleniumUtils.obtenerWebElementx2(driver, driver, elementoBusqueda);
+        Assert.assertTrue(true);
+    }
+
+    @Test(testName = "obtenerWebElementx2_String", description = "Realiza 2 veces la busquedad de los elementos que cumplen con el criterio de busqueda especificado", dependsOnMethods = "elementExist")
+    public void obtenerWebElementx2_String() {
+        SeleniumUtils.obtenerWebElementx2(driver, driver, "//select[@class='mi-select-clase']");
         Assert.assertTrue(true);
     }
 
@@ -1177,17 +1183,6 @@ public class SeleniumUtilsTest {
     public void handlePrompt() {
         logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
         Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
-    }
-
-    @Test(testName = "manejarErrorEnvioTexto", description = "Maneja los errores ocurridos durante el envío de texto a un elemento", dependsOnMethods = "elementExist")
-    public void manejarErrorEnvioTexto() {
-        logParrafo("Maneja los errores ocurridos durante el envío de texto a un elemento, registrando los detalles del error y opcionalmente fallando la prueba");
-        WebElement element = null;
-        try {
-            element.sendKeys("texto");
-        } catch (Exception e) {
-            Assert.assertFalse(SeleniumUtils.PmanejarErrorEnvioTexto("textarea[id='APjFqb']", e, true));
-        }
     }
 
     @AfterClass
