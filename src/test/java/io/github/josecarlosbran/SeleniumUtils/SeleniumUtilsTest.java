@@ -2,7 +2,6 @@ package io.github.josecarlosbran.SeleniumUtils;
 
 import com.josebran.LogsJB.LogsJB;
 import com.josebran.LogsJB.Numeracion.NivelLog;
-import io.appium.java_client.ios.IOSDriver;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -830,7 +829,7 @@ public class SeleniumUtilsTest {
         logParrafo("Se le ingresa un texto sin normalizar, y el método debe de retornar un String normalizado y en mayusculas");
         String stringSinNormalizar = "café";
         String normalizado = SeleniumUtils.Normalizar(stringSinNormalizar);
-        Assert.assertEquals(normalizado, "CAFA");
+        Assert.assertEquals(normalizado, "CAFE");
     }
 
     @Test(testName = "NormalizarFallo", description = "Debe de retornar un error en el string en mayusculas y normalizado")

@@ -2086,7 +2086,7 @@ public class SeleniumUtils {
         WebElement frame = null;
         int i = 0;
         while (Objects.isNull(frame) && i < 2) {
-            frame = obtenerWebElementx2(driver, searchcontext, frameIDorName);
+            frame = SeleniumUtils.getElementIfExist(driver, searchcontext, frameIDorName);
             i++;
         }
         return movetoframeforwebelement(driver, frame);
