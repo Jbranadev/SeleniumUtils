@@ -90,11 +90,14 @@ test {
         if (!desc.parent) { // Solo para el suite principal
             def totalTests = result.testCount
             def failedTests = result.failedTestCount
-            def failurePercentage = (failedTests / totalTests) * 100
+            if (totalTests > 0) {
+                def failurePercentage = (failedTests / totalTests) * 100
 
-            if (failurePercentage > 20) {
-                throw new GradleException("Más del 20% de los tests fallaron. Fallos: ${failedTests}, Total: ${totalTests}")
+                if (failurePercentage > 20) {
+                    throw new GradleException("Más del 20% de los tests fallaron. Fallos: ${failedTests}, Total: ${totalTests}")
+                }
             }
+
         }
     }
 

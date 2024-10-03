@@ -5,6 +5,7 @@ import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -44,12 +45,12 @@ public class SeleniumUtilsTest {
 //        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
 //        driver = wdm.create();
         WebDriverManager.chromedriver().setup();
-        //ChromeOptions options = new ChromeOptions();
-        //options.addArguments("--no-sandbox");
-        //options.addArguments("--disable-dev-shm-usage");
-        //options.addArguments("--headless");
-        //driver = new ChromeDriver(options);
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--headless");
+        driver = new ChromeDriver(options);
+        //driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.FATAL);
@@ -1099,11 +1100,12 @@ public class SeleniumUtilsTest {
         logParrafo("Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter");
         SeleniumUtils.sendKeystoElementvalidValueX2(driver, driver, "textarea[id='APjFqb']", "hola");
     }
-//    @Test(testName = "sendKeystoElementvalidValueForMap", description = "Envia el texto al elemento especificado", dependsOnMethods = "sendKeystoElementvalidValueX2")
-//    public void sendKeystoElementvalidValueForMap() {
-//        logParrafo("Envia el texto al elemento especificado");
-//        SeleniumUtils.sendKeystoElementvalidValueForMap(driver, driver, "textarea[id='APjFqb']", "hola");
-//    }
+
+    @Test(testName = "sendKeystoElementvalidValueForMap", description = "Envia el texto al elemento especificado", dependsOnMethods = "sendKeystoElementvalidValueX2")
+    public void sendKeystoElementvalidValueForMap() {
+        logParrafo("Envia el texto al elemento especificado");
+        SeleniumUtils.sendKeystoElementvalidValueForMap(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
 
     @Test(testName = "sendKeystoElementvalidValue", description = "Envia el texto al elemento especificado", dependsOnMethods = "sendKeystoElementvalidValueForMap")
     public void sendKeystoElementvalidValue() {
@@ -1116,16 +1118,18 @@ public class SeleniumUtilsTest {
         logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
         SeleniumUtils.enviarTextoSiValido(driver, driver, "textarea[id='APjFqb']", "hola");
     }
-//    @Test(testName = "enviarTextoSiValido", description = "Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico.", dependsOnMethods = "enviarTextoSiValido")
-//    public void enviarTextoSiValidoX2() {
-//        logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
-//        SeleniumUtils.enviarTextoSiValidoX2(driver, driver, "textarea[id='APjFqb']", "hola");
-//    }
-//    @Test(testName = "enviarTexto2", description = "Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.", dependsOnMethods = "enviarTextoSiValidoX2")
-//    public void enviarTexto2() {
-//        logParrafo("Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir");
-//        boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
-//    }
+
+    @Test(testName = "enviarTextoSiValido", description = "Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico.", dependsOnMethods = "enviarTextoSiValido")
+    public void enviarTextoSiValidoX2() {
+        logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
+        SeleniumUtils.enviarTextoSiValidoX2(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
+
+    @Test(testName = "enviarTexto2", description = "Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.", dependsOnMethods = "enviarTextoSiValidoX2")
+    public void enviarTexto2() {
+        logParrafo("Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir");
+        boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
+    }
 
     @Test(testName = "sendKeystoElementx2intents", description = "Trata de envíar el texto al elemento especificado en mas de una ocasión", dependsOnMethods = "enviarTexto2")
     public void sendKeystoElementx2intents() {
@@ -1144,35 +1148,37 @@ public class SeleniumUtilsTest {
         logParrafo("Intenta asignar un valor a una variable inaccesible para saltar la exepcion");
         Assert.assertFalse(SeleniumUtils.setFieldValue_Error("secretField", "newValue"));
     }
-//    @Test(testName = "moverATabAnterior", description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña", priority = 2)
-//    public void moverATabAnterior() {
-//        logParrafo("Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña");
-//        driver.switchTo().newWindow(WindowType.TAB);
-//        driver.get("https://www.wikipedia.org");
-//        String SecondTab = driver.getWindowHandle();
-//        driver.switchTo().newWindow(WindowType.TAB);
-//        driver.get("https://www.w3schools.com/");
-//        String thirdTab = driver.getWindowHandle();
-//        SeleniumUtils.moverATabAnterior(driver, SecondTab);
-//        SeleniumUtils.moverATabAnterior(driver, thirdTab);
-//    }
-//
-//    @Test(testName = "switchFrame", description = "Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)", dependsOnMethods = "moverATabAnterior")
-//    public void switchFrame() {
-//        logParrafo("Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)");
-//        SeleniumUtils.switchFrame(driver, driver, "/html/body/iframe[1]");
-//    }
+
+    @Test(testName = "moverATabAnterior", description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña", priority = 2)
+    public void moverATabAnterior() {
+        logParrafo("Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña");
+        driver.switchTo().newWindow(WindowType.TAB);
+        driver.get("https://www.wikipedia.org");
+        String SecondTab = driver.getWindowHandle();
+        driver.switchTo().newWindow(WindowType.TAB);
+        driver.get("https://www.w3schools.com/");
+        String thirdTab = driver.getWindowHandle();
+        SeleniumUtils.moverATabAnterior(driver, SecondTab);
+        SeleniumUtils.moverATabAnterior(driver, thirdTab);
+    }
+
+    @Test(testName = "switchFrame", description = "Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)", dependsOnMethods = "moverATabAnterior")
+    public void switchFrame() {
+        logParrafo("Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)");
+        SeleniumUtils.switchFrame(driver, driver, "/html/body/iframe[1]");
+    }
 
     @Test(testName = "capturar500ServerError", description = "Captura y registra un error 500 (Internal Server Error) en la aplicación si el texto de error es encontrado", dependsOnMethods = "switchFrame")
     public void capturar500ServerError() {
         logParrafo("Captura y registra un error 500 (Internal Server Error)");
         SeleniumUtils.capturar500ServerError(driver, driver, "//body", "500", "Se ha encontrado un error 500 en la página.", 5, 2);
     }
-//    @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores", dependsOnMethods = "capturar500ServerError")
-//    public void handlePrompt() {
-//        logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
-//        Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
-//    }
+
+    @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores", dependsOnMethods = "capturar500ServerError")
+    public void handlePrompt() {
+        logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
+        Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
+    }
 
     @Test(testName = "manejarErrorEnvioTexto", description = "Maneja los errores ocurridos durante el envío de texto a un elemento", dependsOnMethods = "elementExist")
     public void manejarErrorEnvioTexto() {
