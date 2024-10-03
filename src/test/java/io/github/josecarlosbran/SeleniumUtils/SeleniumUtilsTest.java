@@ -1195,7 +1195,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores", dependsOnMethods = "capturar500ServerError")
     public void handlePrompt() {
         logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
-        Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
+        Assert.assertFalse(SeleniumUtils.handlePrompt(driver, "TuNombre"));
     }
 
     @AfterClass
