@@ -5,7 +5,6 @@ import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -45,16 +44,16 @@ public class SeleniumUtilsTest {
 //        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
 //        driver = wdm.create();
         WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--headless");
-        driver = new ChromeDriver(options);
-        //driver = new ChromeDriver();
+//        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("--no-sandbox");
+//        options.addArguments("--disable-dev-shm-usage");
+//        options.addArguments("--headless");
+//        driver = new ChromeDriver(options);
+        driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.FATAL);
-        SeleniumUtils.setSearchTime(1500);
+        SeleniumUtils.setSearchTime(750);
         SeleniumUtils.setSearchRepetitionTime(50);
     }
 
@@ -830,7 +829,7 @@ public class SeleniumUtilsTest {
         logParrafo("Se le ingresa un texto sin normalizar, y el método debe de retornar un String normalizado y en mayusculas");
         String stringSinNormalizar = "café";
         String normalizado = SeleniumUtils.Normalizar(stringSinNormalizar);
-        Assert.assertEquals(normalizado, "CAFA");
+        Assert.assertEquals(normalizado, "CAFE");
     }
 
     @Test(testName = "NormalizarFallo", description = "Debe de retornar un error en el string en mayusculas y normalizado")
@@ -1146,7 +1145,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "enviarTexto2_Error", description = "Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.", dependsOnMethods = "enviarTextoSiValidoX2")
     public void enviarTexto2_Error() {
         logParrafo("Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir");
-        boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "NotElementExist", false,"Texto de prueba", "Texto de prueba 2");
+        boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "NotElementExist", false, "Texto de prueba", "Texto de prueba 2");
     }
 
     @Test(testName = "sendKeystoElementx2intents", description = "Trata de envíar el texto al elemento especificado en mas de una ocasión", dependsOnMethods = "enviarTexto2")
@@ -1194,6 +1193,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores", dependsOnMethods = "capturar500ServerError")
     public void handlePrompt() {
+        simularAlertJavascript();
         logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
         Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
     }

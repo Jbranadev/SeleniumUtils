@@ -530,7 +530,7 @@ public class SeleniumUtils {
                 if (term.endsWith("]}")) {
                     // Eliminar los últimos dos carácteres
                     term = term.substring(0, term.length() - 2);
-                } else if (term.endsWith("]]") && StringUtils.equalsIgnoreCase(locator, "xpath")) {
+                } else if (term.endsWith("]]") && (StringUtils.equalsIgnoreCase(locator, "xpath") || StringUtils.equalsIgnoreCase(locator, "css selector"))) {
                     // Eliminar los últimos dos carácteres
                     term = term.substring(0, term.length() - 1);
                 }
@@ -2360,7 +2360,6 @@ public class SeleniumUtils {
         } catch (Exception e) {
             LogsJB.error("Error enviando texto al elemento: " + element + ". " + e.getMessage());
             LogsJB.error("Stacktrace: " + ExceptionUtils.getStackTrace(e));
-
             if (assertFail) {
                 Assert.fail("Error enviando texto al elemento: " + element);
             }
@@ -2392,7 +2391,6 @@ public class SeleniumUtils {
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
         return sendKeysIfElementExist(driver, searchContext, element, texto);
-
     }
 
     /**
@@ -2408,7 +2406,6 @@ public class SeleniumUtils {
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
         return enviarTexto(driver, searchContext, element, false, texto);
     }
-
 //Tercer lote de métodos
 
     /**
@@ -2566,22 +2563,22 @@ public class SeleniumUtils {
      */
     public static void handlePrompt(WebDriver driver, String texto) {
         try {
-            // Intentar interactuar con el prompt usando Selenium
-            Alert alert = driver.switchTo().alert();
-            alert.sendKeys(texto);
-            alert.accept();
-        } catch (Exception seleniumException) {
+            // Intentar interactuar con el prompt usando JavaScript en caso de falla con Selenium
+            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+            jsExecutor.executeScript("window.promptResult = prompt(arguments[0]);", texto);
+            String promptResult = (String) jsExecutor.executeScript("return window.promptResult;");
+            if (promptResult == null) {
+                throw new Exception("No se pudo manejar el prompt con JavaScript.");
+            }
+        } catch (Exception javascriptException) {
             try {
-                // Intentar interactuar con el prompt usando JavaScript en caso de falla con Selenium
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                jsExecutor.executeScript("window.promptResult = prompt(arguments[0]);", texto);
-                String promptResult = (String) jsExecutor.executeScript("return window.promptResult;");
-                if (promptResult == null) {
-                    throw new Exception("No se pudo manejar el prompt ni con Selenium ni con JavaScript.");
-                }
-            } catch (Exception javascriptException) {
+                // Intentar interactuar con el prompt usando Selenium
+                Alert alert = driver.switchTo().alert();
+                alert.sendKeys(texto);
+                alert.accept();
+            } catch (Exception seleniumException) {
                 // Lanzar excepción si no se puede manejar el prompt ni con Selenium ni con JavaScript
-                throw new RuntimeException("Error al manejar el prompt: " + javascriptException.getMessage());
+                throw new RuntimeException("Error al manejar el prompt con Selenium: " + javascriptException.getMessage());
             }
         }
     }
