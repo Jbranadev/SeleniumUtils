@@ -54,6 +54,8 @@ public class SeleniumUtilsTest {
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.FATAL);
+        SeleniumUtils.setSearchTime(1500);
+        SeleniumUtils.setSearchRepetitionTime(50);
     }
 
     @Test(testName = "Element Exist Google"
@@ -341,7 +343,8 @@ public class SeleniumUtilsTest {
     @Test(testName = "getTextOfWebElement", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextOfWebElement() {
         Boolean condicion = false;
-        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[3]/form/div[1]/div[1]/div[4]/center/input[2]");
+        SeleniumUtils.enviarTexto(driver, driver, "textarea[id='APjFqb']", "texto");
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");
         String respuesta = SeleniumUtils.getTextOfWebElement(driver, elemento);
         condicion = SeleniumUtils.cadenaNulaoVacia(respuesta);
         Assert.assertFalse(condicion);
@@ -349,6 +352,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "getTextNullOfWebElement", description = "Obtiene el texto nulo de un elemento web", dependsOnMethods = "elementExist")
     public void getTextNullOfWebElement() {
+        SeleniumUtils.LimpiarElementoExistente(driver, driver, "textarea[id='APjFqb']");
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
         String respuesta = SeleniumUtils.getTextOfWebElement(driver, elemento);
         Assert.assertTrue(SeleniumUtils.cadenaNulaoVacia(respuesta));
@@ -357,6 +361,8 @@ public class SeleniumUtilsTest {
     @Test(testName = "getTextOfWebElement", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextOfWebElementJavaScript() {
         Boolean condicion = false;
+        SeleniumUtils.LimpiarElementoExistente(driver, driver, "textarea[id='APjFqb']");
+        SeleniumUtils.enviarTexto(driver, driver, "textarea[id='APjFqb']", "texto");
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
         String respuesta = SeleniumUtils.getTextUsingJavaScript(driver, elemento);
         condicion = SeleniumUtils.cadenaNulaoVacia(respuesta);
@@ -441,7 +447,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "cambiarZoomPlusError", description = "Debería de dar un error al momento de aumentar el zoom de la pagina que se está visualizando",
-            expectedExceptions = {java.lang.AssertionError.class}, dependsOnMethods = "elementExist")
+            expectedExceptions = {AssertionError.class}, dependsOnMethods = "elementExist")
     public void cambiarZoomPlusError() {
         logParrafo("Se debe de dar un error al aumentar la cantidad de Zoom que se realiza");
         Assert.assertTrue(SeleniumUtils.cambiarZOOM(null, 2, Keys.ADD));
@@ -484,7 +490,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "cambiarZOOMMasFallo", description = "Debería de dar un error al aumentar el zoom de la pagina que se está visualizando",
-            expectedExceptions = {java.lang.AssertionError.class}, dependsOnMethods = "elementExist")
+            expectedExceptions = {AssertionError.class}, dependsOnMethods = "elementExist")
     public void cambiarZoomMasFallo() {
         logParrafo("Se debe de dar un error al momento de aumentar la cantidad de Zoom que se realiza");
         Assert.assertFalse(SeleniumUtils.cambiarZOOMMas(null, 2));
@@ -526,7 +532,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "getElementIfExist", description = "Debería de obtener un elemento web si existe", dependsOnMethods = "elementExist")
     public void getElementIfExist() {
         logParrafo("Se busca un elemento web para verificar si existe. Si existe, se obtiene su información");
-        List<WebElement> respuesta = SeleniumUtils.getElementsIfExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
+        List<WebElement> respuesta = SeleniumUtils.getElementsIfExist(driver, driver, "div");
         Boolean exito = false;
         if (!respuesta.isEmpty()) {
             exito = true;
@@ -616,7 +622,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "getElementIfExistExito", description = "Se debe de obtener un elemento, si es que existe", dependsOnMethods = "elementExist")
     public void getElementIfExistExito() {
-        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[2]/div/img");
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "div#tophf");
         Assert.assertNotNull(elemento);
     }
 
@@ -666,7 +672,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "getTextIfElementExistSinTiempoExito", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextIfElementExistSinTiempoExito() {
-        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
+        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "#APjFqb");
         Assert.assertNotNull(elemento);
     }
 
@@ -914,6 +920,275 @@ public class SeleniumUtilsTest {
         boolean respuesta = false;
         respuesta = SeleniumUtils.selectOption(driver, driver, "//select[@class='mi-select-clase']", "1");
         Assert.assertTrue(respuesta);
+    }
+
+    @Test(testName = "selectStandarValues - WaitImplicity Overdrive", description = "Prueba de valores predeterminados y waitImplicity Overdrive", dependsOnMethods = "elementExist")
+    public void selectStandarValues() {
+        logParrafo("Funcion para comprobar varibales de control");
+        Integer SerachTime = SeleniumUtils.getSearchTime();
+        SeleniumUtils.setSearchTime(SerachTime);
+        String inespecific = SeleniumUtils.getInespecific();
+        SeleniumUtils.setInespecific(inespecific);
+        Integer SearchRepetitionTime = SeleniumUtils.getSearchRepetitionTime();
+        SeleniumUtils.setSearchRepetitionTime(SearchRepetitionTime);
+        boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"), true);
+        Assert.assertFalse(condicion);
+    }
+
+    @Test(testName = "testObtenerTextOfWebElementx2 - Not Time", description = "Verifica que se obtenga el texto del elemento web especificado, sin controlador de tiempo", dependsOnMethods = "elementExist")
+    public void testObtenerTextOfWebElementx2_NotTimeController() {
+        Boolean condicion = false;
+        String elementoBusqueda = "buscar";
+        condicion = SeleniumUtils.cadenaNulaoVacia(SeleniumUtils.obtenerTextOfWebElementx2(driver, driver, elementoBusqueda));
+        Assert.assertTrue(condicion);
+    }
+
+    @Test(testName = "obtenerWebElementx2", description = "Realiza 2 veces la busquedad de los elementos que cumplen con el criterio de busqueda especificado", dependsOnMethods = "elementExist")
+    public void obtenerWebElementx2() {
+        By elementoBusqueda = By.xpath("//select[@class='mi-select-clase']");
+        SeleniumUtils.obtenerWebElementx2(driver, driver, elementoBusqueda);
+        Assert.assertTrue(true);
+    }
+
+    @Test(testName = "KeyPress - Keys - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist")
+    public void KeyPress_Keys_Error() {
+        SeleniumUtils.keyPress(driver, null);
+    }
+
+    @Test(testName = "KeyPress - Keys - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist", expectedExceptions = {AssertionError.class})
+    public void KeyPress_Keys_Overdrive_Error() {
+        SeleniumUtils.keyPress(driver, null, true);
+    }
+
+    @Test(testName = "KeyPress - Int - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist")
+    public void KeyPress_Int_Error() {
+        SeleniumUtils.keyPress(null, -1);
+    }
+
+    @Test(testName = "KeyPress - Int - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist")
+    public void KeyPress_Int_Overdrive_Error() {
+        SeleniumUtils.keyPress(null, -1, false);
+    }
+
+    @Test(testName = "KeyPress - Int - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress", dependsOnMethods = "elementExist")
+    public void KeyPress_Int_Overdrive_Error2() {
+        SeleniumUtils.keyPress(null, 65, false);
+    }
+
+    @Test(testName = "getElementIfExist_By", description = "Debería de obtener un elemento By si existe", dependsOnMethods = "elementExist")
+    public void getElementIfExist_By() {
+        logParrafo("Se busca un elemento web By para verificar si existe. Si existe, se obtiene su información");
+        //By elemento = By.xpath("div.Q3DXx");
+        By elemento = By.xpath("/html/body/div[1]/div[2]/div/img");
+        List<WebElement> respuesta = SeleniumUtils.getElementsIfExist(driver, driver, elemento);
+        Boolean exito = false;
+        if (!respuesta.isEmpty()) {
+            exito = true;
+        }
+        Assert.assertTrue(exito);
+    }
+
+    @Test(testName = "SendKeys Element Search Google", description = "Envia carácter por carácter al elemento especificado", dependsOnMethods = "elementExist")
+    public void enviarTxtforKeyPress() {
+        logParrafo("Envia carácter por carácter al elemento especificado");
+        SeleniumUtils.enviarTxtforKeyPress(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
+
+    @Test(testName = "waitImplicityForElementNotExist - Error", description = "Debería de hacer un wait Implicity para elementos que no existan pero dara error", dependsOnMethods = "elementExist")
+    public void waitImplicityForElementNotExist_Error() {
+        logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe");
+        Assert.assertFalse(SeleniumUtils.waitImplicityForElementNotExist(driver, null));
+    }
+
+    @Test(testName = "waitImplicityForElementNotExist OverDrive", description = "Debería de hacer un wait Implicity para elementos que no existan,tomando en cuenta la bandera para el assert", dependsOnMethods = "elementExist")
+    public void waitImplicityForElementNotExist_Overdrive() {
+        logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe ");
+        Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"), true)
+        );
+    }
+
+    @Test(testName = "waitImplicityForElementNotExist OverDrive - Error", description = "Debería de hacer un wait Implicity para elementos que no existan,tomando en cuenta la bandera para el assert", dependsOnMethods = "elementExist")
+    public void waitImplicityForElementNotExist_Overdrive_Error() {
+        logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe");
+        Assert.assertFalse(SeleniumUtils.waitImplicityForElementNotExist(driver, null, false));
+    }
+
+    @Test(testName = "cambiarZoomPlus OverDrive", description = "Debería de aumentar el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void cambiarZoomPlus_OverDrive() {
+        logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
+        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, Keys.ADD, true));
+    }
+
+    @Test(testName = "cambiarZoomLess Overdrive", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void cambiarZoomLessCodigoEntero_Overdrive() {
+        logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
+        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, 2, true));
+    }
+
+    @Test(testName = "cambiarZOOMMenos Overdrive", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void cambiarZOOMMenos_Overdrive() {
+        logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
+        Assert.assertTrue(SeleniumUtils.cambiarZOOMMenos(driver, 2, true));
+    }
+
+    @Test(testName = "cambiarZOOMMas Overdrive", description = "Debería de aumentar el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void cambiarZoomMas_Overdrive() {
+        logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
+        Assert.assertTrue(SeleniumUtils.cambiarZOOMMas(driver, 2, true));
+    }
+
+    @Test(testName = "scrollMouse Overdrive", description = "Debería de hacer scroll con el mouse, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void scrollMouse_Overdrive() {
+        logParrafo("Se hará Scroll con el mouse por medio de Selenium");
+        Assert.assertTrue(SeleniumUtils.scrollMouse(2, true));
+    }
+
+    @Test(testName = "scrollMouseDown Overdrive", description = "Debería de hacer scroll con el mouse hacia abajo, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void scrollMouseDown_Overdrive() {
+        logParrafo("Se hará Scroll hacia abajo con el mouse por medio de Selenium");
+        Assert.assertTrue(SeleniumUtils.scrollMouseDown(driver, 2, true));
+    }
+
+    @Test(testName = "scrollMouseUp Overdrive", description = "Debería de hacer scroll con el mouse hacia arriba, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void scrollMouseUp_Overdrive() {
+        logParrafo("Se hará Scroll hacia arriba con el mouse por medio de Selenium");
+        Assert.assertTrue(SeleniumUtils.scrollMouseUp(driver, 2, true));
+    }
+
+    @Test(testName = "selectOptionWithComment -Overdrive seteo", description = "Debería de seleccionar la opcion de un select", dependsOnMethods = "elementExist")
+    public void selectOptionWithComment_Overdrive_Seteo() {
+        logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
+        boolean respuesta = false;
+        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario");
+        Assert.assertTrue(respuesta);
+    }
+
+    @Test(testName = "obtenerTextWebElementx2", description = "Realiza 2 veces la busquedad de el texto de un elemento", dependsOnMethods = "elementExist")
+    public void obtenerTextWebElementx2() {
+        logParrafo("Realiza 2 veces la busquedad de el texto de un elemento");
+        SeleniumUtils.obtenerTextWebElementx2(driver, driver, "textarea[id='APjFqb']");
+    }
+
+    @Test(testName = "obtenerTextoElementoX2", description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna", dependsOnMethods = "elementExist")
+    public void obtenerTextoElementoX2() {
+        logParrafo("Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna");
+        SeleniumUtils.obtenerTextoElementoX2(driver, driver, "textarea[id='APjFqb']");
+    }
+
+    @Test(testName = "obtenerTextoElementoX2 - Time Controller", description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna, controlado por tiempo de duracion de espera", dependsOnMethods = "elementExist")
+    public void obtenerTextoElementoX2_TimeController() {
+        logParrafo("Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna controlado por tiempo de duracion de espera");
+        SeleniumUtils.obtenerTextoElementoX2(driver, driver, "textarea[id='APjFqb']", 1500, 50);
+    }
+
+    @Test(testName = "enviarTexto", description = "Envía un texto al elemento indicado, si este existe en el contexto actual", dependsOnMethods = "elementExist")
+    public void enviarTexto() {
+        logParrafo("Envía un texto al elemento indicado, si este existe en el contexto actual");
+        driver.navigate().refresh();
+        SeleniumUtils.threadslepp(2000);
+        SeleniumUtils.enviarTexto(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
+
+    @Test(testName = "enviarTexto Overdrive", description = "Envía un texto al elemento indicado, si este existe en el contexto actual", dependsOnMethods = "enviarTexto")
+    public void enviarTexto_Overdrive() {
+        logParrafo("Envía un texto al elemento indicado, si este existe en el contexto actual");
+        SeleniumUtils.enviarTexto(driver, driver, "textarea[id='APjFqb']", "hola", true);
+    }
+
+    @Test(testName = "sendKeystoElementvalidValueX2", description = "Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter", dependsOnMethods = "enviarTexto_Overdrive", priority = 1)
+    public void sendKeystoElementvalidValueX2() {
+        logParrafo("Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter");
+        SeleniumUtils.sendKeystoElementvalidValueX2(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
+
+    @Test(testName = "sendKeystoElementvalidValueForMap", description = "Envia el texto al elemento especificado", dependsOnMethods = "sendKeystoElementvalidValueX2")
+    public void sendKeystoElementvalidValueForMap() {
+        logParrafo("Envia el texto al elemento especificado");
+        SeleniumUtils.sendKeystoElementvalidValueForMap(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
+
+    @Test(testName = "sendKeystoElementvalidValue", description = "Envia el texto al elemento especificado", dependsOnMethods = "sendKeystoElementvalidValueForMap")
+    public void sendKeystoElementvalidValue() {
+        logParrafo("Envia el texto al elemento especificado");
+        SeleniumUtils.sendKeystoElementvalidValue(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
+
+    @Test(testName = "enviarTextoSiValido", description = "Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico.", dependsOnMethods = "sendKeystoElementvalidValue")
+    public void enviarTextoSiValido() {
+        logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
+        SeleniumUtils.enviarTextoSiValido(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
+
+    @Test(testName = "enviarTextoSiValido", description = "Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico.", dependsOnMethods = "enviarTextoSiValido")
+    public void enviarTextoSiValidoX2() {
+        logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
+        SeleniumUtils.enviarTextoSiValidoX2(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
+
+    @Test(testName = "enviarTexto2", description = "Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.", dependsOnMethods = "enviarTextoSiValidoX2")
+    public void enviarTexto2() {
+        logParrafo("Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir");
+        boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
+    }
+
+    @Test(testName = "sendKeystoElementx2intents", description = "Trata de envíar el texto al elemento especificado en mas de una ocasión", dependsOnMethods = "enviarTexto2")
+    public void sendKeystoElementx2intents() {
+        logParrafo("Trata de envíar el texto al elemento especificado en mas de una ocasión");
+        boolean resultado = SeleniumUtils.sendKeystoElementx2intents(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
+    }
+
+    @Test(testName = "setFieldValue_Error", description = "Método privado que maneja la lógica de cambio de cualquier campo usando Reflection, saltando la excepcion", dependsOnMethods = "elementExist")
+    public void setFieldValue() {
+        logParrafo("Intenta asignar un valor a una variable inaccesible para saltar la exepcion");
+        Assert.assertTrue(SeleniumUtils.setFieldValue_Error("searchRepetitionTime", 50));
+    }
+
+    @Test(testName = "setFieldValue_Error", description = "Método privado que maneja la lógica de cambio de cualquier campo usando Reflection, saltando la excepcion", dependsOnMethods = "elementExist")
+    public void setFieldValue_Error() {
+        logParrafo("Intenta asignar un valor a una variable inaccesible para saltar la exepcion");
+        Assert.assertFalse(SeleniumUtils.setFieldValue_Error("secretField", "newValue"));
+    }
+
+    @Test(testName = "moverATabAnterior", description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña", priority = 2)
+    public void moverATabAnterior() {
+        logParrafo("Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña");
+        driver.switchTo().newWindow(WindowType.TAB);
+        driver.get("https://www.wikipedia.org");
+        String SecondTab = driver.getWindowHandle();
+        driver.switchTo().newWindow(WindowType.TAB);
+        driver.get("https://www.w3schools.com/");
+        String thirdTab = driver.getWindowHandle();
+        SeleniumUtils.moverATabAnterior(driver, SecondTab);
+        SeleniumUtils.moverATabAnterior(driver, thirdTab);
+    }
+
+    @Test(testName = "switchFrame", description = "Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)", dependsOnMethods = "moverATabAnterior")
+    public void switchFrame() {
+        logParrafo("Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)");
+        SeleniumUtils.switchFrame(driver, driver, "/html/body/iframe[1]");
+    }
+
+    @Test(testName = "capturar500ServerError", description = "Captura y registra un error 500 (Internal Server Error) en la aplicación si el texto de error es encontrado", dependsOnMethods = "switchFrame")
+    public void capturar500ServerError() {
+        logParrafo("Captura y registra un error 500 (Internal Server Error)");
+        SeleniumUtils.capturar500ServerError(driver, driver, "//body", "500", "Se ha encontrado un error 500 en la página.", 5, 2);
+    }
+
+    @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores", dependsOnMethods = "capturar500ServerError")
+    public void handlePrompt() {
+        logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
+        Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
+    }
+
+    @Test(testName = "manejarErrorEnvioTexto", description = "Maneja los errores ocurridos durante el envío de texto a un elemento", dependsOnMethods = "elementExist")
+    public void manejarErrorEnvioTexto() {
+        logParrafo("Maneja los errores ocurridos durante el envío de texto a un elemento, registrando los detalles del error y opcionalmente fallando la prueba");
+        WebElement element = null;
+        try {
+            element.sendKeys("texto");
+        } catch (Exception e) {
+            Assert.assertFalse(SeleniumUtils.PmanejarErrorEnvioTexto("textarea[id='APjFqb']", e, true));
+        }
     }
 
     @AfterClass

@@ -6,7 +6,7 @@ plugins {
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 group = 'io.github.josecarlosbran'
-version = '1.1.3.3'
+version = '1.1.3.4'
 //Publicación en maven
 // ./gradlew clean build javadocJar sourcesJar publish
 //Publicación local
@@ -32,7 +32,7 @@ dependencies {
     //Utilidades Estandar desarrolladas por la Apache Fundation
     implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.apache.commons:commons-compress:1.27.1'
-    implementation 'io.github.josecarlosbran:logsjbsupport:1.0.4'
+    implementation 'io.github.josecarlosbran:logsjbsupport:1.0.5'
 
     implementation 'commons-io:commons-io:2.17.0'
 
@@ -90,11 +90,14 @@ test {
         if (!desc.parent) { // Solo para el suite principal
             def totalTests = result.testCount
             def failedTests = result.failedTestCount
-            def failurePercentage = (failedTests / totalTests) * 100
+            if (totalTests > 0) {
+                def failurePercentage = (failedTests / totalTests) * 100
 
-            if (failurePercentage > 20) {
-                throw new GradleException("Más del 20% de los tests fallaron. Fallos: ${failedTests}, Total: ${totalTests}")
+                if (failurePercentage > 20) {
+                    throw new GradleException("Más del 20% de los tests fallaron. Fallos: ${failedTests}, Total: ${totalTests}")
+                }
             }
+
         }
     }
 

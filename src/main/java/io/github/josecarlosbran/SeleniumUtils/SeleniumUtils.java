@@ -23,11 +23,11 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class SeleniumUtils {
-    private static final String inespecific = "N/E";
-    private static final Integer searchTime = 2500;
-    private static final Integer searchRepetitionTime = 50;
     @Getter(AccessLevel.PACKAGE)
     static ExecutorService seleniumEjecutor = Executors.newCachedThreadPool();
+    private static String inespecific = "N/E";
+    private static Integer searchTime = 2500;
+    private static Integer searchRepetitionTime = 50;
 
     // Métodos para obtener los valores actuales
     public static String getInespecific() {
@@ -39,6 +39,7 @@ public class SeleniumUtils {
         setFieldValue("inespecific", newInespecific);
     }
 
+    // Metodo para obtener el valor searchTime
     public static Integer getSearchTime() {
         return searchTime;
     }
@@ -48,6 +49,7 @@ public class SeleniumUtils {
         setFieldValue("searchTime", newSearchTime);
     }
 
+    // Metodo para obtener el valor searchRepetitionTime
     public static Integer getSearchRepetitionTime() {
         return searchRepetitionTime;
     }
@@ -55,6 +57,15 @@ public class SeleniumUtils {
     // Método para cambiar el valor de 'searchRepetitionTime' usando Reflection
     public static void setSearchRepetitionTime(Integer newSearchRepetitionTime) {
         setFieldValue("searchRepetitionTime", newSearchRepetitionTime);
+    }
+
+    public static boolean setFieldValue_Error(String fieldName, Object newValue) {
+        try {
+            SeleniumUtils.setFieldValue(fieldName, newValue);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     // Método privado que maneja la lógica de cambio de cualquier campo usando Reflection
@@ -289,7 +300,7 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
      * @return Retorna True si el elemento Existe, caso contrario retorna False
      */
-    public static Boolean ElementoExistente(WebDriver driver, SearchContext searchContext, String element) {
+    public static boolean ElementoExistente(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Buscara si existe el elemento indicado: " + element);
@@ -360,7 +371,7 @@ public class SeleniumUtils {
      * @return Retorna True si logra limpiar el elemento, False si no logra limpiar el elemento o sucede un error en la ejecución de esta
      * instrucción.
      */
-    public static Boolean LimpiarElementoExistente(WebDriver driver, SearchContext searchContext, String element) {
+    public static boolean LimpiarElementoExistente(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Si existe el elemento indicado, lo limpiara: " + element);
@@ -614,7 +625,7 @@ public class SeleniumUtils {
      * @param Texto         Texto a envíar al elemento indicado
      * @return Retorna True si encontro el elemento y pudo setear el texto.
      */
-    public static Boolean sendKeysIfElementExist(WebDriver driver, SearchContext searchContext, String element, CharSequence... Texto) {
+    public static boolean sendKeysIfElementExist(WebDriver driver, SearchContext searchContext, String element, CharSequence... Texto) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Si existe el elemento " + element +
@@ -874,7 +885,7 @@ public class SeleniumUtils {
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
      * @return Retorna True si logra hacer clic en el elemento, de lo contrario false
      */
-    public static Boolean clickElementIfExist(WebDriver driver, SearchContext searchContext, String element) {
+    public static boolean clickElementIfExist(WebDriver driver, SearchContext searchContext, String element) {
         //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Si existe el elemento indicado, hará click en el elemento: " + element);
@@ -968,7 +979,7 @@ public class SeleniumUtils {
      * @param element       Atributo del elemento, por medio del cual se realizara la busqueda
      * @return Retorna True si logra hacer clic en el elemento, de lo contrario false
      */
-    public static Boolean clicktoElementx2intents(WebDriver driver, SearchContext searchContext, String element) {
+    public static boolean clicktoElementx2intents(WebDriver driver, SearchContext searchContext, String element) {
         int i = 0;
         while (i < 2) {
             if (SeleniumUtils.clickElementIfExist(driver, searchContext, element)) {
@@ -1003,7 +1014,7 @@ public class SeleniumUtils {
     public static boolean waitImplicity(WebDriver driver, By by) {
         boolean bandera = false;
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
             wait.until(driver1 -> !ElementoDeshabilitado(driver1.findElement(by)));
             bandera = true;
         } catch (TimeoutException ignored) {
@@ -1026,7 +1037,7 @@ public class SeleniumUtils {
     public static boolean waitImplicity(WebDriver driver, By by, boolean banderaAssert) {
         boolean bandera = false;
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
             wait.until(driver1 -> !ElementoDeshabilitado(driver1.findElement(by)));
             bandera = true;
         } catch (TimeoutException ignored) {
@@ -1424,11 +1435,11 @@ public class SeleniumUtils {
      */
     public static void enviarTxtforKeyPress(WebDriver driver, SearchContext searchcontext, String element, String valor) {
         //Pendiente eliminar el texto existente
-        WebElement campo = SeleniumUtils.obtenerWebElementx2(driver, searchcontext, element);
+        WebElement campo = SeleniumUtils.getElementIfExist(driver, searchcontext, element);
         assert campo != null;
         String texto = SeleniumUtils.getTextOfWebElement(driver, campo);
         LogsJB.info("Texto que tiene el elemento: " + texto);
-        if (SeleniumUtils.clicktoElementx2intents(driver, searchcontext, element)) {
+        if (SeleniumUtils.clickElementIfExist(driver, searchcontext, element)) {
             //Elimina carácter por carácter
             for (char c : texto.toCharArray()) {
                 keyPress(driver, KeyEvent.VK_BACK_SPACE);
@@ -1530,7 +1541,7 @@ public class SeleniumUtils {
      */
     public static boolean waitImplicityForElementNotExist(WebDriver driver, By by) {
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
             wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
             return true;
         } catch (TimeoutException ignored) {
@@ -1557,7 +1568,7 @@ public class SeleniumUtils {
      */
     public static boolean waitImplicityForElementNotExist(WebDriver driver, By by, boolean banderaAssert) {
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
             wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
             return true;
         } catch (TimeoutException ignored) {
@@ -1605,7 +1616,7 @@ public class SeleniumUtils {
      */
     public static boolean acceptAlert(WebDriver driver) {
         try {
-            Wait wait = getFluentWait(driver, 5000, 100);
+            Wait wait = getFluentWait(driver, getSearchTime(), getSearchRepetitionTime());
             Alert alert = (Alert) wait.until(ExpectedConditions.alertIsPresent());
             String text = alert.getText();
             LogsJB.info(text);
@@ -1961,7 +1972,7 @@ public class SeleniumUtils {
      */
     public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment, boolean banderaAssert) {
         try {
-            WebElement elemento = obtenerWebElementx2(driver, searchcontext, element);
+            WebElement elemento = SeleniumUtils.getElementIfExist(driver, searchcontext, element);
             if (!Objects.isNull(elemento)) {
                 //Si encuentra el elemento ejecuta este codigo
                 try {
@@ -2011,7 +2022,7 @@ public class SeleniumUtils {
      * @param opcion Opcion del elemento que queremos seleccionar
      */
     public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion) {
-        WebElement elemento = obtenerWebElementx2(driver, searchcontext, element);
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, searchcontext, element);
         try {
             if (!Objects.isNull(elemento)) {
                 //Si encuentra el elemento ejecuta este codigo
@@ -2074,7 +2085,7 @@ public class SeleniumUtils {
         WebElement frame = null;
         int i = 0;
         while (Objects.isNull(frame) && i < 2) {
-            frame = obtenerWebElementx2(driver, searchcontext, frameIDorName);
+            frame = SeleniumUtils.getElementIfExist(driver, searchcontext, frameIDorName);
             i++;
         }
         return movetoframeforwebelement(driver, frame);
@@ -2149,7 +2160,7 @@ public class SeleniumUtils {
      */
     public static boolean subirArchivo(WebDriver driver, String elementoFile, String path) {
         try {
-            WebElement subirArchivo = obtenerWebElementx2(driver, driver, elementoFile);
+            WebElement subirArchivo = SeleniumUtils.getElementIfExist(driver, driver, elementoFile);
             sendKeysToElement(driver, subirArchivo, path);
             String nameFile = Path.of(path).getFileName().toString();
             LogsJB.info("Se subió archivo: " + nameFile);
@@ -2281,8 +2292,10 @@ public class SeleniumUtils {
     public static void enviarTextoX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
         enviarTexto(driver, searchContext, elemento, false, texto);
         keyPress(driver, Keys.ENTER);
+        SeleniumUtils.threadslepp(10);
         enviarTexto(driver, searchContext, elemento, false, texto);
         keyPress(driver, Keys.ENTER);
+        SeleniumUtils.threadslepp(100);
     }
 
     /***
@@ -2347,12 +2360,7 @@ public class SeleniumUtils {
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
         try {
-            if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
-                WebElement elemento = obtenerWebElementx2(driver, searchContext, element);
-                getImageScreeenshotWebElement(driver, elemento);
-                return true;
-            }
-            LogsJB.info("No se encontró el elemento: " + element);
+            return sendKeysIfElementExist(driver, searchContext, element, texto);
         } catch (Exception e) {
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
@@ -2389,12 +2397,7 @@ public class SeleniumUtils {
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
         try {
-            if (enviarTextoX2Intentos(driver, searchContext, element, texto)) {
-                return true;
-            } else {
-                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se envío el Texto");
-            }
-            return enviarTextoX2Intentos(driver, searchContext, element, texto);
+            return sendKeysIfElementExist(driver, searchContext, element, texto);
         } catch (Exception e) {
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
@@ -2419,6 +2422,15 @@ public class SeleniumUtils {
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
         return enviarTexto(driver, searchContext, element, false, texto);
+    }
+
+    public static boolean PmanejarErrorEnvioTexto(String element, Exception e, boolean assertFail) {
+        try {
+            SeleniumUtils.manejarErrorEnvioTexto(element, e, assertFail);
+            return true;
+        } catch (Exception ee) {
+            return false;
+        }
     }
 
     /**
@@ -2496,7 +2508,7 @@ public class SeleniumUtils {
      * @param texto         Texto que deseamos envíar al elmento
      * @return True si logra envíar el texto, de lo contrario false
      */
-    public static Boolean sendKeystoElementx2intents(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
+    public static boolean sendKeystoElementx2intents(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
         int i = 0;
         while (i < 2) {
             if (SeleniumUtils.sendKeysIfElementExist(driver, searchContext, element, texto)) {
@@ -2534,14 +2546,14 @@ public class SeleniumUtils {
      * */
 
     /**
-     * Función para cambiar el contexto del WebDriver para interactuar con un marco (frame) especifico en la BERediseño
+     * Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)
      *
      * @param driver WebDriver es el que cambiará el contexto al marco especificado
      * @param frame  Identificador del marco al que se desea cambiar
      */
     public static void switchFrame(WebDriver driver, SearchContext searchContext, String frame) {
         String cadena = "#" + frame;
-        WebElement iframe = obtenerWebElementx2(driver, searchContext, cadena);
+        WebElement iframe = SeleniumUtils.getElementIfExist(driver, searchContext, cadena);
         driver.switchTo().frame(iframe);
     }
 
@@ -2574,6 +2586,15 @@ public class SeleniumUtils {
             LogsJB.info("*");
             LogsJB.error("El servicio si está habilitado");
             LogsJB.info("*");
+        }
+    }
+
+    public static boolean PhandlePrompt(WebDriver driver, String texto) {
+        try {
+            SeleniumUtils.handlePrompt(driver, texto);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
