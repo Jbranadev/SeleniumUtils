@@ -5,6 +5,7 @@ import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -44,12 +45,12 @@ public class SeleniumUtilsTest {
 //        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
 //        driver = wdm.create();
         WebDriverManager.chromedriver().setup();
-//        ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--no-sandbox");
-//        options.addArguments("--disable-dev-shm-usage");
-//        options.addArguments("--headless");
-//        driver = new ChromeDriver(options);
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--headless");
+        driver = new ChromeDriver(options);
+        //driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.FATAL);
@@ -1080,7 +1081,9 @@ public class SeleniumUtilsTest {
         SeleniumUtils.obtenerTextoElementoX2(driver, driver, "textarea[id='APjFqb']");
     }
 
-    @Test(testName = "obtenerTextoElementoX2 - Time Controller", description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna, controlado por tiempo de duracion de espera", dependsOnMethods = "elementExist")
+    @Test(testName = "obtenerTextoElementoX2 - Time Controller",
+            description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna, controlado por tiempo de duracion de espera",
+            dependsOnMethods = "elementExist")
     public void obtenerTextoElementoX2_TimeController() {
         logParrafo("Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna controlado por tiempo de duracion de espera");
         SeleniumUtils.obtenerTextoElementoX2(driver, driver, "textarea[id='APjFqb']", 1500, 50);
