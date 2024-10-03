@@ -1436,11 +1436,11 @@ public class SeleniumUtils {
      */
     public static void enviarTxtforKeyPress(WebDriver driver, SearchContext searchcontext, String element, String valor) {
         //Pendiente eliminar el texto existente
-        WebElement campo = SeleniumUtils.obtenerWebElementx2(driver, searchcontext, element);
+        WebElement campo = SeleniumUtils.getElementIfExist(driver, searchcontext, element);
         assert campo != null;
         String texto = SeleniumUtils.getTextOfWebElement(driver, campo);
         LogsJB.info("Texto que tiene el elemento: " + texto);
-        if (SeleniumUtils.clicktoElementx2intents(driver, searchcontext, element)) {
+        if (SeleniumUtils.clickElementIfExist(driver, searchcontext, element)) {
             //Elimina carácter por carácter
             for (char c : texto.toCharArray()) {
                 keyPress(driver, KeyEvent.VK_BACK_SPACE);
@@ -1973,7 +1973,7 @@ public class SeleniumUtils {
      */
     public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment, boolean banderaAssert) {
         try {
-            WebElement elemento = obtenerWebElementx2(driver, searchcontext, element);
+            WebElement elemento = SeleniumUtils.getElementIfExist(driver, searchcontext, element);
             if (!Objects.isNull(elemento)) {
                 //Si encuentra el elemento ejecuta este codigo
                 try {
@@ -2023,7 +2023,7 @@ public class SeleniumUtils {
      * @param opcion Opcion del elemento que queremos seleccionar
      */
     public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion) {
-        WebElement elemento = obtenerWebElementx2(driver, searchcontext, element);
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, searchcontext, element);
         try {
             if (!Objects.isNull(elemento)) {
                 //Si encuentra el elemento ejecuta este codigo
@@ -2161,7 +2161,7 @@ public class SeleniumUtils {
      */
     public static boolean subirArchivo(WebDriver driver, String elementoFile, String path) {
         try {
-            WebElement subirArchivo = obtenerWebElementx2(driver, driver, elementoFile);
+            WebElement subirArchivo = SeleniumUtils.getElementIfExist(driver, driver, elementoFile);
             sendKeysToElement(driver, subirArchivo, path);
             String nameFile = Path.of(path).getFileName().toString();
             LogsJB.info("Se subió archivo: " + nameFile);
@@ -2361,7 +2361,7 @@ public class SeleniumUtils {
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
         try {
-            return enviarTextoX2Intentos(driver, searchContext, element, texto);
+            return sendKeysIfElementExist(driver, searchContext, element, texto);
         } catch (Exception e) {
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
@@ -2398,7 +2398,7 @@ public class SeleniumUtils {
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
         try {
-            return enviarTextoX2Intentos(driver, searchContext, element, texto);
+            return sendKeysIfElementExist(driver, searchContext, element, texto);
         } catch (Exception e) {
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element);
             LogsJB.error("Error inesperado al envíar el texto y tomar la captura del elemento: " + element + " " + e.getMessage());
@@ -2554,7 +2554,7 @@ public class SeleniumUtils {
      */
     public static void switchFrame(WebDriver driver, SearchContext searchContext, String frame) {
         String cadena = "#" + frame;
-        WebElement iframe = obtenerWebElementx2(driver, searchContext, cadena);
+        WebElement iframe = SeleniumUtils.getElementIfExist(driver, searchContext, cadena);
         driver.switchTo().frame(iframe);
     }
 
