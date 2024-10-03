@@ -690,10 +690,6 @@ public class SeleniumUtils {
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No logro encontrar y setear el Texto: " + Arrays.toString(Texto) +
                     " en el elemento especificado: " + element);
-        } else {
-            LogsJB.info(" Logro encontrar y setear el Texto: " + Arrays.toString(Texto) +
-                    " en el elemento especificado: " + element);
-            return true;
         }
         //Retorna Falso si el elemento no Existe
         return false;
@@ -2395,17 +2391,8 @@ public class SeleniumUtils {
      * @return true si el texto fue enviado correctamente, false si falló después de los intentos.
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
-        try {
-            return sendKeysIfElementExist(driver, searchContext, element, texto);
-        } catch (Exception e) {
-            LogsJB.error("Error enviando texto al elemento: " + element + ". " + e.getMessage());
-            LogsJB.error("Stacktrace: " + ExceptionUtils.getStackTrace(e));
+        return sendKeysIfElementExist(driver, searchContext, element, texto);
 
-            if (assertFail) {
-                Assert.fail("Error enviando texto al elemento: " + element);
-            }
-        }
-        return false;
     }
 
     /**

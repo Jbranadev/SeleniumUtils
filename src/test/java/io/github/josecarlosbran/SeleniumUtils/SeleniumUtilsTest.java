@@ -1100,6 +1100,12 @@ public class SeleniumUtilsTest {
         SeleniumUtils.enviarTexto(driver, driver, "textarea[id='APjFqb']", "hola", true);
     }
 
+    @Test(testName = "enviarTexto Overdrive_Error", description = "Envía un texto al elemento indicado, si este existe en el contexto actual", dependsOnMethods = "enviarTexto")
+    public void enviarTexto_Overdrive_Error() {
+        logParrafo("Envía un texto al elemento indicado, si este existe en el contexto actual");
+        SeleniumUtils.enviarTexto(driver, driver, "Fallo", "hola", true);
+    }
+
     @Test(testName = "sendKeystoElementvalidValueX2", description = "Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter", dependsOnMethods = "enviarTexto_Overdrive", priority = 1)
     public void sendKeystoElementvalidValueX2() {
         logParrafo("Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter");
@@ -1134,6 +1140,12 @@ public class SeleniumUtilsTest {
     public void enviarTexto2() {
         logParrafo("Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir");
         boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
+    }
+
+    @Test(testName = "enviarTexto2_Error", description = "Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.", dependsOnMethods = "enviarTextoSiValidoX2")
+    public void enviarTexto2_Error() {
+        logParrafo("Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir");
+        boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "NotElementExist", false,"Texto de prueba", "Texto de prueba 2");
     }
 
     @Test(testName = "sendKeystoElementx2intents", description = "Trata de envíar el texto al elemento especificado en mas de una ocasión", dependsOnMethods = "enviarTexto2")
