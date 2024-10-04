@@ -60,7 +60,7 @@ public class SeleniumUtilsTest {
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.DEBUG);
-        SeleniumUtils.setSearchTime(1000);
+        SeleniumUtils.setSearchTime(750);
         SeleniumUtils.setSearchRepetitionTime(50);
     }
 
@@ -831,39 +831,39 @@ public class SeleniumUtilsTest {
         eliminarElementoPorId(driver, "mi-frame-id");
     }
 
-    @Test(testName = "waitImplicity", description = "Debe de dar una espera implicita hasta que aparezca un elemento web ",
-            dependsOnMethods = "movetoframeIDorName")
-    public void waitImplicity() {
-        logParrafo("El método debe de dar una espera, con un máximo de 30 segundos para que aparezca un elemento en específico, si no, lanzará una excepción");
-        boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"));
-        Assert.assertFalse(condicion);
-    }
-
-    @Test(testName = "waitCall", description = "Debería de hacer un waitCall exitosamente",
-            dependsOnMethods = "waitImplicity")
-    public void waitCall() {
-        logParrafo("Debe de llamar al waitCall y retornar sin errores, pasando el driver y la duración");
-        Assert.assertTrue(SeleniumUtils.waitCall(driver, 3));
-    }
-
-    @Test(testName = "waitImplicityForElementNotExist", description = "Debería de hacer un wait Implicity para elementos que no existan",
-            dependsOnMethods = "waitCall")
-    public void waitImplicityForElementNotExist() {
-        logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe ");
-        Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"))
-        );
-    }
-    //Segundo lote de métodos
-//    @Test(testName = "movetoframeforwebelement", description = "Debe de moverse de frame",
-//            dependsOnMethods = "waitImplicityForElementNotExist")
-//    public void movetoframeforwebelement() {
-//        logParrafo("Primero debe de estar creado un frame por medio de javascript, posteriormente debe de cambiarse a ese frame ");
-//        driver.switchTo().defaultContent();
-//        crearFrames("mi-frame-id","mi-frame-clase");
-//        Assert.assertTrue(SeleniumUtils.movetoframeforwebelement(driver, SeleniumUtils.obtenerWebElementx2(driver, driver, "mi-frame-id")));
-//        driver.switchTo().defaultContent();
-//        eliminarElementoPorId(driver, "mi-frame-id");
+    //    @Test(testName = "waitImplicity", description = "Debe de dar una espera implicita hasta que aparezca un elemento web ",
+//            dependsOnMethods = "movetoframeIDorName")
+//    public void waitImplicity() {
+//        logParrafo("El método debe de dar una espera, con un máximo de 30 segundos para que aparezca un elemento en específico, si no, lanzará una excepción");
+//        boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"));
+//        Assert.assertFalse(condicion);
 //    }
+//
+//    @Test(testName = "waitCall", description = "Debería de hacer un waitCall exitosamente",
+//            dependsOnMethods = "waitImplicity")
+//    public void waitCall() {
+//        logParrafo("Debe de llamar al waitCall y retornar sin errores, pasando el driver y la duración");
+//        Assert.assertTrue(SeleniumUtils.waitCall(driver, 3));
+//    }
+//
+//    @Test(testName = "waitImplicityForElementNotExist", description = "Debería de hacer un wait Implicity para elementos que no existan",
+//            dependsOnMethods = "waitCall")
+//    public void waitImplicityForElementNotExist() {
+//        logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe ");
+//        Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"))
+//        );
+//    }
+    //Segundo lote de métodos
+    @Test(testName = "movetoframeforwebelement", description = "Debe de moverse de frame",
+            dependsOnMethods = "movetoframeIDorName")
+    public void movetoframeforwebelement() {
+        logParrafo("Primero debe de estar creado un frame por medio de javascript, posteriormente debe de cambiarse a ese frame ");
+        driver.switchTo().defaultContent();
+        crearFrames("mi-frame-id", "mi-frame-clase");
+        Assert.assertTrue(SeleniumUtils.movetoframeforwebelement(driver, SeleniumUtils.obtenerWebElementx2(driver, driver, "mi-frame-id")));
+        driver.switchTo().defaultContent();
+        eliminarElementoPorId(driver, "mi-frame-id");
+    }
 
     @Test(testName = "NormalizarExito", description = "Debe de retornar el string en mayusculas y normalizado")
     public void NormalizarExito() {
@@ -882,7 +882,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "validarNullExito", description = "Debe de validar si un campo está nulo",
-            dependsOnMethods = "waitImplicityForElementNotExist")
+            dependsOnMethods = "movetoframeIDorName")
     public void ValidarNullExito() {
         String campo = "";
         String nombre = "Nombre";
@@ -1042,23 +1042,24 @@ public class SeleniumUtilsTest {
     public void KeyPress_Int_Overdrive_Error2() {
         SeleniumUtils.keyPress(null, 65, false);
     }
-//    @Test(testName = "getElementIfExist_By", description = "Debería de obtener un elemento By si existe",
-//            dependsOnMethods = "KeyPress_Int_Overdrive_Error2")
-//    public void getElementIfExist_By() {
-//        logParrafo("Se busca un elemento web By para verificar si existe. Si existe, se obtiene su información");
-//        driver.switchTo().defaultContent();
-//        //By elemento = By.xpath("div.Q3DXx");
-//        By elemento = By.tagName("div");
-//        List<WebElement> respuesta = SeleniumUtils.obtenerWebElementsx2(driver, driver, elemento);
-//        Boolean exito = false;
-//        if (!respuesta.isEmpty()) {
-//            exito = true;
-//        }
-//        Assert.assertTrue(exito);
-//    }
+
+    @Test(testName = "getElementIfExist_By", description = "Debería de obtener un elemento By si existe",
+            dependsOnMethods = "KeyPress_Int_Overdrive_Error2")
+    public void getElementIfExist_By() {
+        logParrafo("Se busca un elemento web By para verificar si existe. Si existe, se obtiene su información");
+        driver.switchTo().defaultContent();
+        //By elemento = By.xpath("div.Q3DXx");
+        By elemento = By.tagName("div");
+        List<WebElement> respuesta = SeleniumUtils.obtenerWebElementsx2(driver, driver, elemento);
+        Boolean exito = false;
+        if (!respuesta.isEmpty()) {
+            exito = true;
+        }
+        Assert.assertTrue(exito);
+    }
 
     @Test(testName = "SendKeys Element Search Google", description = "Envia carácter por carácter al elemento especificado",
-            dependsOnMethods = "KeyPress_Int_Overdrive_Error2")
+            dependsOnMethods = "getElementIfExist_By")
     public void enviarTxtforKeyPress() {
         logParrafo("Envia carácter por carácter al elemento especificado");
         SeleniumUtils.enviarTxtforKeyPress(driver, driver, "textarea[id='APjFqb']", "hola");
@@ -1212,14 +1213,16 @@ public class SeleniumUtilsTest {
         logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
         SeleniumUtils.enviarTextoSiValido(driver, driver, "textarea[id='APjFqb']", "hola");
     }
-//    @Test(testName = "enviarTextoSiValido", description = "Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico.", dependsOnMethods = "enviarTextoSiValido")
-//    public void enviarTextoSiValidoX2() {
-//        logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
-//        SeleniumUtils.enviarTextoSiValidoX2(driver, driver, "textarea[id='APjFqb']", "hola");
-//    }
+
+    @Test(testName = "enviarTextoSiValido", description = "Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico.",
+            dependsOnMethods = "enviarTextoSiValido")
+    public void enviarTextoSiValidoX2() {
+        logParrafo(" Envía un texto a un elemento si el valor proporcionado no es nulo, vacío o igual a un valor específico");
+        SeleniumUtils.enviarTextoSiValidoX2(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
 
     @Test(testName = "enviarTexto2", description = "Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir."
-            , dependsOnMethods = "enviarTextoSiValido")
+            , dependsOnMethods = "enviarTextoSiValidoX2")
     public void enviarTexto2() {
         logParrafo("Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir");
         boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
