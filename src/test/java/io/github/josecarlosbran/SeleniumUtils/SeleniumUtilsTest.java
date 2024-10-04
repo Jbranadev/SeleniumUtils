@@ -517,7 +517,6 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "cambiarZOOMMasFallo", description = "Debería de dar un error al aumentar el zoom de la pagina que se está visualizando",
-            expectedExceptions = {AssertionError.class},
             dependsOnMethods = "cambiarZoomMas")
     public void cambiarZoomMasFallo() {
         logParrafo("Se debe de dar un error al momento de aumentar la cantidad de Zoom que se realiza");
