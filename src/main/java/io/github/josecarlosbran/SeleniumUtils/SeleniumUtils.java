@@ -1750,14 +1750,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones) {
-        try {
-            cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
-            return true;
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            return false;
-        }
+            return cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
     }
 
     /***
@@ -1768,17 +1761,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones, boolean banderaAssert) {
-        try {
-            cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
-            return true;
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if (banderaAssert) {
-                Assert.fail("Error inesperado al presionar una tecla: ");
-            }
-            return false;
-        }
+            return cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
     }
 
     /***
@@ -1789,14 +1772,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones) {
-        try {
-            cambiarZOOM(driver, repeticiones, Keys.ADD);
-            return true;
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            return false;
-        }
+            return cambiarZOOM(driver, repeticiones, Keys.ADD);
     }
 
     /***
@@ -1807,17 +1783,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones, boolean banderaAssert) {
-        try {
-            cambiarZOOM(driver, repeticiones, Keys.ADD);
-            return true;
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if (banderaAssert) {
-                Assert.fail("Error inesperado al presionar una tecla: ");
-            }
-            return false;
-        }
+        return cambiarZOOM(driver, repeticiones, Keys.ADD);
     }
 
     /**
@@ -2355,16 +2321,7 @@ public class SeleniumUtils {
      * @param assertFail Bandera para controlar si se quiere controlar el Assert.fail
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
-        try {
             return sendKeysIfElementExist(driver, searchContext, element, texto);
-        } catch (Exception e) {
-            LogsJB.error("Error enviando texto al elemento: " + element + ". " + e.getMessage());
-            LogsJB.error("Stacktrace: " + ExceptionUtils.getStackTrace(e));
-            if (assertFail) {
-                Assert.fail("Error enviando texto al elemento: " + element);
-            }
-        }
-        return false;
     }
 
     /**
@@ -2406,6 +2363,7 @@ public class SeleniumUtils {
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
         return enviarTexto(driver, searchContext, element, false, texto);
     }
+
 //Tercer lote de métodos
 
     /**

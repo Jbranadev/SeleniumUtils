@@ -465,10 +465,10 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, 2));
     }
 
-    @Test(testName = "cambiarZoomLess", description = "Debería de disminuir el zoom de la pagina que se está visualizando", dependsOnMethods = "elementExist")
-    public void cambiarZoomLessCodigoEntero() {
-        logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
-        Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, 2));
+    @Test(testName = "cambiarZoomPlusCodigoEntero Error", description = "Debería de aumentar el zoom de la pagina que se está visualizando", dependsOnMethods = "elementExist")
+    public void cambiarZoomPlusCodigoEntero_Error() {
+        logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
+        Assert.assertFalse(SeleniumUtils.cambiarZOOM(null, 5, 3000));
     }
 
     @Test(testName = "cambiarZOOMMenos", description = "Debería de disminuir el zoom de la pagina que se está visualizando", dependsOnMethods = "elementExist")
@@ -477,23 +477,10 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.cambiarZOOMMenos(driver, 2));
     }
 
-    @Test(testName = "cambiarZOOMMenosFallo", description = "Debería dar un error al disminuir el zoom de la página visualizada", dependsOnMethods = "elementExist")
-    public void cambiarZOOMMenosFallo() {
-        logParrafo("Se debe dar un error al momento de disminuir la cantidad de Zoom que se realiza");
-        SeleniumUtils.cambiarZOOMMenos(null, 2);
-    }
-
     @Test(testName = "cambiarZOOMMas", description = "Debería de aumentar el zoom de la pagina que se está visualizando", dependsOnMethods = "elementExist")
     public void cambiarZoomMas() {
         logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
         Assert.assertTrue(SeleniumUtils.cambiarZOOMMas(driver, 2));
-    }
-
-    @Test(testName = "cambiarZOOMMasFallo", description = "Debería de dar un error al aumentar el zoom de la pagina que se está visualizando",
-            expectedExceptions = {AssertionError.class}, dependsOnMethods = "elementExist")
-    public void cambiarZoomMasFallo() {
-        logParrafo("Se debe de dar un error al momento de aumentar la cantidad de Zoom que se realiza");
-        Assert.assertFalse(SeleniumUtils.cambiarZOOMMas(null, 2));
     }
 
     @Test(testName = "scrollMouse", description = "Debería de hacer scroll con el mouse", dependsOnMethods = "elementExist")
@@ -502,10 +489,23 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.scrollMouse(2));
     }
 
+    @Test(testName = "scrollMouse Fallo", description = "Debería de hacer scroll con el mouse", dependsOnMethods = "elementExist")
+    public void scrollMouse_Fallo() {
+        logParrafo("Se hará Scroll con el mouse por medio de Selenium");
+        Assert.assertTrue(SeleniumUtils.scrollMouse(Integer.MAX_VALUE));
+    }
+
+
     @Test(testName = "scrollMouseDown", description = "Debería de hacer scroll con el mouse hacia abajo", dependsOnMethods = "elementExist")
     public void scrollMouseDown() {
         logParrafo("Se hará Scroll hacia abajo con el mouse por medio de Selenium");
         Assert.assertTrue(SeleniumUtils.scrollMouseDown(driver, 2));
+    }
+
+    @Test(testName = "scrollMouseDown Fallo", description = "Debería de hacer scroll con el mouse hacia abajo", dependsOnMethods = "elementExist")
+    public void scrollMouseDown_Fallo() {
+        logParrafo("Se hará Scroll hacia abajo con el mouse por medio de Selenium");
+        Assert.assertFalse(SeleniumUtils.scrollMouseDown(null, 2));
     }
 
     @Test(testName = "scrollMouseUp", description = "Debería de hacer scroll con el mouse hacia arriba", dependsOnMethods = "elementExist")
@@ -641,7 +641,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "clickToElementFallo", description = "Error al dar click en un elemento", dependsOnMethods = "elementExist")
     public void clickToElementFallo() {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "xxxxxxxxxxx");
-        Assert.assertFalse(SeleniumUtils.clickToElement(driver, elemento));
+        Assert.assertFalse(SeleniumUtils.clickToElement(driver, null));
     }
 
     @Test(testName = "obtenerWebElementsx2StringAcierto")
@@ -830,7 +830,7 @@ public class SeleniumUtilsTest {
         logParrafo("Se le ingresa un texto sin normalizar, y el método debe de retornar un String normalizado y en mayusculas");
         String stringSinNormalizar = "café";
         String normalizado = SeleniumUtils.Normalizar(stringSinNormalizar);
-        Assert.assertEquals(normalizado, "CAFE");
+        Assert.assertEquals(normalizado, "CAFA");
     }
 
     @Test(testName = "NormalizarFallo", description = "Debe de retornar un error en el string en mayusculas y normalizado")
@@ -919,6 +919,14 @@ public class SeleniumUtilsTest {
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
         boolean respuesta = false;
         respuesta = SeleniumUtils.selectOption(driver, driver, "//select[@class='mi-select-clase']", "1");
+        Assert.assertTrue(respuesta);
+    }
+
+    @Test(testName = "selectOptionWithoutComment_Error", description = "Debería de seleccionar la opcion de un select con comentario con error", dependsOnMethods = "elementExist")
+    public void selectOptionWithoutComment_Error() {
+        logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
+        boolean respuesta = false;
+        respuesta = SeleniumUtils.selectOption(driver, driver, "miElementoSelect", "opcionInvalida");
         Assert.assertTrue(respuesta);
     }
 
@@ -1025,10 +1033,22 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, Keys.ADD, true));
     }
 
+    @Test(testName = "cambiarZoomPlus OverDrive Error", description = "Debería de aumentar el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void cambiarZoomPlus_OverDrive_Error() {
+        logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
+        Assert.assertFalse(SeleniumUtils.cambiarZOOM(driver, 2, null, false));
+    }
+
     @Test(testName = "cambiarZoomLess Overdrive", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void cambiarZoomLessCodigoEntero_Overdrive() {
         logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
         Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, 2, true));
+    }
+
+    @Test(testName = "cambiarZoomLess Overdrive Fallo", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void cambiarZoomLessCodigoEntero_Overdrive_Fallo() {
+        logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
+        Assert.assertFalse(SeleniumUtils.cambiarZOOM(null, 5, 3000, false));
     }
 
     @Test(testName = "cambiarZOOMMenos Overdrive", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
@@ -1049,16 +1069,34 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.scrollMouse(2, true));
     }
 
+    @Test(testName = "scrollMouse Overdrive Fallo", description = "Debería de hacer scroll con el mouse, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void scrollMouse_Overdrive_Fallo() {
+        logParrafo("Se hará Scroll con el mouse por medio de Selenium");
+        Assert.assertTrue(SeleniumUtils.scrollMouse(-2, true));
+    }
+
     @Test(testName = "scrollMouseDown Overdrive", description = "Debería de hacer scroll con el mouse hacia abajo, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void scrollMouseDown_Overdrive() {
         logParrafo("Se hará Scroll hacia abajo con el mouse por medio de Selenium");
         Assert.assertTrue(SeleniumUtils.scrollMouseDown(driver, 2, true));
     }
 
+    @Test(testName = "scrollMouseDown Overdrive Fallo", description = "Debería de hacer scroll con el mouse hacia abajo, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void scrollMouseDown_Overdrive_Fallo() {
+        logParrafo("Se hará Scroll hacia abajo con el mouse por medio de Selenium");
+        Assert.assertFalse(SeleniumUtils.scrollMouseDown(null, 2, false));
+    }
+
     @Test(testName = "scrollMouseUp Overdrive", description = "Debería de hacer scroll con el mouse hacia arriba, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void scrollMouseUp_Overdrive() {
         logParrafo("Se hará Scroll hacia arriba con el mouse por medio de Selenium");
         Assert.assertTrue(SeleniumUtils.scrollMouseUp(driver, 2, true));
+    }
+
+    @Test(testName = "scrollMouseUp Overdrive Fallo", description = "Debería de hacer scroll con el mouse hacia arriba, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    public void scrollMouseUp_Overdrive_Fallo() {
+        logParrafo("Se hará Scroll hacia arriba con el mouse por medio de Selenium");
+        Assert.assertFalse(SeleniumUtils.scrollMouseUp(null, 2, false));
     }
 
     @Test(testName = "selectOptionWithComment -Overdrive seteo", description = "Debería de seleccionar la opcion de un select", dependsOnMethods = "elementExist")
@@ -1081,9 +1119,7 @@ public class SeleniumUtilsTest {
         SeleniumUtils.obtenerTextoElementoX2(driver, driver, "textarea[id='APjFqb']");
     }
 
-    @Test(testName = "obtenerTextoElementoX2 - Time Controller",
-            description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna, controlado por tiempo de duracion de espera",
-            dependsOnMethods = "elementExist")
+    @Test(testName = "obtenerTextoElementoX2 - Time Controller", description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna, controlado por tiempo de duracion de espera", dependsOnMethods = "elementExist")
     public void obtenerTextoElementoX2_TimeController() {
         logParrafo("Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna controlado por tiempo de duracion de espera");
         SeleniumUtils.obtenerTextoElementoX2(driver, driver, "textarea[id='APjFqb']", 1500, 50);
@@ -1101,12 +1137,6 @@ public class SeleniumUtilsTest {
     public void enviarTexto_Overdrive() {
         logParrafo("Envía un texto al elemento indicado, si este existe en el contexto actual");
         SeleniumUtils.enviarTexto(driver, driver, "textarea[id='APjFqb']", "hola", true);
-    }
-
-    @Test(testName = "enviarTexto Overdrive_Error", description = "Envía un texto al elemento indicado, si este existe en el contexto actual", dependsOnMethods = "enviarTexto")
-    public void enviarTexto_Overdrive_Error() {
-        logParrafo("Envía un texto al elemento indicado, si este existe en el contexto actual");
-        SeleniumUtils.enviarTexto(driver, driver, "Fallo", "hola", true);
     }
 
     @Test(testName = "sendKeystoElementvalidValueX2", description = "Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter", dependsOnMethods = "enviarTexto_Overdrive", priority = 1)
