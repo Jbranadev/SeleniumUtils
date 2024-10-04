@@ -304,8 +304,6 @@ public class SeleniumUtils {
         }
     }
 
-
-
     /**
      * Función que se utiliza para posicionarse en un elemento, utilizando un controlador WebDriver
      *
@@ -1121,35 +1119,35 @@ public class SeleniumUtils {
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
         while (System.currentTimeMillis() < endTime) {
             try {
-                if (futureId.isDone() && !futureId.get().isEmpty()) {
+                if (futureId.isDone() && !Objects.isNull(futureId.get())) {
                     LogsJB.info("Elementos encontrados por ID: " + futureId.get());
                     return futureId.get();
                 }
-                if (futureClassName.isDone() && !futureClassName.get().isEmpty()) {
+                if (futureClassName.isDone() && !Objects.isNull(futureClassName.get())) {
                     LogsJB.info("Elementos encontrados por ClassName: " + futureClassName.get());
                     return futureClassName.get();
                 }
-                if (futureCss.isDone() && !futureCss.get().isEmpty()) {
+                if (futureCss.isDone() && !Objects.isNull(futureCss.get())) {
                     LogsJB.info("Elementos encontrados por CSS: " + futureCss.get());
                     return futureCss.get();
                 }
-                if (futureTagName.isDone() && !futureTagName.get().isEmpty()) {
+                if (futureTagName.isDone() && !Objects.isNull(futureTagName.get())) {
                     LogsJB.info("Elementos encontrados por TagName: " + futureTagName.get());
                     return futureTagName.get();
                 }
-                if (futureLinkText.isDone() && !futureLinkText.get().isEmpty()) {
+                if (futureLinkText.isDone() && !Objects.isNull(futureLinkText.get())) {
                     LogsJB.info("Elementos encontrados por LinkText: " + futureLinkText.get());
                     return futureLinkText.get();
                 }
-                if (futurePartialLinkText.isDone() && !futurePartialLinkText.get().isEmpty()) {
+                if (futurePartialLinkText.isDone() && !Objects.isNull(futurePartialLinkText.get())) {
                     LogsJB.info("Elementos encontrados por PartialLinkText: " + futurePartialLinkText.get());
                     return futurePartialLinkText.get();
                 }
-                if (futureXpath.isDone() && !futureXpath.get().isEmpty()) {
+                if (futureXpath.isDone() && !Objects.isNull(futureXpath.get())) {
                     LogsJB.info("Elementos encontrados por XPath: " + futureXpath.get());
                     return futureXpath.get();
                 }
-                if (futureName.isDone() && !futureName.get().isEmpty()) {
+                if (futureName.isDone() && !Objects.isNull(futureName.get())) {
                     LogsJB.info("Elementos encontrados por Name: " + futureName.get());
                     return futureName.get();
                 }
@@ -1175,9 +1173,9 @@ public class SeleniumUtils {
      */
     public static boolean movetoframeforwebelement(WebDriver driver, WebElement frame) {
         if (!Objects.isNull(frame)) {
+            LogsJB.info("El Iframe Obtenido no es nulo, es: " + frame);
             driver.switchTo().frame(frame);
             SeleniumUtils.threadslepp(200);
-            LogsJB.info("El Iframe Obtenido no es nulo, es: " + frame);
             return true;
         }
         return false;

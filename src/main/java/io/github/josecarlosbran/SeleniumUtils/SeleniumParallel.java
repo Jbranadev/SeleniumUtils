@@ -234,7 +234,7 @@ public class SeleniumParallel {
                 elementos = wait.until(new Function<>() {
                     public List<WebElement> apply(WebDriver driver) {
                         LogsJB.trace(" Obtiene los elementos por medio de " + identificador.toString());
-                        return searchContext.findElements(identificador);
+                        return searchContext.findElements(identificador).isEmpty() ? null : searchContext.findElements(identificador);
                     }
                 });
             } catch (WebDriverException ignored) {

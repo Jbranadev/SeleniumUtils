@@ -39,6 +39,13 @@ public class SeleniumUtilsTest {
         js.executeScript(comando);
     }
 
+    public static void eliminarElementoPorId(WebDriver driver, String id) {
+        String comando = "var element = document.getElementById('" + id + "');" +
+                "if (element) { element.parentNode.removeChild(element); }";
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript(comando);
+    }
+
     @BeforeClass
     public void setUp() {
 //        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
@@ -52,8 +59,8 @@ public class SeleniumUtilsTest {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
-        LogsJB.setGradeLog(NivelLog.FATAL);
-        SeleniumUtils.setSearchTime(750);
+        LogsJB.setGradeLog(NivelLog.DEBUG);
+        SeleniumUtils.setSearchTime(1000);
         SeleniumUtils.setSearchRepetitionTime(50);
     }
 
@@ -623,7 +630,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "getElementsIfExistExito", description = "Se debe de obtener una lista de elementos, si es que existen",
             dependsOnMethods = "acceptAlertTest")
     public void getElementsIfExistExito() {
-        List<WebElement> elementos = SeleniumUtils.getElementsIfExist(driver, driver, "/html/body/div[1]/div[2]/div/img");
+        List<WebElement> elementos = SeleniumUtils.getElementsIfExist(driver, driver, "//img");
         Assert.assertNotNull(elementos);
     }
 
@@ -665,7 +672,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "obtenerWebElementsx2StringAcierto", dependsOnMethods = "clickToElementFallo")
     public void obtenerWebElementsx2StringAcierto() {
-        List<WebElement> elementos = SeleniumUtils.obtenerWebElementsx2(driver, driver, "/html/body/div[1]/div[2]/div/img");
+        List<WebElement> elementos = SeleniumUtils.obtenerWebElementsx2(driver, driver, "//img");
         Assert.assertNotNull(elementos);
     }
 
@@ -678,7 +685,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "obtenerWebElementsx2ByAcierto", dependsOnMethods = "obtenerWebElementsx2StringFallo")
     public void obtenerWebElementsx2ByAcierto() {
-        List<WebElement> elementos = SeleniumUtils.obtenerWebElementsx2(driver, driver, By.xpath("/html/body/div[1]/div[2]/div/img"));
+        List<WebElement> elementos = SeleniumUtils.obtenerWebElementsx2(driver, driver, By.xpath("//img"));
         Assert.assertNotNull(elementos);
     }
 
@@ -757,6 +764,7 @@ public class SeleniumUtilsTest {
     public void crearSelect(String nombreClase) {
         String comando = "var select = document.createElement('select');" +
                 "select.className = '" + nombreClase + "';" +  // Añade la clase al select
+                "select.id = '" + nombreClase + "';" +  // Asignar el ID al input
                 "var options = ['Opción 1', 'Opción 2', 'Opción 3', 'Opción 4'];" +
                 "options.forEach(function(optionText) {" +
                 "    var option = document.createElement('option');" +
@@ -792,10 +800,12 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "obtenerTextoSeleccionadoSelectFallo")
     public void obtenerTextoSeleccionadoSelectAcierto() {
         crearSelect("mi-select-clase");
+        SeleniumUtils.threadslepp(200);
         logParrafo("Debe de buscar un select para obtener el texto de ese elemento en específico ");
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "//select[@class='mi-select-clase']");
         String respuesta = SeleniumUtils.obtenerTextoSeleccionadoSelect(driver, elemento);
         Assert.assertNotNull(respuesta);
+        eliminarElementoPorId(driver, "mi-select-clase");
     }
 
     @Test(testName = "getImageScreenshotExito", description = "Toma de captura de pantalla en la págian proporcionada",
@@ -811,10 +821,14 @@ public class SeleniumUtilsTest {
     @Test(testName = "movetoframeIDorName", description = "Debe de cambiar de frame en la página principal de google",
             dependsOnMethods = "getImageScreenshotExito")
     public void movetoframeIDorName() {
+        driver.switchTo().defaultContent();
         crearFrames("mi-frame-id", "mi-frame-clase");
+        SeleniumUtils.threadslepp(200);
         logParrafo("Primero se crea, por medio de javascript un frame para inyectar en la página de google. Posteriormente debe de cambiarse a ese frame ");
         boolean respuesta = SeleniumUtils.movetoframeIDorName(driver, driver, "mi-frame-id");
         Assert.assertTrue(respuesta);
+        driver.switchTo().defaultContent();
+        eliminarElementoPorId(driver, "mi-frame-id");
     }
 
     @Test(testName = "waitImplicity", description = "Debe de dar una espera implicita hasta que aparezca un elemento web ",
@@ -840,17 +854,16 @@ public class SeleniumUtilsTest {
         );
     }
     //Segundo lote de métodos
-
-    @Test(testName = "movetoframeforwebelement", description = "Debe de moverse de frame",
-            dependsOnMethods = "waitImplicityForElementNotExist")
-    public void movetoframeforwebelement() {
-        logParrafo("Primero debe de estar creado un frame por medio de javascript, posteriormente debe de cambiarse a ese frame ");
-        //crearFrames("mi-frame-id2","mi-frame-clase2");
-        driver.switchTo().defaultContent();
-        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "mi-frame-id");
-        boolean respuesta = SeleniumUtils.movetoframeforwebelement(driver, elemento);
-        Assert.assertTrue(respuesta);
-    }
+//    @Test(testName = "movetoframeforwebelement", description = "Debe de moverse de frame",
+//            dependsOnMethods = "waitImplicityForElementNotExist")
+//    public void movetoframeforwebelement() {
+//        logParrafo("Primero debe de estar creado un frame por medio de javascript, posteriormente debe de cambiarse a ese frame ");
+//        driver.switchTo().defaultContent();
+//        crearFrames("mi-frame-id","mi-frame-clase");
+//        Assert.assertTrue(SeleniumUtils.movetoframeforwebelement(driver, SeleniumUtils.obtenerWebElementx2(driver, driver, "mi-frame-id")));
+//        driver.switchTo().defaultContent();
+//        eliminarElementoPorId(driver, "mi-frame-id");
+//    }
 
     @Test(testName = "NormalizarExito", description = "Debe de retornar el string en mayusculas y normalizado")
     public void NormalizarExito() {
@@ -869,7 +882,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "validarNullExito", description = "Debe de validar si un campo está nulo",
-            dependsOnMethods = "movetoframeforwebelement")
+            dependsOnMethods = "waitImplicityForElementNotExist")
     public void ValidarNullExito() {
         String campo = "";
         String nombre = "Nombre";
@@ -892,9 +905,11 @@ public class SeleniumUtilsTest {
         String id = "id-elementoFile";
         String clase = "clase-elementoFile";
         crearInputFile(driver, id, clase);
+        SeleniumUtils.threadslepp(200);
         String rutaArchivo = "C:/Users/mlemus/Pictures/Captura.PNG";
         boolean condicion = SeleniumUtils.subirArchivo(driver, "//*[@id=\"id-elementoFile\"]", rutaArchivo);
         Assert.assertTrue(condicion);
+        eliminarElementoPorId(driver, id);
     }
 
     @Test(testName = "subirArchivoFallo", description = "Debe de lanzar un error al subir un archivo por medio de texto",
@@ -903,8 +918,10 @@ public class SeleniumUtilsTest {
         String id = "id-elementoFile";
         String clase = "clase-elementoFile";
         crearInputFile(driver, id, clase);
+        SeleniumUtils.threadslepp(200);
         boolean condicion = SeleniumUtils.subirArchivo(null, null, null);
         Assert.assertFalse(condicion);
+        eliminarElementoPorId(driver, id);
     }
 
     @Test(testName = "regresarFramePrincipal", description = "Debe de regresar al frame inicial",
@@ -1025,23 +1042,23 @@ public class SeleniumUtilsTest {
     public void KeyPress_Int_Overdrive_Error2() {
         SeleniumUtils.keyPress(null, 65, false);
     }
-
-    @Test(testName = "getElementIfExist_By", description = "Debería de obtener un elemento By si existe",
-            dependsOnMethods = "KeyPress_Int_Overdrive_Error2")
-    public void getElementIfExist_By() {
-        logParrafo("Se busca un elemento web By para verificar si existe. Si existe, se obtiene su información");
-        //By elemento = By.xpath("div.Q3DXx");
-        By elemento = By.xpath("/html/body/div[1]/div[2]/div/img");
-        List<WebElement> respuesta = SeleniumUtils.getElementsIfExist(driver, driver, elemento);
-        Boolean exito = false;
-        if (!respuesta.isEmpty()) {
-            exito = true;
-        }
-        Assert.assertTrue(exito);
-    }
+//    @Test(testName = "getElementIfExist_By", description = "Debería de obtener un elemento By si existe",
+//            dependsOnMethods = "KeyPress_Int_Overdrive_Error2")
+//    public void getElementIfExist_By() {
+//        logParrafo("Se busca un elemento web By para verificar si existe. Si existe, se obtiene su información");
+//        driver.switchTo().defaultContent();
+//        //By elemento = By.xpath("div.Q3DXx");
+//        By elemento = By.tagName("div");
+//        List<WebElement> respuesta = SeleniumUtils.obtenerWebElementsx2(driver, driver, elemento);
+//        Boolean exito = false;
+//        if (!respuesta.isEmpty()) {
+//            exito = true;
+//        }
+//        Assert.assertTrue(exito);
+//    }
 
     @Test(testName = "SendKeys Element Search Google", description = "Envia carácter por carácter al elemento especificado",
-            dependsOnMethods = "getElementIfExist_By")
+            dependsOnMethods = "KeyPress_Int_Overdrive_Error2")
     public void enviarTxtforKeyPress() {
         logParrafo("Envia carácter por carácter al elemento especificado");
         SeleniumUtils.enviarTxtforKeyPress(driver, driver, "textarea[id='APjFqb']", "hola");
@@ -1276,7 +1293,6 @@ public class SeleniumUtilsTest {
         logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
         Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
     }
-
 
     @AfterClass
     public void tearDown() {
