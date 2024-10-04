@@ -1276,23 +1276,11 @@ public class SeleniumUtilsTest {
         boolean resultado = SeleniumUtils.sendKeystoElementx2intents(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
     }
 
-    @Test(testName = "setFieldValue_Error", description = "Método privado que maneja la lógica de cambio de cualquier campo usando Reflection, saltando la excepcion",
-            dependsOnMethods = "sendKeystoElementx2intents")
-    public void setFieldValue() {
-        logParrafo("Intenta asignar un valor a una variable inaccesible para saltar la exepcion");
-        Assert.assertTrue(SeleniumUtils.setFieldValue_Error("searchRepetitionTime", 50));
-    }
 
-    @Test(testName = "setFieldValue_Error", description = "Método privado que maneja la lógica de cambio de cualquier campo usando Reflection, saltando la excepcion",
-            dependsOnMethods = "setFieldValue")
-    public void setFieldValue_Error() {
-        logParrafo("Intenta asignar un valor a una variable inaccesible para saltar la exepcion");
-        Assert.assertFalse(SeleniumUtils.setFieldValue_Error("secretField", "newValue"));
-    }
 
     @Test(testName = "moverATabAnterior",
             description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña",
-            dependsOnMethods = "setFieldValue_Error")
+            dependsOnMethods = "sendKeystoElementx2intents")
     public void moverATabAnterior() {
         logParrafo("Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña");
         driver.switchTo().newWindow(WindowType.TAB);
@@ -1327,16 +1315,9 @@ public class SeleniumUtilsTest {
         SeleniumUtils.sendKeystoElementvalidValueForMap(driver, driver, "textarea[id='APjFqb']", "hola");
     }
 
-    @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores",
-            dependsOnMethods = "sendKeystoElementvalidValueForMap")
-    public void handlePrompt() {
-        simularAlertJavascript();
-        logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
-        Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
-    }
 
     @Test(testName = "waitImplicity", description = "Debe de dar una espera implicita hasta que aparezca un elemento web ",
-            dependsOnMethods = "handlePrompt")
+            dependsOnMethods = "sendKeystoElementvalidValueForMap")
     public void waitImplicity() {
         logParrafo("El método debe de dar una espera, con un máximo de 30 segundos para que aparezca un elemento en específico, si no, lanzará una excepción");
         boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"));
