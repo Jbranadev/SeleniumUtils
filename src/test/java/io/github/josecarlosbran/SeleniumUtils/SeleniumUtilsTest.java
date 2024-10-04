@@ -1255,28 +1255,32 @@ public class SeleniumUtilsTest {
         logParrafo("Intenta asignar un valor a una variable inaccesible para saltar la exepcion");
         Assert.assertFalse(SeleniumUtils.setFieldValue_Error("secretField", "newValue"));
     }
-//    @Test(testName = "moverATabAnterior", description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña", priority = 2)
-//    public void moverATabAnterior() {
-//        logParrafo("Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña");
-//        driver.switchTo().newWindow(WindowType.TAB);
-//        driver.get("https://www.wikipedia.org");
-//        String SecondTab = driver.getWindowHandle();
-//        driver.switchTo().newWindow(WindowType.TAB);
-//        driver.get("https://www.w3schools.com/");
-//        String thirdTab = driver.getWindowHandle();
-//        SeleniumUtils.moverATabAnterior(driver, SecondTab);
-//        SeleniumUtils.moverATabAnterior(driver, thirdTab);
-//    }
-//    @Test(testName = "switchFrame", description = "Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)",
-//            dependsOnMethods = "setFieldValue_Error")
-//    public void switchFrame() {
-//        logParrafo("Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)");
-//        SeleniumUtils.switchFrame(driver, driver, "/html/body/iframe[1]");
-//    }
+
+    @Test(testName = "moverATabAnterior",
+            description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña",
+            dependsOnMethods = "setFieldValue_Error")
+    public void moverATabAnterior() {
+        logParrafo("Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña");
+        driver.switchTo().newWindow(WindowType.TAB);
+        driver.get("https://www.wikipedia.org");
+        String SecondTab = driver.getWindowHandle();
+        driver.switchTo().newWindow(WindowType.TAB);
+        driver.get("https://www.w3schools.com/");
+        String thirdTab = driver.getWindowHandle();
+        SeleniumUtils.moverATabAnterior(driver, SecondTab);
+        SeleniumUtils.moverATabAnterior(driver, thirdTab);
+    }
+
+    @Test(testName = "switchFrame", description = "Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)",
+            dependsOnMethods = "moverATabAnterior")
+    public void switchFrame() {
+        logParrafo("Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)");
+        SeleniumUtils.switchFrame(driver, driver, "/html/body/iframe[1]");
+    }
 
     @Test(testName = "capturar500ServerError",
             description = "Captura y registra un error 500 (Internal Server Error) en la aplicación si el texto de error es encontrado",
-            dependsOnMethods = "setFieldValue_Error")
+            dependsOnMethods = "switchFrame")
     public void capturar500ServerError() {
         logParrafo("Captura y registra un error 500 (Internal Server Error)");
         SeleniumUtils.capturar500ServerError(driver, driver, "//body", "500", "Se ha encontrado un error 500 en la página.", 5, 2);
