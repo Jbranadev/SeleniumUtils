@@ -59,15 +59,6 @@ public class SeleniumUtils {
         setFieldValue("searchRepetitionTime", newSearchRepetitionTime);
     }
 
-    public static boolean setFieldValue_Error(String fieldName, Object newValue) {
-        try {
-            SeleniumUtils.setFieldValue(fieldName, newValue);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     // Método privado que maneja la lógica de cambio de cualquier campo usando Reflection
     private static void setFieldValue(String fieldName, Object newValue) {
         try {
@@ -2502,15 +2493,6 @@ public class SeleniumUtils {
             LogsJB.info("*");
             LogsJB.error("El servicio si está habilitado");
             LogsJB.info("*");
-        }
-    }
-
-    public static boolean PhandlePrompt(WebDriver driver, String texto) {
-        try {
-            SeleniumUtils.handlePrompt(driver, texto);
-            return true;
-        } catch (Exception e) {
-            return false;
         }
     }
 

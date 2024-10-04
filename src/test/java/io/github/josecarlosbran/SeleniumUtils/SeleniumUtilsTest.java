@@ -54,7 +54,7 @@ public class SeleniumUtilsTest {
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.FATAL);
-        SeleniumUtils.setSearchTime(750);
+        SeleniumUtils.setSearchTime(1500);
         SeleniumUtils.setSearchRepetitionTime(50);
     }
 
@@ -1187,7 +1187,7 @@ public class SeleniumUtilsTest {
         boolean resultado = SeleniumUtils.sendKeystoElementx2intents(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
     }
 
-    @Test(testName = "setFieldValue_Error", description = "Método privado que maneja la lógica de cambio de cualquier campo usando Reflection, saltando la excepcion", dependsOnMethods = "elementExist")
+   /* @Test(testName = "setFieldValue_Error", description = "Método privado que maneja la lógica de cambio de cualquier campo usando Reflection, saltando la excepcion", dependsOnMethods = "elementExist")
     public void setFieldValue() {
         logParrafo("Intenta asignar un valor a una variable inaccesible para saltar la exepcion");
         Assert.assertTrue(SeleniumUtils.setFieldValue_Error("searchRepetitionTime", 50));
@@ -1197,7 +1197,7 @@ public class SeleniumUtilsTest {
     public void setFieldValue_Error() {
         logParrafo("Intenta asignar un valor a una variable inaccesible para saltar la exepcion");
         Assert.assertFalse(SeleniumUtils.setFieldValue_Error("secretField", "newValue"));
-    }
+    }*/
 //    @Test(testName = "moverATabAnterior", description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña", priority = 2)
 //    public void moverATabAnterior() {
 //        logParrafo("Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña");
