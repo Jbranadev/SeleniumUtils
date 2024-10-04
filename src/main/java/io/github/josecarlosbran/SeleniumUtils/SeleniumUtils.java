@@ -244,26 +244,67 @@ public class SeleniumUtils {
             }
             // Limpiar el elemento
             element.clear();
-            LogsJB.debug("Limpió el elemento.");
+            String text = SeleniumUtils.getTextOfWebElement(driver, element);
+            //Quiero que en lugar de obtener los atributos, si la cadena no esta vacía, se limpie el elemento,
+            // limpiando el inner text, el value y por medio de java script
+            if (!cadenaNulaoVacia(text)) {
+                return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
+            }
+            LogsJB.debug("Limpió el elemento por medio del API estandar de selenium.");
             SeleniumUtils.posicionarmeEn(driver, element);
             return true;
         } catch (ElementNotInteractableException e) {
             LogsJB.warning("Capturó ElementNotInteractableException. Intentará limpiar mediante JavaScript.");
-            try {
-                // Utilizar JavaScript para borrar el contenido del elemento
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                jsExecutor.executeScript("arguments[0].value = '';", element);
-                LogsJB.debug("Limpió el elemento por medio de JavaScript.");
-                return true;
-            } catch (Exception jsException) {
-                LogsJB.fatal("Excepción capturada al intentar limpiar mediante JavaScript: " + ExceptionUtils.getStackTrace(jsException));
-                return false;
-            }
+            return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
         } catch (Exception e) {
             LogsJB.fatal("Excepción capturada al intentar limpiar el elemento: " + ExceptionUtils.getStackTrace(e));
             return false;
         }
     }
+
+    /**
+     * Limpia el elemento por medio de javascript
+     *
+     * @param driver  Driver que manipula el navegador
+     * @param element Elemento que se desea limpiar
+     * @return True si logra limpiar el elemento, False si no logra limpiar el elemento o si sucede un error.
+     */
+    public static boolean limpiarTextUsingJavaScript(WebDriver driver, WebElement element) {
+        try {
+            if (Objects.isNull(element)) {
+                LogsJB.warning("El elemento es nulo. No se puede limpiar.");
+                return false;
+            }
+            // Utilizar JavaScript para borrar el contenido del elemento
+            String text = SeleniumUtils.getTextOfWebElement(driver, element);
+            if (!cadenaNulaoVacia(text)) {
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].innerText = '';", element);
+                text = SeleniumUtils.getTextOfWebElement(driver, element);
+            }
+            if (!cadenaNulaoVacia(text)) {
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].value = '';", element);
+                text = SeleniumUtils.getTextOfWebElement(driver, element);
+            }
+            if (!cadenaNulaoVacia(text)) {
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].textContent = '';", element);
+                text = SeleniumUtils.getTextOfWebElement(driver, element);
+            }
+            if (!cadenaNulaoVacia(text)) {
+                LogsJB.debug("No fue posible limpiar el elmento por medio de JavaScript.");
+                return false;
+            }
+            LogsJB.debug("Limpió el elemento por medio de JavaScript.");
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Excepción capturada al intentar limpiar mediante JavaScript: " + ExceptionUtils.getStackTrace(e));
+            return false;
+        }
+    }
+
+
 
     /**
      * Función que se utiliza para posicionarse en un elemento, utilizando un controlador WebDriver
