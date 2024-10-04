@@ -235,23 +235,62 @@ public class SeleniumUtils {
             }
             // Limpiar el elemento
             element.clear();
-            LogsJB.debug("Limpió el elemento.");
+            String text = SeleniumUtils.getTextOfWebElement(driver, element);
+            //Quiero que en lugar de obtener los atributos, si la cadena no esta vacía, se limpie el elemento,
+            // limpiando el inner text, el value y por medio de java script
+            if (!cadenaNulaoVacia(text)) {
+                return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
+            }
+            LogsJB.debug("Limpió el elemento por medio del API estandar de selenium.");
             SeleniumUtils.posicionarmeEn(driver, element);
             return true;
         } catch (ElementNotInteractableException e) {
             LogsJB.warning("Capturó ElementNotInteractableException. Intentará limpiar mediante JavaScript.");
-            try {
-                // Utilizar JavaScript para borrar el contenido del elemento
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                jsExecutor.executeScript("arguments[0].value = '';", element);
-                LogsJB.debug("Limpió el elemento por medio de JavaScript.");
-                return true;
-            } catch (Exception jsException) {
-                LogsJB.fatal("Excepción capturada al intentar limpiar mediante JavaScript: " + ExceptionUtils.getStackTrace(jsException));
-                return false;
-            }
+            return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
         } catch (Exception e) {
             LogsJB.fatal("Excepción capturada al intentar limpiar el elemento: " + ExceptionUtils.getStackTrace(e));
+            return false;
+        }
+    }
+
+    /**
+     * Limpia el elemento por medio de javascript
+     *
+     * @param driver  Driver que manipula el navegador
+     * @param element Elemento que se desea limpiar
+     * @return True si logra limpiar el elemento, False si no logra limpiar el elemento o si sucede un error.
+     */
+    public static boolean limpiarTextUsingJavaScript(WebDriver driver, WebElement element) {
+        try {
+            if (Objects.isNull(element)) {
+                LogsJB.warning("El elemento es nulo. No se puede limpiar.");
+                return false;
+            }
+            // Utilizar JavaScript para borrar el contenido del elemento
+            String text = SeleniumUtils.getTextOfWebElement(driver, element);
+            if (!cadenaNulaoVacia(text)) {
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].innerText = '';", element);
+                text = SeleniumUtils.getTextOfWebElement(driver, element);
+            }
+            if (!cadenaNulaoVacia(text)) {
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].value = '';", element);
+                text = SeleniumUtils.getTextOfWebElement(driver, element);
+            }
+            if (!cadenaNulaoVacia(text)) {
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].textContent = '';", element);
+                text = SeleniumUtils.getTextOfWebElement(driver, element);
+            }
+            if (!cadenaNulaoVacia(text)) {
+                LogsJB.debug("No fue posible limpiar el elmento por medio de JavaScript.");
+                return false;
+            }
+            LogsJB.debug("Limpió el elemento por medio de JavaScript.");
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Excepción capturada al intentar limpiar mediante JavaScript: " + ExceptionUtils.getStackTrace(e));
             return false;
         }
     }
@@ -1071,35 +1110,35 @@ public class SeleniumUtils {
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
         while (System.currentTimeMillis() < endTime) {
             try {
-                if (futureId.isDone() && !futureId.get().isEmpty()) {
+                if (futureId.isDone() && !Objects.isNull(futureId.get())) {
                     LogsJB.info("Elementos encontrados por ID: " + futureId.get());
                     return futureId.get();
                 }
-                if (futureClassName.isDone() && !futureClassName.get().isEmpty()) {
+                if (futureClassName.isDone() && !Objects.isNull(futureClassName.get())) {
                     LogsJB.info("Elementos encontrados por ClassName: " + futureClassName.get());
                     return futureClassName.get();
                 }
-                if (futureCss.isDone() && !futureCss.get().isEmpty()) {
+                if (futureCss.isDone() && !Objects.isNull(futureCss.get())) {
                     LogsJB.info("Elementos encontrados por CSS: " + futureCss.get());
                     return futureCss.get();
                 }
-                if (futureTagName.isDone() && !futureTagName.get().isEmpty()) {
+                if (futureTagName.isDone() && !Objects.isNull(futureTagName.get())) {
                     LogsJB.info("Elementos encontrados por TagName: " + futureTagName.get());
                     return futureTagName.get();
                 }
-                if (futureLinkText.isDone() && !futureLinkText.get().isEmpty()) {
+                if (futureLinkText.isDone() && !Objects.isNull(futureLinkText.get())) {
                     LogsJB.info("Elementos encontrados por LinkText: " + futureLinkText.get());
                     return futureLinkText.get();
                 }
-                if (futurePartialLinkText.isDone() && !futurePartialLinkText.get().isEmpty()) {
+                if (futurePartialLinkText.isDone() && !Objects.isNull(futurePartialLinkText.get())) {
                     LogsJB.info("Elementos encontrados por PartialLinkText: " + futurePartialLinkText.get());
                     return futurePartialLinkText.get();
                 }
-                if (futureXpath.isDone() && !futureXpath.get().isEmpty()) {
+                if (futureXpath.isDone() && !Objects.isNull(futureXpath.get())) {
                     LogsJB.info("Elementos encontrados por XPath: " + futureXpath.get());
                     return futureXpath.get();
                 }
-                if (futureName.isDone() && !futureName.get().isEmpty()) {
+                if (futureName.isDone() && !Objects.isNull(futureName.get())) {
                     LogsJB.info("Elementos encontrados por Name: " + futureName.get());
                     return futureName.get();
                 }
@@ -1125,9 +1164,9 @@ public class SeleniumUtils {
      */
     public static boolean movetoframeforwebelement(WebDriver driver, WebElement frame) {
         if (!Objects.isNull(frame)) {
+            LogsJB.info("El Iframe Obtenido no es nulo, es: " + frame);
             driver.switchTo().frame(frame);
             SeleniumUtils.threadslepp(200);
-            LogsJB.info("El Iframe Obtenido no es nulo, es: " + frame);
             return true;
         }
         return false;
