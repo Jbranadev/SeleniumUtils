@@ -848,28 +848,7 @@ public class SeleniumUtilsTest {
         eliminarElementoPorId(driver, "mi-frame-id");
     }
 
-    //    @Test(testName = "waitImplicity", description = "Debe de dar una espera implicita hasta que aparezca un elemento web ",
-//            dependsOnMethods = "movetoframeIDorName")
-//    public void waitImplicity() {
-//        logParrafo("El método debe de dar una espera, con un máximo de 30 segundos para que aparezca un elemento en específico, si no, lanzará una excepción");
-//        boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"));
-//        Assert.assertFalse(condicion);
-//    }
-//
-//    @Test(testName = "waitCall", description = "Debería de hacer un waitCall exitosamente",
-//            dependsOnMethods = "waitImplicity")
-//    public void waitCall() {
-//        logParrafo("Debe de llamar al waitCall y retornar sin errores, pasando el driver y la duración");
-//        Assert.assertTrue(SeleniumUtils.waitCall(driver, 3));
-//    }
-//
-//    @Test(testName = "waitImplicityForElementNotExist", description = "Debería de hacer un wait Implicity para elementos que no existan",
-//            dependsOnMethods = "waitCall")
-//    public void waitImplicityForElementNotExist() {
-//        logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe ");
-//        Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"))
-//        );
-//    }
+
     //Segundo lote de métodos
     @Test(testName = "movetoframeforwebelement", description = "Debe de moverse de frame",
             dependsOnMethods = "movetoframeIDorName")
@@ -1354,6 +1333,30 @@ public class SeleniumUtilsTest {
         logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
         Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
     }
+
+    @Test(testName = "waitImplicity", description = "Debe de dar una espera implicita hasta que aparezca un elemento web ",
+            dependsOnMethods = "handlePrompt")
+    public void waitImplicity() {
+        logParrafo("El método debe de dar una espera, con un máximo de 30 segundos para que aparezca un elemento en específico, si no, lanzará una excepción");
+        boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"));
+        Assert.assertFalse(condicion);
+    }
+
+    @Test(testName = "waitImplicityForElementNotExist", description = "Debería de hacer un wait Implicity para elementos que no existan",
+            dependsOnMethods = "waitImplicity")
+    public void waitImplicityForElementNotExist() {
+        logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe ");
+        Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"))
+        );
+    }
+
+    @Test(testName = "waitCall", description = "Debería de hacer un waitCall exitosamente",
+            dependsOnMethods = "waitImplicityForElementNotExist")
+    public void waitCall() {
+        logParrafo("Debe de llamar al waitCall y retornar sin errores, pasando el driver y la duración");
+        Assert.assertTrue(SeleniumUtils.waitCall(driver, 1));
+    }
+
 
     @AfterClass
     public void tearDown() {
