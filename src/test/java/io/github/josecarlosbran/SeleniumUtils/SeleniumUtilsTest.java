@@ -5,7 +5,6 @@ import com.josebran.LogsJB.Numeracion.NivelLog;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -45,12 +44,12 @@ public class SeleniumUtilsTest {
 //        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
 //        driver = wdm.create();
         WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--headless");
-        driver = new ChromeDriver(options);
-        //driver = new ChromeDriver();
+//        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("--no-sandbox");
+//        options.addArguments("--disable-dev-shm-usage");
+//        options.addArguments("--headless");
+//        driver = new ChromeDriver(options);
+        driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.FATAL);
@@ -101,7 +100,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "KeyPress Using Keys",
             description = "Verifica que se puede presionar una tecla utilizando el objeto Keys",
-            dependsOnMethods = "elementExist")
+            dependsOnMethods = "clearElementIfExists")
     public void keyPressUsingKeys() {
         logParrafo("Se va a presionar la tecla ENTER utilizando Keys");
         WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
@@ -112,7 +111,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "KeyPress Using ASCII Code",
             description = "Verifica que se puede presionar una tecla utilizando un código ASCII",
-            dependsOnMethods = "elementExist")
+            dependsOnMethods = "keyPressUsingKeys")
     public void keyPressUsingAsciiCode() {
         logParrafo("Se va a presionar la tecla 'A' utilizando su código ASCII");
         WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
@@ -126,7 +125,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "KeyPress Using Keys",
             description = "Verifica que se puede presionar una tecla utilizando Keys",
-            dependsOnMethods = "elementExist")
+            dependsOnMethods = "keyPressUsingAsciiCode")
     public void KeyPressUsingKeys() {
         logParrafo("Se va a presionar la tecla '-->' utilizando su Keys ");
         WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
@@ -384,16 +383,7 @@ public class SeleniumUtilsTest {
         LogsJB.waitForOperationComplete();
         Assert.assertTrue(variable, "No se logro hacer click en el elemento");
     }
-/*
-    @Test(testName = "clickElementIfExistBran")
-    public void clickElementIfExistBran() {
-        logParrafo("Se debe de dar click en un elemento especificado");
-        driver.get("http://10.253.15.109/SIB/transaction/LOGON.asp");
-        Boolean variable = SeleniumUtils.clickElementIfExist(driver, driver, "input[type='submit'][value='Conectar']");
-        LogsJB.waitForOperationComplete();
-        Assert.assertTrue(variable, "No se logro hacer click en el elemento");
-    }
-    */
+
 
     @Test(testName = "clickElementIfExistFallo", description = "Should make click in the specified element", dependsOnMethods = "elementExist")
     public void clickElementIfExistFallo() {
@@ -551,17 +541,6 @@ public class SeleniumUtilsTest {
             Assert.assertFalse(exito);
         }
     }
-//    @Test(testName = "waitImplicity",description = "Cambia de frame al enviado",dependsOnMethods = "elementExist")
-//    public void waitImplicity(){
-//        logParrafo("Espera a que apareza el elemento deseado");
-//        boolean exito = false;
-//        exito = SeleniumUtils.waitImplicity(driver,By.id("hfcr"));
-//        if (exito){
-//            Assert.assertTrue(exito);
-//        }else{
-//            Assert.assertFalse(exito);
-//        }
-//    }
 
     @Test(testName = "CambiarFrame", description = "Cambia de frame al enviado", dependsOnMethods = "elementExist")
     public void CambiarFrame() {
@@ -681,13 +660,6 @@ public class SeleniumUtilsTest {
         String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "xxxxxxxxxxxxxxxxxx");
         Assert.assertNull(elemento);
     }
-
-    /*
-    @Test(testName = "getTextIfElementExistConTiempoExito", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
-    public void getTextIfElementExistConTiempoExito() {
-        String elemento = SeleniumUtils.getTextIfElementExist(driver, driver, "/html/body/div[1]/div[6]/div[1]", 4, 2);
-        Assert.assertNotNull(elemento);
-    }*/
 
     @Test(testName = "getTextIfElementExistConTiempoFallo", description = "Obtiene el texto de un elemento web", dependsOnMethods = "elementExist")
     public void getTextIfElementExistConTiempoFallo() {
@@ -1114,11 +1086,6 @@ public class SeleniumUtilsTest {
         logParrafo("Envia el texto al elemento especificado 2 veces seguidas, confirmando con un enter");
         SeleniumUtils.sendKeystoElementvalidValueX2(driver, driver, "textarea[id='APjFqb']", "hola");
     }
-//    @Test(testName = "sendKeystoElementvalidValueForMap", description = "Envia el texto al elemento especificado", dependsOnMethods = "sendKeystoElementvalidValueX2")
-//    public void sendKeystoElementvalidValueForMap() {
-//        logParrafo("Envia el texto al elemento especificado");
-//        SeleniumUtils.sendKeystoElementvalidValueForMap(driver, driver, "textarea[id='APjFqb']", "hola");
-//    }
 
     @Test(testName = "sendKeystoElementvalidValue", description = "Envia el texto al elemento especificado", dependsOnMethods = "sendKeystoElementvalidValueX2")
     public void sendKeystoElementvalidValue() {
@@ -1193,13 +1160,22 @@ public class SeleniumUtilsTest {
         logParrafo("Captura y registra un error 500 (Internal Server Error)");
         SeleniumUtils.capturar500ServerError(driver, driver, "//body", "500", "Se ha encontrado un error 500 en la página.", 5, 2);
     }
-//    @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores",
-//            dependsOnMethods = "capturar500ServerError")
-//    public void handlePrompt() {
-//        simularAlertJavascript();
-//        logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
-//        Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
-//    }
+
+    @Test(testName = "sendKeystoElementvalidValueForMap", description = "Envia el texto al elemento especificado",
+            dependsOnMethods = "capturar500ServerError")
+    public void sendKeystoElementvalidValueForMap() {
+        logParrafo("Envia el texto al elemento especificado");
+        SeleniumUtils.sendKeystoElementvalidValueForMap(driver, driver, "textarea[id='APjFqb']", "hola");
+    }
+
+    @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores",
+            dependsOnMethods = "sendKeystoElementvalidValueForMap")
+    public void handlePrompt() {
+        simularAlertJavascript();
+        logParrafo("Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores");
+        Assert.assertFalse(SeleniumUtils.PhandlePrompt(driver, "TuNombre"));
+    }
+
 
     @AfterClass
     public void tearDown() {
