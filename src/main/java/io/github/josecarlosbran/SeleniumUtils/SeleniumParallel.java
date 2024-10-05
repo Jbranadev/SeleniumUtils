@@ -14,7 +14,6 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 
 public class SeleniumParallel {
-
     /**
      * Obtiene el identificador del tipo de localizador a utilizar para realizar la busqueda
      *
@@ -70,10 +69,7 @@ public class SeleniumParallel {
                 }
             } catch (WebDriverException ignored) {
             } catch (Exception e) {
-                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + locator + " : " + element);
-                LogsJB.fatal("*");
-                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
-                LogsJB.fatal("*");
+                printError(e, " Exepcion Capturada - al tratar de verificar si un elemento existe por medio de " + locator + " : " + element);
             } finally {
                 return exist;
             }
@@ -116,10 +112,7 @@ public class SeleniumParallel {
                 });
             } catch (WebDriverException ignored) {
             } catch (Exception e) {
-                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + locator + " : " + element);
-                LogsJB.fatal("*");
-                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
-                LogsJB.fatal("*");
+                printError(e, " Exepcion Capturada - al tratar de limpiar un elemento por medio de " + locator + " : " + element);
             } finally {
                 return exist;
             }
@@ -164,10 +157,7 @@ public class SeleniumParallel {
                 });
             } catch (WebDriverException ignored) {
             } catch (Exception e) {
-                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + locator + " : " + element);
-                LogsJB.fatal("*");
-                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
-                LogsJB.fatal("*");
+                printError(e, " Exepcion Capturada - al tratar de enviar texto a un elemento por medio de " + locator + " : " + element);
             } finally {
                 return exist;
             }
@@ -203,10 +193,7 @@ public class SeleniumParallel {
                 });
             } catch (WebDriverException ignored) {
             } catch (Exception e) {
-                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + locator + " : " + element);
-                LogsJB.fatal("*");
-                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
-                LogsJB.fatal("*");
+                printError(e, " Exepcion Capturada - al tratar de obtener el texto de un elemento por medio de " + locator + " : " + element);
             } finally {
                 return result;
             }
@@ -247,10 +234,7 @@ public class SeleniumParallel {
                 });
             } catch (WebDriverException ignored) {
             } catch (Exception e) {
-                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + locator + " : " + element);
-                LogsJB.fatal("*");
-                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
-                LogsJB.fatal("*");
+                printError(e, " Exepcion Capturada - al tratar de hacer click en un elemento por medio de " + locator + " : " + element);
             } finally {
                 return exist;
             }
@@ -281,10 +265,7 @@ public class SeleniumParallel {
                 });
             } catch (WebDriverException ignored) {
             } catch (Exception e) {
-                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + locator + " : " + element);
-                LogsJB.fatal("*");
-                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
-                LogsJB.fatal("*");
+                printError(e, " Exepcion Capturada - al tratar de obtener una lista de elementos por medio de " + locator + " : " + element);
             } finally {
                 return elementos;
             }
@@ -316,14 +297,18 @@ public class SeleniumParallel {
                 });
             } catch (WebDriverException ignored) {
             } catch (Exception e) {
-                LogsJB.fatal(" Exepcion Capturada - Busquedad por medio de " + locator + " : " + element);
-                LogsJB.fatal("*");
-                LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e));
-                LogsJB.fatal("*");
+                printError(e, " Exepcion Capturada - al tratar de obtener un elemento por medio de " + locator + " : " + element);
             } finally {
                 return elemento[0];
             }
         };
         return SeleniumUtils.getSeleniumEjecutor().submit(run);
+    }
+
+    protected static void printError(Exception e, String mensaje) {
+        LogsJB.fatal(mensaje, 1);
+        LogsJB.fatal("*", 1);
+        LogsJB.fatal(" " + ExceptionUtils.getStackTrace(e), 1);
+        LogsJB.fatal("*", 1);
     }
 }

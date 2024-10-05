@@ -4,7 +4,6 @@ import com.josebran.LogsJB.LogsJB;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.*;
@@ -64,8 +63,7 @@ public class SeleniumUtils {
         try {
             FieldUtils.writeDeclaredStaticField(SeleniumUtils.class, fieldName, newValue, true);
         } catch (IllegalAccessException e) {
-            LogsJB.fatal("Error inesperado al Cambiar el valor de: " + fieldName + "valor: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al Cambiar el valor de: " + fieldName + "valor: " + e.getMessage());
         }
     }
 
@@ -79,8 +77,7 @@ public class SeleniumUtils {
             Actions actions = new Actions(driver);
             actions.sendKeys(codigo).perform();
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al presionar una tecla: ");
         }
     }
 
@@ -95,8 +92,7 @@ public class SeleniumUtils {
             Actions actions = new Actions(driver);
             actions.sendKeys(codigo).perform();
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al presionar una tecla: ");
             if (controlAssert) {
                 Assert.fail("Error inesperado al presionar una tecla: ");
             }
@@ -114,8 +110,7 @@ public class SeleniumUtils {
             Actions actions = new Actions(driver);
             actions.keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).perform();
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al presionar una tecla: ");
         }
     }
 
@@ -131,8 +126,7 @@ public class SeleniumUtils {
             Actions actions = new Actions(driver);
             actions.keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).perform();
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al presionar una tecla: ");
             if (controlAssert) {
                 Assert.fail("Error inesperado al presionar una tecla: ");
             }
@@ -182,7 +176,7 @@ public class SeleniumUtils {
             // Si se llega hasta aquí, el elemento está habilitado y visible
             return false;
         } catch (Exception e) {
-            LogsJB.fatal("Excepción al intentar verificar si el elemento está deshabilitado: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al verificar si el elemento está deshabilitado: ");
             return true; // En caso de excepción, consideramos el elemento como deshabilitado
         }
     }
@@ -201,9 +195,7 @@ public class SeleniumUtils {
             }
             return array;
         } catch (Exception e) {
-            LogsJB.fatal("error al parsear el Objeto object a strings");
-            LogsJB.fatal(e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al convertir un array de objetos en un ArrayList de cadenas: ");
         }
         return null;
     }
@@ -216,8 +208,7 @@ public class SeleniumUtils {
         try {
             Thread.sleep(milisegundos);
         } catch (Exception e) {
-            LogsJB.fatal("Se ha capturado un error en thread sleep");
-            LogsJB.fatal("Stacktrace de la exception capturada: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al hacer una pausa en el hilo de ejecución: ");
         }
     }
 
@@ -248,7 +239,7 @@ public class SeleniumUtils {
             LogsJB.warning("Capturó ElementNotInteractableException. Intentará limpiar mediante JavaScript.");
             return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
         } catch (Exception e) {
-            LogsJB.fatal("Excepción capturada al intentar limpiar el elemento: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al intentar limpiar el elemento: ");
             return false;
         }
     }
@@ -290,7 +281,7 @@ public class SeleniumUtils {
             LogsJB.debug("Limpió el elemento por medio de JavaScript.");
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Excepción capturada al intentar limpiar mediante JavaScript: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al intentar limpiar el elemento por medio de JavaScript: ");
             return false;
         }
     }
@@ -317,8 +308,7 @@ public class SeleniumUtils {
                 actions.moveToElement(elemento).perform();
             } catch (WebDriverException e5) {
                 // Capturar la excepción final si todas las opciones fallan
-                LogsJB.fatal("Todas las opciones de scroll han fallado para el elemento: " + elemento);
-                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e5));
+                SeleniumParallel.printError(e5, "Todas las opciones de scroll han fallado para el elemento: " + elemento.toString());
             }
         }
     }
@@ -377,8 +367,7 @@ public class SeleniumUtils {
                     return true;
                 }
             } catch (Exception e) {
-                LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
-                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
             }
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
@@ -453,8 +442,7 @@ public class SeleniumUtils {
                     return futureName.get();
                 }
             } catch (Exception e) {
-                LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
-                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
             }
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
@@ -512,8 +500,7 @@ public class SeleniumUtils {
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
             return null;
         } catch (Exception e) {
-            LogsJB.fatal("Excepción capturada al tomar la captura de pantalla");
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al tomar la captura de pantalla del elemento: ");
             return null;
         }
         return null;
@@ -548,7 +535,6 @@ public class SeleniumUtils {
         return null;
     }
 
-
     /**
      * Actualiza la referencia al elemento si está disponible en el contexto actual de selenium
      *
@@ -577,8 +563,7 @@ public class SeleniumUtils {
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
             return null;
         } catch (Exception e) {
-            LogsJB.fatal("Excepción al refrescar el elemento");
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al refrescar el elemento: ");
             return null;
         }
         return null;
@@ -627,9 +612,8 @@ public class SeleniumUtils {
                 result = false;
             }
         } catch (Exception e) {
-            LogsJB.fatal("Excepción capturada al intentar enviar el texto" + Arrays.toString(keysToSend) +
+            SeleniumParallel.printError(e, "Error inesperado al intentar enviar el texto: " + Arrays.toString(keysToSend) +
                     " al  elemento: " + element.toString());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             result = false;
         } finally {
             return result;
@@ -701,8 +685,7 @@ public class SeleniumUtils {
                     return futureName.get();
                 }
             } catch (Exception e) {
-                LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
-                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
             }
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
@@ -791,8 +774,7 @@ public class SeleniumUtils {
                     break;
                 }
             } catch (Exception e) {
-                LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
-                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
             }
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
@@ -869,8 +851,7 @@ public class SeleniumUtils {
                 text = getTextUsingJavaScript(driver, element);
             }
         } catch (WebDriverException e) {
-            LogsJB.fatal("El elemento ya no existe en el contexto actual ");
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error al intentar obtener el texto del elemento: ");
         }
         if (cadenaNulaoVacia(text)) {
             LogsJB.warning(" No se pudo obtener el texto del elemento, comuníquese con los administradores ");
@@ -889,7 +870,7 @@ public class SeleniumUtils {
             JavascriptExecutor jsExecutor = (JavascriptExecutor) driver; // Asegúrate de tener una instancia válida de WebDriver
             return (String) jsExecutor.executeScript("return arguments[0].textContent", element);
         } catch (Exception e) {
-            LogsJB.fatal("Error al intentar obtener el texto mediante JavaScript: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error al intentar obtener el texto mediante JavaScript: ");
             return "";
         }
     }
@@ -971,8 +952,7 @@ public class SeleniumUtils {
                     }
                 }
             } catch (Exception e) {
-                LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
-                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
             }
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
@@ -1032,8 +1012,7 @@ public class SeleniumUtils {
             bandera = true;
         } catch (TimeoutException ignored) {
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al esperar la aparicion del elemento: ");
         } finally {
             return bandera;
         }
@@ -1055,8 +1034,7 @@ public class SeleniumUtils {
             bandera = true;
         } catch (TimeoutException ignored) {
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al esperar la aparicion del elemento: ");
             if (banderaAssert) {
                 Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
             }
@@ -1130,8 +1108,7 @@ public class SeleniumUtils {
                     return futureName.get();
                 }
             } catch (Exception e) {
-                LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
-                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
             }
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
@@ -1247,8 +1224,7 @@ public class SeleniumUtils {
                     }
                 }
             } catch (Exception e) {
-                LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
-                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
             }
         }
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
@@ -1433,7 +1409,7 @@ public class SeleniumUtils {
             retorno = getTextOfWebElement(driver, proceso.getFirstSelectedOption());
             return retorno;
         } catch (Exception e) {
-            LogsJB.fatal(e.getMessage());
+            SeleniumParallel.printError(e, "Error al intentar obtener el texto de la opción seleccionada: ");
             return "fatal";
         }
     }
@@ -1487,9 +1463,7 @@ public class SeleniumUtils {
             driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
             return true;
         } catch (Exception e) {
-            LogsJB.info("----------------------");
-            LogsJB.fatal(e.getMessage());
-            LogsJB.info("----------------------");
+            SeleniumParallel.printError(e, "Error al intentar modificar el tiempo de espera: ");
             return false;
         }
     }
@@ -1560,14 +1534,7 @@ public class SeleniumUtils {
         } catch (TimeoutException ignored) {
             return false;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
-            LogsJB.fatal("*");
-            LogsJB.fatal(" " + e);
-            LogsJB.fatal(" Tipo de Excepción : " + e.getClass());
-            LogsJB.fatal(" Causa de la Excepción : " + e.getCause());
-            LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
-            LogsJB.fatal("*");
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al esperar la aparicion del elemento: ");
             return false;
         }
     }
@@ -1587,14 +1554,7 @@ public class SeleniumUtils {
         } catch (TimeoutException ignored) {
             return false;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparicion del elemento: " + by);
-            LogsJB.fatal("*");
-            LogsJB.fatal(" " + e);
-            LogsJB.fatal(" Tipo de Excepción : " + e.getClass());
-            LogsJB.fatal(" Causa de la Excepción : " + e.getCause());
-            LogsJB.fatal(" Mensaje de la Excepción : " + e.getMessage());
-            LogsJB.fatal("*");
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al esperar la aparicion del elemento: ");
             if (banderaAssert) {
                 Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
             }
@@ -1614,11 +1574,11 @@ public class SeleniumUtils {
             js.executeScript("window.confirm=function(){return " + aceptar + "}");
             return true;
         } catch (WebDriverException e) {
-            LogsJB.fatal("Error WebDriver al interactuar con la alerta: " + e.getMessage());
+            SeleniumParallel.printError(e, "Error WebDriver al interactuar con la alerta: ");
             return false;
             // Puedes agregar más manejo de excepciones específicas según sea necesario
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
+            SeleniumParallel.printError(e, "Error WebDriver al interactuar con la alerta: ");
             return false;
         }
     }
@@ -1642,11 +1602,11 @@ public class SeleniumUtils {
             jsExecutor.executeScript("window.alert = function() {};");
             return false;
         } catch (WebDriverException e) {
-            LogsJB.fatal("Error WebDriver al interactuar con la alerta: " + e.getMessage());
+            SeleniumParallel.printError(e, "Error WebDriver al interactuar con la alerta: ");
             return false;
             // Puedes agregar más manejo de excepciones específicas según sea necesario
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al esperar la aparición del elemento: " + e.getMessage());
+            SeleniumParallel.printError(e, "Error WebDriver al interactuar con la alerta: ");
             return false;
         }
     }
@@ -1670,8 +1630,7 @@ public class SeleniumUtils {
             }
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al Cambiar Zoom: ");
             return false;
         }
     }
@@ -1695,8 +1654,7 @@ public class SeleniumUtils {
             }
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al Cambiar Zoom: ");
             if (banderaAssert) {
                 Assert.fail("Error inesperado al presionar una tecla: ");
             }
@@ -1724,8 +1682,7 @@ public class SeleniumUtils {
             }
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al cambiar el Zoom: ");
             return false;
         }
     }
@@ -1750,8 +1707,7 @@ public class SeleniumUtils {
             }
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al cambiar el Zoom: ");
             if (banderaAssert) {
                 Assert.fail("Error inesperado al presionar una tecla: ");
             }
@@ -1821,8 +1777,7 @@ public class SeleniumUtils {
             threadslepp(100);
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al realizar un el scroll: ");
             return false;
         }
     }
@@ -1845,8 +1800,7 @@ public class SeleniumUtils {
             threadslepp(100);
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al realizar un el scroll: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al realizar un el scroll: ");
             if (banderaAssert) {
                 Assert.fail("Error inesperado al intentar realizar el scroll: ");
             }
@@ -1868,8 +1822,7 @@ public class SeleniumUtils {
             }
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al realizar el scroll: ");
             return false;
         }
     }
@@ -1888,8 +1841,7 @@ public class SeleniumUtils {
             }
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al realizar el scroll: ");
             if (banderaAssert) {
                 Assert.fail("Error inesperado al intentar realizar el scroll: ");
             }
@@ -1911,8 +1863,7 @@ public class SeleniumUtils {
             }
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al realizar el scroll: ");
             return false;
         }
     }
@@ -1931,8 +1882,7 @@ public class SeleniumUtils {
             }
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al realizar el scroll: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al realizar el scroll: ");
             if (banderaAssert) {
                 Assert.fail("Error inesperado al intentar realizar el scroll: ");
             }
@@ -1971,8 +1921,7 @@ public class SeleniumUtils {
             }
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al seleccionar el elemento: " + element);
             if (banderaAssert) {
                 Assert.fail("Error inesperado al seleccionar el elemento: " + element);
             }
@@ -2036,8 +1985,7 @@ public class SeleniumUtils {
             }
             return true;
         } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al seleccionar el elemento: " + element + " " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al seleccionar el elemento: " + element);
         }
         return false;
     }
@@ -2095,8 +2043,7 @@ public class SeleniumUtils {
                 return true;
             }
         } catch (Exception e) {
-            LogsJB.fatal("Excepción capturada al intentar hacer clic en el elemento: " + element.toString());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error inesperado al intentar hacer clic en el elemento: " + element);
             return false;
         }
     }
@@ -2145,7 +2092,7 @@ public class SeleniumUtils {
             LogsJB.info("Se subió archivo: " + nameFile);
             return true;
         } catch (Exception e) {
-            LogsJB.error("No se pudo subir el archivo: " + ExceptionUtils.getStackTrace(e));
+            SeleniumParallel.printError(e, "Error al subir archivo: ");
             return false;
         }
     }
@@ -2162,7 +2109,7 @@ public class SeleniumUtils {
             LogsJB.info("Se regresa al frame inicial");
             return true;
         } catch (Exception ex) {
-            LogsJB.error("Error al cambiar al frame principal: " + ex.getMessage());
+            SeleniumParallel.printError(ex, "Error al cambiar al frame principal: ");
             return false;
         }
     }
@@ -2195,7 +2142,7 @@ public class SeleniumUtils {
             LogsJB.info("Ejecutado comando JS: " + comandoJs);
             return true;
         } catch (Exception ex) {
-            LogsJB.error("Error ejecutando comando JS: " + comandoJs + ". StackTrace: " + ExceptionUtils.getStackTrace(ex));
+            SeleniumParallel.printError(ex, "Error al ejecutar comando JS: " + comandoJs);
             return false;
         }
     }
