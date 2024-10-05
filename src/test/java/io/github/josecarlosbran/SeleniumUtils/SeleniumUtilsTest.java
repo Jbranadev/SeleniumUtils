@@ -61,7 +61,7 @@ public class SeleniumUtilsTest {
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.DEBUG);
-        SeleniumUtils.setSearchTime(750);
+        SeleniumUtils.setSearchTime(1000);
         SeleniumUtils.setSearchRepetitionTime(50);
     }
 
