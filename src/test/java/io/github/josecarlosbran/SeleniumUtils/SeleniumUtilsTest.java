@@ -849,7 +849,6 @@ public class SeleniumUtilsTest {
         eliminarElementoPorId(driver, "mi-frame-id");
     }
 
-
     //Segundo lote de métodos
     @Test(testName = "movetoframeforwebelement", description = "Debe de moverse de frame",
             dependsOnMethods = "movetoframeIDorName")
@@ -971,6 +970,7 @@ public class SeleniumUtilsTest {
         respuesta = SeleniumUtils.selectOption(driver, driver, "//select[@class='mi-select-clase']", "1");
         Assert.assertTrue(respuesta);
     }
+
     @Test(testName = "selectOptionWithoutComment_Error", description = "Debería de seleccionar la opcion de un select con comentario con error", dependsOnMethods = "elementExist")
     public void selectOptionWithoutComment_Error() {
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
@@ -1276,8 +1276,6 @@ public class SeleniumUtilsTest {
         boolean resultado = SeleniumUtils.sendKeystoElementx2intents(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
     }
 
-
-
     @Test(testName = "moverATabAnterior",
             description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña",
             dependsOnMethods = "sendKeystoElementx2intents")
@@ -1315,7 +1313,6 @@ public class SeleniumUtilsTest {
         SeleniumUtils.sendKeystoElementvalidValueForMap(driver, driver, "textarea[id='APjFqb']", "hola");
     }
 
-
     @Test(testName = "waitImplicity", description = "Debe de dar una espera implicita hasta que aparezca un elemento web ",
             dependsOnMethods = "sendKeystoElementvalidValueForMap")
     public void waitImplicity() {
@@ -1338,7 +1335,6 @@ public class SeleniumUtilsTest {
         logParrafo("Debe de llamar al waitCall y retornar sin errores, pasando el driver y la duración");
         Assert.assertTrue(SeleniumUtils.waitCall(driver, 1));
     }
-
 
     @AfterClass
     public void tearDown() {
