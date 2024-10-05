@@ -59,15 +59,6 @@ public class SeleniumUtils {
         setFieldValue("searchRepetitionTime", newSearchRepetitionTime);
     }
 
-    public static boolean setFieldValue_Error(String fieldName, Object newValue) {
-        try {
-            SeleniumUtils.setFieldValue(fieldName, newValue);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     // Método privado que maneja la lógica de cambio de cualquier campo usando Reflection
     private static void setFieldValue(String fieldName, Object newValue) {
         try {
@@ -244,23 +235,62 @@ public class SeleniumUtils {
             }
             // Limpiar el elemento
             element.clear();
-            LogsJB.debug("Limpió el elemento.");
+            String text = SeleniumUtils.getTextOfWebElement(driver, element);
+            //Quiero que en lugar de obtener los atributos, si la cadena no esta vacía, se limpie el elemento,
+            // limpiando el inner text, el value y por medio de java script
+            if (!cadenaNulaoVacia(text)) {
+                return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
+            }
+            LogsJB.debug("Limpió el elemento por medio del API estandar de selenium.");
             SeleniumUtils.posicionarmeEn(driver, element);
             return true;
         } catch (ElementNotInteractableException e) {
             LogsJB.warning("Capturó ElementNotInteractableException. Intentará limpiar mediante JavaScript.");
-            try {
-                // Utilizar JavaScript para borrar el contenido del elemento
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                jsExecutor.executeScript("arguments[0].value = '';", element);
-                LogsJB.debug("Limpió el elemento por medio de JavaScript.");
-                return true;
-            } catch (Exception jsException) {
-                LogsJB.fatal("Excepción capturada al intentar limpiar mediante JavaScript: " + ExceptionUtils.getStackTrace(jsException));
-                return false;
-            }
+            return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
         } catch (Exception e) {
             LogsJB.fatal("Excepción capturada al intentar limpiar el elemento: " + ExceptionUtils.getStackTrace(e));
+            return false;
+        }
+    }
+
+    /**
+     * Limpia el elemento por medio de javascript
+     *
+     * @param driver  Driver que manipula el navegador
+     * @param element Elemento que se desea limpiar
+     * @return True si logra limpiar el elemento, False si no logra limpiar el elemento o si sucede un error.
+     */
+    public static boolean limpiarTextUsingJavaScript(WebDriver driver, WebElement element) {
+        try {
+            if (Objects.isNull(element)) {
+                LogsJB.warning("El elemento es nulo. No se puede limpiar.");
+                return false;
+            }
+            // Utilizar JavaScript para borrar el contenido del elemento
+            String text = SeleniumUtils.getTextOfWebElement(driver, element);
+            if (!cadenaNulaoVacia(text)) {
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].innerText = '';", element);
+                text = SeleniumUtils.getTextOfWebElement(driver, element);
+            }
+            if (!cadenaNulaoVacia(text)) {
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].value = '';", element);
+                text = SeleniumUtils.getTextOfWebElement(driver, element);
+            }
+            if (!cadenaNulaoVacia(text)) {
+                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].textContent = '';", element);
+                text = SeleniumUtils.getTextOfWebElement(driver, element);
+            }
+            if (!cadenaNulaoVacia(text)) {
+                LogsJB.debug("No fue posible limpiar el elmento por medio de JavaScript.");
+                return false;
+            }
+            LogsJB.debug("Limpió el elemento por medio de JavaScript.");
+            return true;
+        } catch (Exception e) {
+            LogsJB.fatal("Excepción capturada al intentar limpiar mediante JavaScript: " + ExceptionUtils.getStackTrace(e));
             return false;
         }
     }
@@ -530,7 +560,7 @@ public class SeleniumUtils {
                 if (term.endsWith("]}")) {
                     // Eliminar los últimos dos carácteres
                     term = term.substring(0, term.length() - 2);
-                } else if (term.endsWith("]]") && StringUtils.equalsIgnoreCase(locator, "xpath")) {
+                } else if (term.endsWith("]]") && (StringUtils.equalsIgnoreCase(locator, "xpath") || StringUtils.equalsIgnoreCase(locator, "css selector"))) {
                     // Eliminar los últimos dos carácteres
                     term = term.substring(0, term.length() - 1);
                 }
@@ -626,35 +656,74 @@ public class SeleniumUtils {
      * @return Retorna True si encontro el elemento y pudo setear el texto.
      */
     public static boolean sendKeysIfElementExist(WebDriver driver, SearchContext searchContext, String element, CharSequence... Texto) {
+        //Para optimizar el tiempo de respuestá
+        LogsJB.debug("* ");
+        LogsJB.debug(" Si existe el elemento " + element +
+                ", enviara el texto: " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
+        LogsJB.debug("* ");
+        CountDownLatch latchId = new CountDownLatch(1);
+        CountDownLatch latchClassName = new CountDownLatch(1);
+        CountDownLatch latchCss = new CountDownLatch(1);
+        CountDownLatch latchTagName = new CountDownLatch(1);
+        CountDownLatch latchLinkText = new CountDownLatch(1);
+        CountDownLatch latchPartialLinkText = new CountDownLatch(1);
+        CountDownLatch latchXpath = new CountDownLatch(1);
+        CountDownLatch latchName = new CountDownLatch(1);
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
-
-        List<By> strategies = Arrays.asList(
-                By.id(element),
-                By.className(element),
-                By.cssSelector(element),
-                By.tagName(element),
-                By.linkText(element),
-                By.partialLinkText(element),
-                By.xpath(element),
-                By.name(element)
-        );
-
-        for (By strategy : strategies) {
+// Declaración de features para obtener el resultado de buscar los elementos en cuestión
+        Future<Boolean> futureId = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.id(element), latchId, Texto);
+        Future<Boolean> futureClassName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.className(element), latchClassName, Texto);
+        Future<Boolean> futureCss = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.cssSelector(element), latchCss, Texto);
+        Future<Boolean> futureTagName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.tagName(element), latchTagName, Texto);
+        Future<Boolean> futureLinkText = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.linkText(element), latchLinkText, Texto);
+        Future<Boolean> futurePartialLinkText = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.partialLinkText(element), latchPartialLinkText, Texto);
+        Future<Boolean> futureXpath = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.xpath(element), latchXpath, Texto);
+        Future<Boolean> futureName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.name(element), latchName, Texto);
+        //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        // Esperará saber si existe el elemento en alguno de los tipos usando Future
+        while (System.currentTimeMillis() < endTime) {
             try {
-                WebElement webElement = wait.until(ExpectedConditions.presenceOfElementLocated(strategy));
-                if (webElement != null) {
-                    webElement.sendKeys(Texto);
-                    return true;
+                if (latchId.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureId.get();
+                }
+                if (latchClassName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureClassName.get();
+                }
+                if (latchCss.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureCss.get();
+                }
+                if (latchTagName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureTagName.get();
+                }
+                if (latchLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureLinkText.get();
+                }
+                if (latchPartialLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futurePartialLinkText.get();
+                }
+                if (latchXpath.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureXpath.get();
+                }
+                if (latchName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
+                    return futureName.get();
                 }
             } catch (Exception e) {
-                LogsJB.debug("No se encontró el elemento usando: " + strategy.toString());
+                LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
+                LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-
-        LogsJB.info("No se logró encontrar y setear el texto: " + Arrays.toString(Texto) + " en el elemento especificado: " + element);
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+        if (System.currentTimeMillis() >= endTime) {
+            LogsJB.info(" No logro encontrar y setear el Texto: " + Arrays.toString(Texto) +
+                    " en el elemento especificado: " + element);
+        }
+        //Retorna Falso si el elemento no Existe
         return false;
     }
-
 
     /***
      * Obtiene el texto del elemento indicado, si este existe en el contexto actual
@@ -677,54 +746,76 @@ public class SeleniumUtils {
      * @return Retorna el texto del elemento, si lo logra encontrar, de lo contrario retorna null
      */
     public static String getTextIfElementExist(WebDriver driver, SearchContext searchContext, String element, Integer timeDuration, Integer timeRepetition) {
+        String texto = null;
+        //Para optimizar el tiempo de respuestá
         LogsJB.debug("* ");
         LogsJB.debug(" Obtendrá el texto del elemento si este existe: " + element);
         LogsJB.debug("* ");
-
+        //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, timeDuration, timeRepetition);
-        ExecutorService executor = Executors.newFixedThreadPool(8);
-        CompletionService<String> completionService = new ExecutorCompletionService<>(executor);
-
-        // Enviar tareas paralelas para obtener el texto
-        completionService.submit(() -> SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.id(element)).get());
-        completionService.submit(() -> SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.className(element)).get());
-        completionService.submit(() -> SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.cssSelector(element)).get());
-        completionService.submit(() -> SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.tagName(element)).get());
-        completionService.submit(() -> SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.linkText(element)).get());
-        completionService.submit(() -> SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.partialLinkText(element)).get());
-        completionService.submit(() -> SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.xpath(element)).get());
-        completionService.submit(() -> SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.name(element)).get());
-
-        long endTime = System.currentTimeMillis() + timeDuration;
-        String texto = null;
-
-        // Esperar hasta obtener el resultado o que se agote el tiempo
-        for (int i = 0; i < 8 && System.currentTimeMillis() < endTime; i++) {
+        //Declaración de features para obtener el resultado de buscar los elementos en cuestión
+        Future<String> futureId = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.id(element));
+        Future<String> futureClassName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.className(element));
+        Future<String> futureCss = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.cssSelector(element));
+        Future<String> futureTagName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.tagName(element));
+        Future<String> futureLinkText = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.linkText(element));
+        Future<String> futurePartialLinkText = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.partialLinkText(element));
+        Future<String> futureXpath = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.xpath(element));
+        Future<String> futureName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.name(element));
+        // Esperará saber si existe el elemento en alguno de los tipos usando Future
+        while (System.currentTimeMillis() < endTime) {
             try {
-                Future<String> future = completionService.poll(endTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-                if (future != null) {
-                    texto = future.get();
-                    if (texto != null && !texto.isEmpty()) {
-                        break;
-                    }
+                if (futureId.isDone() && !futureId.get().isEmpty()) {
+                    texto = futureId.get();
+                    break;
+                }
+                if (futureClassName.isDone() && !futureClassName.get().isEmpty()) {
+                    texto = futureClassName.get();
+                    break;
+                }
+                if (futureCss.isDone() && !futureCss.get().isEmpty()) {
+                    texto = futureCss.get();
+                    break;
+                }
+                if (futureTagName.isDone() && !futureTagName.get().isEmpty()) {
+                    texto = futureTagName.get();
+                    break;
+                }
+                if (futureLinkText.isDone() && !futureLinkText.get().isEmpty()) {
+                    texto = futureLinkText.get();
+                    break;
+                }
+                if (futurePartialLinkText.isDone() && !futurePartialLinkText.get().isEmpty()) {
+                    texto = futurePartialLinkText.get();
+                    break;
+                }
+                if (futureXpath.isDone() && !futureXpath.get().isEmpty()) {
+                    texto = futureXpath.get();
+                    break;
+                }
+                if (futureName.isDone() && !futureName.get().isEmpty()) {
+                    texto = futureName.get();
+                    break;
                 }
             } catch (Exception e) {
                 LogsJB.fatal("Error al obtener el resultado del Future: " + e.getMessage());
                 LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
             }
         }
-
-        executor.shutdown();
-
-        if (texto != null) {
-            LogsJB.info(" Logró encontrar y obtener el texto: " + texto + " del elemento especificado: " + element);
-            return texto;
+        LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
+        LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
+        if (System.currentTimeMillis() >= endTime) {
+            LogsJB.info(" No pudo hacer obtener el texto del elemento especificado, ya que no existe: " + element);
         } else {
-            LogsJB.info(" No pudo obtener el texto del elemento especificado, ya que no existe: " + element);
-            return null;
+            LogsJB.info(" Logro encontrar y obtener el texto: " + texto + " del elemento especificado: " + element);
+            return texto;
         }
+        //Retorna Falso si el elemento no Existe
+        return null;
     }
-
 
     /***
      * Realiza 2 veces la busquedad del texto de un elemento
@@ -935,6 +1026,7 @@ public class SeleniumUtils {
     public static String getIdentificadorBy(By by) {
         String tempelement = by.toString();
         String[] data = tempelement.split(": ");
+        String locator = data[0];
         return data[1];
     }
 
@@ -1018,35 +1110,35 @@ public class SeleniumUtils {
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
         while (System.currentTimeMillis() < endTime) {
             try {
-                if (futureId.isDone() && !futureId.get().isEmpty()) {
+                if (futureId.isDone() && !Objects.isNull(futureId.get())) {
                     LogsJB.info("Elementos encontrados por ID: " + futureId.get());
                     return futureId.get();
                 }
-                if (futureClassName.isDone() && !futureClassName.get().isEmpty()) {
+                if (futureClassName.isDone() && !Objects.isNull(futureClassName.get())) {
                     LogsJB.info("Elementos encontrados por ClassName: " + futureClassName.get());
                     return futureClassName.get();
                 }
-                if (futureCss.isDone() && !futureCss.get().isEmpty()) {
+                if (futureCss.isDone() && !Objects.isNull(futureCss.get())) {
                     LogsJB.info("Elementos encontrados por CSS: " + futureCss.get());
                     return futureCss.get();
                 }
-                if (futureTagName.isDone() && !futureTagName.get().isEmpty()) {
+                if (futureTagName.isDone() && !Objects.isNull(futureTagName.get())) {
                     LogsJB.info("Elementos encontrados por TagName: " + futureTagName.get());
                     return futureTagName.get();
                 }
-                if (futureLinkText.isDone() && !futureLinkText.get().isEmpty()) {
+                if (futureLinkText.isDone() && !Objects.isNull(futureLinkText.get())) {
                     LogsJB.info("Elementos encontrados por LinkText: " + futureLinkText.get());
                     return futureLinkText.get();
                 }
-                if (futurePartialLinkText.isDone() && !futurePartialLinkText.get().isEmpty()) {
+                if (futurePartialLinkText.isDone() && !Objects.isNull(futurePartialLinkText.get())) {
                     LogsJB.info("Elementos encontrados por PartialLinkText: " + futurePartialLinkText.get());
                     return futurePartialLinkText.get();
                 }
-                if (futureXpath.isDone() && !futureXpath.get().isEmpty()) {
+                if (futureXpath.isDone() && !Objects.isNull(futureXpath.get())) {
                     LogsJB.info("Elementos encontrados por XPath: " + futureXpath.get());
                     return futureXpath.get();
                 }
-                if (futureName.isDone() && !futureName.get().isEmpty()) {
+                if (futureName.isDone() && !Objects.isNull(futureName.get())) {
                     LogsJB.info("Elementos encontrados por Name: " + futureName.get());
                     return futureName.get();
                 }
@@ -1072,9 +1164,9 @@ public class SeleniumUtils {
      */
     public static boolean movetoframeforwebelement(WebDriver driver, WebElement frame) {
         if (!Objects.isNull(frame)) {
+            LogsJB.info("El Iframe Obtenido no es nulo, es: " + frame);
             driver.switchTo().frame(frame);
             SeleniumUtils.threadslepp(200);
-            LogsJB.info("El Iframe Obtenido no es nulo, es: " + frame);
             return true;
         }
         return false;
@@ -1328,6 +1420,7 @@ public class SeleniumUtils {
                 LogsJB.info("Selecciona el elemento: " + element);
                 String tempelement = element.toString().split(" -> ")[1];
                 String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
+                String locator = data[0];
                 String term = data[1];
                 clicktoElementx2intents(driver, searchcontext, term);
                 return true;
@@ -1687,14 +1780,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones) {
-        try {
-            cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
-            return true;
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            return false;
-        }
+            return cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
     }
 
     /***
@@ -1705,17 +1791,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones, boolean banderaAssert) {
-        try {
-            cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
-            return true;
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if (banderaAssert) {
-                Assert.fail("Error inesperado al presionar una tecla: ");
-            }
-            return false;
-        }
+            return cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
     }
 
     /***
@@ -1726,14 +1802,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones) {
-        try {
-            cambiarZOOM(driver, repeticiones, Keys.ADD);
-            return true;
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            return false;
-        }
+            return cambiarZOOM(driver, repeticiones, Keys.ADD);
     }
 
     /***
@@ -1744,17 +1813,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones, boolean banderaAssert) {
-        try {
-            cambiarZOOM(driver, repeticiones, Keys.ADD);
-            return true;
-        } catch (Exception e) {
-            LogsJB.fatal("Error inesperado al presionar una tecla: " + e.getMessage());
-            LogsJB.fatal("Stacktrace de la excepción: " + ExceptionUtils.getStackTrace(e));
-            if (banderaAssert) {
-                Assert.fail("Error inesperado al presionar una tecla: ");
-            }
-            return false;
-        }
+        return cambiarZOOM(driver, repeticiones, Keys.ADD);
     }
 
     /**
@@ -2292,17 +2351,7 @@ public class SeleniumUtils {
      * @param assertFail Bandera para controlar si se quiere controlar el Assert.fail
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
-        try {
             return sendKeysIfElementExist(driver, searchContext, element, texto);
-        } catch (Exception e) {
-            LogsJB.error("Error enviando texto al elemento: " + element + ". " + e.getMessage());
-            LogsJB.error("Stacktrace: " + ExceptionUtils.getStackTrace(e));
-
-            if (assertFail) {
-                Assert.fail("Error enviando texto al elemento: " + element);
-            }
-        }
-        return false;
     }
 
     /**
@@ -2323,13 +2372,12 @@ public class SeleniumUtils {
      * @param driver        El WebDriver que controla el navegador.
      * @param searchContext El contexto de búsqueda para encontrar el elemento (puede ser una página o un marco).
      * @param element       El selector del elemento al que se enviará el texto.
-     * @param ignoredAssertFail    Indica si la prueba debe fallar (con Assert.fail) en caso de error al enviar el texto.
+     * @param assertFail    Indica si la prueba debe fallar (con Assert.fail) en caso de error al enviar el texto.
      * @param texto         El texto o secuencia de caracteres que se enviará al elemento.
      * @return true si el texto fue enviado correctamente, false si falló después de los intentos.
      */
-    public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean ignoredAssertFail, CharSequence... texto) {
+    public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
         return sendKeysIfElementExist(driver, searchContext, element, texto);
-
     }
 
     /**
@@ -2373,12 +2421,11 @@ public class SeleniumUtils {
      * @param value         Valor que se validara no sea null o vacio
      */
     public static void sendKeystoElementvalidValueForMap(WebDriver driver, SearchContext searchContext, String element, String value) {
-        if (cadenaNulaoVacia(value) || value.equalsIgnoreCase(inespecific)) {
-            return;
-        }
-
-        if (sendKeysIfElementExist(driver, searchContext, element, value)) {
-            keyPress(driver, Keys.ENTER);
+        if (!SeleniumUtils.cadenaNulaoVacia(value)) {
+            if (!value.equalsIgnoreCase(inespecific)) {
+                enviarTexto(driver, searchContext, element, false, value);
+                SeleniumUtils.keyPress(driver, Keys.ENTER);
+            }
         }
     }
 
@@ -2451,20 +2498,9 @@ public class SeleniumUtils {
      * @param frame  Identificador del marco al que se desea cambiar
      */
     public static void switchFrame(WebDriver driver, SearchContext searchContext, String frame) {
-        String cssSelector = "#" + frame;
-
-        try {
-            // Configurar un WebDriverWait con un timeout para encontrar el iframe
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-
-            // Esperar a que el iframe esté presente en el DOM y obtener el elemento
-            WebElement iframe = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(cssSelector)));
-
-            // Cambiar al frame
-            driver.switchTo().frame(iframe);
-        } catch (TimeoutException e) {
-            throw new RuntimeException("No se pudo encontrar o cambiar al frame: " + frame, e);
-        }
+        String cadena = "#" + frame;
+        WebElement iframe = SeleniumUtils.getElementIfExist(driver, searchContext, cadena);
+        driver.switchTo().frame(iframe);
     }
 
     /**
@@ -2499,51 +2535,30 @@ public class SeleniumUtils {
         }
     }
 
-
-
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
      * @param driver Web Driver que manipula el navegador
      * @param texto Texto a ingresar en el prompt
      */
-    public static boolean handlePrompt(WebDriver driver, String texto) {
-        // Verificar primero si existe una alerta
-        if (isAlertPresent(driver)) {
+    public static void handlePrompt(WebDriver driver, String texto) {
+        try {
+            // Intentar interactuar con el prompt usando JavaScript en caso de falla con Selenium
+            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+            jsExecutor.executeScript("window.promptResult = prompt(arguments[0]);", texto);
+            String promptResult = (String) jsExecutor.executeScript("return window.promptResult;");
+            if (promptResult == null) {
+                throw new Exception("No se pudo manejar el prompt con JavaScript.");
+            }
+        } catch (Exception javascriptException) {
             try {
+                // Intentar interactuar con el prompt usando Selenium
                 Alert alert = driver.switchTo().alert();
                 alert.sendKeys(texto);
                 alert.accept();
-                return true;
-            } catch (Exception e) {
-                throw new RuntimeException("Error al manejar el prompt con Selenium: " + e.getMessage(), e);
-            }
-        } else {
-            // Si no existe alerta, usar JavaScript para invocar el prompt
-            try {
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                String script = "var result = prompt(arguments[0]); window.promptResult = result; return result;";
-                String promptResult = (String) jsExecutor.executeScript(script, texto);
-
-                if (promptResult != null) {
-                    return true;
-                } else {
-                    throw new RuntimeException("No se pudo manejar el prompt con JavaScript.");
-                }
-            } catch (Exception jsException) {
-                throw new RuntimeException("Error al manejar el prompt: " + jsException.getMessage(), jsException);
+            } catch (Exception seleniumException) {
+                // Lanzar excepción si no se puede manejar el prompt ni con Selenium ni con JavaScript
+                throw new RuntimeException("Error al manejar el prompt con Selenium: " + javascriptException.getMessage());
             }
         }
     }
-
-    // Método auxiliar para verificar si hay una alerta presente
-    private static boolean isAlertPresent(WebDriver driver) {
-        try {
-            driver.switchTo().alert();
-            return true;
-        } catch (NoAlertPresentException e) {
-            return false;
-        }
-    }
-
-
 }
