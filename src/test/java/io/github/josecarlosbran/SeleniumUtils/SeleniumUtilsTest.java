@@ -9,6 +9,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -1335,6 +1336,13 @@ public class SeleniumUtilsTest {
         logParrafo("Debe de llamar al waitCall y retornar sin errores, pasando el driver y la duración");
         Assert.assertTrue(SeleniumUtils.waitCall(driver, 1));
     }
+
+
+    @AfterTest
+    public void AfterTest() {
+        LogsJB.waitForOperationComplete();
+    }
+
 
     @AfterClass
     public void tearDown() {
