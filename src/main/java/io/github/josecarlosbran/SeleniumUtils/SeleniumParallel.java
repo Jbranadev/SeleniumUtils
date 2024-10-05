@@ -24,7 +24,7 @@ public class SeleniumParallel {
      */
     static Future<Boolean> elementExist(Wait<WebDriver> wait, SearchContext searchContext, By identificador) {
         Callable<Boolean> run = () -> {
-            Boolean exist = false;
+            boolean exist = false;
             try {
                 //Verifica si el Elemento Existe
                 exist = wait.until(new Function<>() {
@@ -61,7 +61,7 @@ public class SeleniumParallel {
      */
     static Future<Boolean> clearElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CountDownLatch latch) {
         Callable<Boolean> run = () -> {
-            Boolean exist = false;
+            boolean exist = false;
             try {
                 //Limpia el elemento
                 exist = wait.until(new Function<>() {
@@ -72,7 +72,7 @@ public class SeleniumParallel {
                         }
                         LogsJB.info(" Limpiando el elemento por medio de " + identificador);
                         latch.countDown(); // Marcar la tarea como completada
-                        Boolean result = SeleniumUtils.cleanElement(driver, searchContext.findElement(identificador));
+                        boolean result = SeleniumUtils.cleanElement(driver, searchContext.findElement(identificador));
                         if (!result) {
                             LogsJB.warning(" No pudo limpiar el elemento, " + identificador +
                                     " comuniquese con los administradores ");
@@ -105,7 +105,7 @@ public class SeleniumParallel {
      */
     static Future<Boolean> sendKeysIfElementExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CountDownLatch latch, CharSequence... Texto) {
         Callable<Boolean> run = () -> {
-            Boolean exist = false;
+            boolean exist = false;
             try {
                 //Envia el texto al elemento
                 exist = wait.until(new Function<>() {
@@ -118,7 +118,7 @@ public class SeleniumParallel {
                         LogsJB.info(" Enviando Texto al elemento por medio de " + identificador +
                                 " : " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
                         latch.countDown(); // Marcar la tarea como completada
-                        Boolean result = SeleniumUtils.sendKeysToElement(driver, searchContext.findElement(identificador), Texto);
+                        boolean result = SeleniumUtils.sendKeysToElement(driver, searchContext.findElement(identificador), Texto);
                         if (!result) {
                             LogsJB.warning(" No pudo enviar el texto a el elemento, " + identificador +
                                     " comuniquese con los administradores ");
@@ -187,7 +187,7 @@ public class SeleniumParallel {
      */
     static Future<Boolean> clickElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, By identificador, CountDownLatch latch) {
         Callable<Boolean> run = () -> {
-            Boolean exist = false;
+            boolean exist = false;
             try {
                 //Hace Click sobre el elemento
                 exist = wait.until(new Function<>() {
@@ -198,7 +198,7 @@ public class SeleniumParallel {
                         }
                         LogsJB.info(" Hace click en el elemento por medio de " + identificador);
                         latch.countDown(); // Marcar la tarea como completada
-                        Boolean result = SeleniumUtils.clickToElement(driver, searchContext.findElement(identificador));
+                        boolean result = SeleniumUtils.clickToElement(driver, searchContext.findElement(identificador));
                         if (!result) {
                             LogsJB.warning(" No pudo hacer click en el elemento, comuniquese con los administradores ");
                         }
