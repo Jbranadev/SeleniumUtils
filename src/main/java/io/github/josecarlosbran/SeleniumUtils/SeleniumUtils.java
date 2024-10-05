@@ -341,14 +341,14 @@ public class SeleniumUtils {
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<Boolean> futureId = SeleniumParallel.elementExist(wait, searchContext, By.id(element));
-        Future<Boolean> futureClassName = SeleniumParallel.elementExist(wait, searchContext, By.className(element));
-        Future<Boolean> futureCss = SeleniumParallel.elementExist(wait, searchContext, By.cssSelector(element));
-        Future<Boolean> futureTagName = SeleniumParallel.elementExist(wait, searchContext, By.tagName(element));
-        Future<Boolean> futureLinkText = SeleniumParallel.elementExist(wait, searchContext, By.linkText(element));
-        Future<Boolean> futurePartialLinkText = SeleniumParallel.elementExist(wait, searchContext, By.partialLinkText(element));
-        Future<Boolean> futureXpath = SeleniumParallel.elementExist(wait, searchContext, By.xpath(element));
-        Future<Boolean> futureName = SeleniumParallel.elementExist(wait, searchContext, By.name(element));
+        Future<Boolean> futureId = SeleniumParallel.elementExist(wait, searchContext, "id", element);
+        Future<Boolean> futureClassName = SeleniumParallel.elementExist(wait, searchContext, "class name", element);
+        Future<Boolean> futureCss = SeleniumParallel.elementExist(wait, searchContext, "css selector", element);
+        Future<Boolean> futureTagName = SeleniumParallel.elementExist(wait, searchContext, "tag name", element);
+        Future<Boolean> futureLinkText = SeleniumParallel.elementExist(wait, searchContext, "link text", element);
+        Future<Boolean> futurePartialLinkText = SeleniumParallel.elementExist(wait, searchContext, "partial link text", element);
+        Future<Boolean> futureXpath = SeleniumParallel.elementExist(wait, searchContext, "xpath", element);
+        Future<Boolean> futureName = SeleniumParallel.elementExist(wait, searchContext, "name", element);
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
         while (System.currentTimeMillis() < endTime) {
             try {
@@ -416,14 +416,14 @@ public class SeleniumUtils {
         CountDownLatch latchName = new CountDownLatch(1);
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         // Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<Boolean> futureId = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.id(element), latchId);
-        Future<Boolean> futureClassName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.className(element), latchClassName);
-        Future<Boolean> futureCss = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.cssSelector(element), latchCss);
-        Future<Boolean> futureTagName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.tagName(element), latchTagName);
-        Future<Boolean> futureLinkText = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.linkText(element), latchLinkText);
-        Future<Boolean> futurePartialLinkText = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.partialLinkText(element), latchPartialLinkText);
-        Future<Boolean> futureXpath = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.xpath(element), latchXpath);
-        Future<Boolean> futureName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, By.name(element), latchName);
+        Future<Boolean> futureId = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, "id", element, latchId);
+        Future<Boolean> futureClassName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, "class name", element, latchClassName);
+        Future<Boolean> futureCss = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, "css selector", element, latchCss);
+        Future<Boolean> futureTagName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, "tag name", element, latchTagName);
+        Future<Boolean> futureLinkText = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, "link text", element, latchLinkText);
+        Future<Boolean> futurePartialLinkText = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, "partial link text", element, latchPartialLinkText);
+        Future<Boolean> futureXpath = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, "xpath", element, latchXpath);
+        Future<Boolean> futureName = SeleniumParallel.clearElementIfExist(driver, wait, searchContext, "name", element, latchName);
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SeleniumUtils.getSearchTime();
@@ -670,15 +670,15 @@ public class SeleniumUtils {
         CountDownLatch latchXpath = new CountDownLatch(1);
         CountDownLatch latchName = new CountDownLatch(1);
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
-// Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<Boolean> futureId = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.id(element), latchId, Texto);
-        Future<Boolean> futureClassName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.className(element), latchClassName, Texto);
-        Future<Boolean> futureCss = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.cssSelector(element), latchCss, Texto);
-        Future<Boolean> futureTagName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.tagName(element), latchTagName, Texto);
-        Future<Boolean> futureLinkText = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.linkText(element), latchLinkText, Texto);
-        Future<Boolean> futurePartialLinkText = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.partialLinkText(element), latchPartialLinkText, Texto);
-        Future<Boolean> futureXpath = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.xpath(element), latchXpath, Texto);
-        Future<Boolean> futureName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, By.name(element), latchName, Texto);
+        // Declaración de features para obtener el resultado de buscar los elementos en cuestión
+        Future<Boolean> futureId = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, "id", element, latchId, Texto);
+        Future<Boolean> futureClassName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, "class name", element, latchClassName, Texto);
+        Future<Boolean> futureCss = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, "css selector", element, latchCss, Texto);
+        Future<Boolean> futureTagName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, "tag name", element, latchTagName, Texto);
+        Future<Boolean> futureLinkText = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, "link text", element, latchLinkText, Texto);
+        Future<Boolean> futurePartialLinkText = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, "partial link text", element, latchPartialLinkText, Texto);
+        Future<Boolean> futureXpath = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, "xpath", element, latchXpath, Texto);
+        Future<Boolean> futureName = SeleniumParallel.sendKeysIfElementExist(driver, wait, searchContext, "name", element, latchName, Texto);
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SeleniumUtils.getSearchTime();
@@ -757,14 +757,14 @@ public class SeleniumUtils {
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, timeDuration, timeRepetition);
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<String> futureId = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.id(element));
-        Future<String> futureClassName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.className(element));
-        Future<String> futureCss = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.cssSelector(element));
-        Future<String> futureTagName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.tagName(element));
-        Future<String> futureLinkText = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.linkText(element));
-        Future<String> futurePartialLinkText = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.partialLinkText(element));
-        Future<String> futureXpath = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.xpath(element));
-        Future<String> futureName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, By.name(element));
+        Future<String> futureId = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, "id", element);
+        Future<String> futureClassName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, "class name", element);
+        Future<String> futureCss = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, "css selector", element);
+        Future<String> futureTagName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, "tag name", element);
+        Future<String> futureLinkText = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, "link text", element);
+        Future<String> futurePartialLinkText = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, "partial link text", element);
+        Future<String> futureXpath = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, "xpath", element);
+        Future<String> futureName = SeleniumParallel.getTextIfElementExist(driver, wait, searchContext, "name", element);
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
         while (System.currentTimeMillis() < endTime) {
             try {
@@ -926,14 +926,14 @@ public class SeleniumUtils {
         CountDownLatch latchName = new CountDownLatch(1);
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<Boolean> futureId = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.id(element), latchId);
-        Future<Boolean> futureClassName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.className(element), latchClassName);
-        Future<Boolean> futureCss = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.cssSelector(element), latchCss);
-        Future<Boolean> futureTagName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.tagName(element), latchTagName);
-        Future<Boolean> futureLinkText = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.linkText(element), latchLinkText);
-        Future<Boolean> futurePartialLinkText = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.partialLinkText(element), latchPartialLinkText);
-        Future<Boolean> futureXpath = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.xpath(element), latchXpath);
-        Future<Boolean> futureName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, By.name(element), latchName);        // Esperará saber si existe el elemento en alguno de los tipos usando Future
+        Future<Boolean> futureId = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, "id", element, latchId);
+        Future<Boolean> futureClassName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, "class name", element, latchClassName);
+        Future<Boolean> futureCss = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, "css selector", element, latchCss);
+        Future<Boolean> futureTagName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, "tag name", element, latchTagName);
+        Future<Boolean> futureLinkText = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, "link text", element, latchLinkText);
+        Future<Boolean> futurePartialLinkText = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, "partial link text", element, latchPartialLinkText);
+        Future<Boolean> futureXpath = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, "xpath", element, latchXpath);
+        Future<Boolean> futureName = SeleniumParallel.clickElementIfExist(driver, wait, searchContext, "name", element, latchName);     // Esperará saber si existe el elemento en alguno de los tipos usando Future
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SeleniumUtils.getSearchTime();
@@ -1099,14 +1099,14 @@ public class SeleniumUtils {
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         //Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<List<WebElement>> futureId = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.id(element));
-        Future<List<WebElement>> futureClassName = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.className(element));
-        Future<List<WebElement>> futureCss = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.cssSelector(element));
-        Future<List<WebElement>> futureTagName = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.tagName(element));
-        Future<List<WebElement>> futureLinkText = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.linkText(element));
-        Future<List<WebElement>> futurePartialLinkText = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.partialLinkText(element));
-        Future<List<WebElement>> futureXpath = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.xpath(element));
-        Future<List<WebElement>> futureName = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, By.name(element));
+        Future<List<WebElement>> futureId = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, "id", element);
+        Future<List<WebElement>> futureClassName = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, "class name", element);
+        Future<List<WebElement>> futureCss = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, "css selector", element);
+        Future<List<WebElement>> futureTagName = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, "tag name", element);
+        Future<List<WebElement>> futureLinkText = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, "link text", element);
+        Future<List<WebElement>> futurePartialLinkText = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, "partial link text", element);
+        Future<List<WebElement>> futureXpath = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, "xpath", element);
+        Future<List<WebElement>> futureName = SeleniumParallel.getElementsIfExist(driver, wait, searchContext, "name", element);
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
         while (System.currentTimeMillis() < endTime) {
             try {
@@ -1192,14 +1192,14 @@ public class SeleniumUtils {
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
         // Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<WebElement> futureId = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.id(element));
-        Future<WebElement> futureClassName = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.className(element));
-        Future<WebElement> futureCss = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.cssSelector(element));
-        Future<WebElement> futureTagName = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.tagName(element));
-        Future<WebElement> futureLinkText = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.linkText(element));
-        Future<WebElement> futurePartialLinkText = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.partialLinkText(element));
-        Future<WebElement> futureXpath = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.xpath(element));
-        Future<WebElement> futureName = SeleniumParallel.getElementIfExist(driver, wait, searchContext, By.name(element));
+        Future<WebElement> futureId = SeleniumParallel.getElementIfExist(driver, wait, searchContext, "id", element);
+        Future<WebElement> futureClassName = SeleniumParallel.getElementIfExist(driver, wait, searchContext, "class name", element);
+        Future<WebElement> futureCss = SeleniumParallel.getElementIfExist(driver, wait, searchContext, "css selector", element);
+        Future<WebElement> futureTagName = SeleniumParallel.getElementIfExist(driver, wait, searchContext, "tag name", element);
+        Future<WebElement> futureLinkText = SeleniumParallel.getElementIfExist(driver, wait, searchContext, "link text", element);
+        Future<WebElement> futurePartialLinkText = SeleniumParallel.getElementIfExist(driver, wait, searchContext, "partial link text", element);
+        Future<WebElement> futureXpath = SeleniumParallel.getElementIfExist(driver, wait, searchContext, "xpath", element);
+        Future<WebElement> futureName = SeleniumParallel.getElementIfExist(driver, wait, searchContext, "name", element);
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
         while (System.currentTimeMillis() < endTime) {
             try {
@@ -1780,7 +1780,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones) {
-            return cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
+        return cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
     }
 
     /***
@@ -1791,7 +1791,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMenos(WebDriver driver, int repeticiones, boolean banderaAssert) {
-            return cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
+        return cambiarZOOM(driver, repeticiones, Keys.SUBTRACT);
     }
 
     /***
@@ -1802,7 +1802,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOMMas(WebDriver driver, int repeticiones) {
-            return cambiarZOOM(driver, repeticiones, Keys.ADD);
+        return cambiarZOOM(driver, repeticiones, Keys.ADD);
     }
 
     /***
@@ -2351,7 +2351,7 @@ public class SeleniumUtils {
      * @param assertFail Bandera para controlar si se quiere controlar el Assert.fail
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
-            return sendKeysIfElementExist(driver, searchContext, element, texto);
+        return sendKeysIfElementExist(driver, searchContext, element, texto);
     }
 
     /**
@@ -2393,7 +2393,6 @@ public class SeleniumUtils {
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
         return enviarTexto(driver, searchContext, element, false, texto);
     }
-
 //Tercer lote de métodos
 
     /**
