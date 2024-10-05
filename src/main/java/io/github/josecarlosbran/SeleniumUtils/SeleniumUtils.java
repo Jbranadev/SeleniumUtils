@@ -385,9 +385,6 @@ public class SeleniumUtils {
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No Existe el elemento especificado: " + element);
-        } else {
-            LogsJB.info(" Logro encontrar el elemento especificado: " + element);
-            return true;
         }
         //Retorna Falso si el elemento no Existe
         return false;
@@ -464,9 +461,6 @@ public class SeleniumUtils {
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No logro limpiar el elemento especificado: " + element);
-        } else {
-            LogsJB.info(" Logro limpiar el elemento especificado: " + element);
-            return true;
         }
         //Retorna Falso si el elemento no Existe
         return false;
@@ -512,24 +506,7 @@ public class SeleniumUtils {
                     // Eliminar los últimos dos carácteres
                     term = term.substring(0, term.length() - 2);
                 }
-                switch (locator) {
-                    case "xpath":
-                        return driver.findElement(By.xpath(term)).getScreenshotAs(OutputType.FILE);
-                    case "css selector":
-                        return driver.findElement(By.cssSelector(term)).getScreenshotAs(OutputType.FILE);
-                    case "id":
-                        return driver.findElement(By.id(term)).getScreenshotAs(OutputType.FILE);
-                    case "tag name":
-                        return driver.findElement(By.tagName(term)).getScreenshotAs(OutputType.FILE);
-                    case "name":
-                        return driver.findElement(By.name(term)).getScreenshotAs(OutputType.FILE);
-                    case "link text":
-                        return driver.findElement(By.linkText(term)).getScreenshotAs(OutputType.FILE);
-                    case "partial link text":
-                        return driver.findElement(By.partialLinkText(term)).getScreenshotAs(OutputType.FILE);
-                    case "class name":
-                        return driver.findElement(By.className(term)).getScreenshotAs(OutputType.FILE);
-                }
+                return getElementByLocator(driver, locator, term).getScreenshotAs(OutputType.FILE);
             }
             LogsJB.warning("No pudo tomar la captura de pantalla del elemento indicado, retorna null");
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
@@ -541,6 +518,36 @@ public class SeleniumUtils {
         }
         return null;
     }
+
+    /***
+     * Obtiene el elemento web por medio de un locator y un elemento
+     * @param driver Driver que manipula el navegador
+     * @param locator Tipo de locator que se utilizará para buscar el elemento
+     * @param element Criterio que se utilizará para buscar el elemento
+     * @return Retorna el WebElement si logra encontrarlo, de lo contrario retorna null
+     */
+    public static WebElement getElementByLocator(WebDriver driver, String locator, String element) {
+        switch (locator) {
+            case "xpath":
+                return driver.findElement(By.xpath(element));
+            case "css selector":
+                return driver.findElement(By.cssSelector(element));
+            case "id":
+                return driver.findElement(By.id(element));
+            case "tag name":
+                return driver.findElement(By.tagName(element));
+            case "name":
+                return driver.findElement(By.name(element));
+            case "link text":
+                return driver.findElement(By.linkText(element));
+            case "partial link text":
+                return driver.findElement(By.partialLinkText(element));
+            case "class name":
+                return driver.findElement(By.className(element));
+        }
+        return null;
+    }
+
 
     /**
      * Actualiza la referencia al elemento si está disponible en el contexto actual de selenium
@@ -564,24 +571,7 @@ public class SeleniumUtils {
                     // Eliminar los últimos dos carácteres
                     term = term.substring(0, term.length() - 1);
                 }
-                switch (locator) {
-                    case "xpath":
-                        return driver.findElement(By.xpath(term));
-                    case "css selector":
-                        return driver.findElement(By.cssSelector(term));
-                    case "id":
-                        return driver.findElement(By.id(term));
-                    case "tag name":
-                        return driver.findElement(By.tagName(term));
-                    case "name":
-                        return driver.findElement(By.name(term));
-                    case "link text":
-                        return driver.findElement(By.linkText(term));
-                    case "partial link text":
-                        return driver.findElement(By.partialLinkText(term));
-                    case "class name":
-                        return driver.findElement(By.className(term));
-                }
+                return getElementByLocator(driver, locator, term);
             }
             LogsJB.info("No fue posible refrescar la referencia al elemento");
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
@@ -989,9 +979,6 @@ public class SeleniumUtils {
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No pudo hacer click en el elemento especificado, ya que no existe: " + element);
-        } else {
-            LogsJB.info(" Logro encontrar y hacer click en el elemento especificado: " + element);
-            return true;
         }
         //Retorna Falso si el elemento no Existe
         return false;
