@@ -474,7 +474,6 @@ public class SeleniumUtils {
     public static File getImageScreeenshotWebElement(WebDriver driver, WebElement elementScreenshot) {
         try {
             if (!Objects.isNull(elementScreenshot)) {
-                elementScreenshot = SeleniumUtils.RefreshReferenceToElement(driver, elementScreenshot);
                 return elementScreenshot.getScreenshotAs(OutputType.FILE);
             }
             LogsJB.warning("No pudo tomar la captura de pantalla del elemento indicado, retorna null");
@@ -1455,11 +1454,10 @@ public class SeleniumUtils {
      */
     public static File getImageScrennshot(WebDriver driver, WebElement elementScreenshot) {
         if (!Objects.isNull(elementScreenshot)) {
-            WebElement element = RefreshReferenceToElement(driver, elementScreenshot);
             // Desplazarse hasta el elemento
-            SeleniumUtils.posicionarmeEn(driver, element);
+            SeleniumUtils.posicionarmeEn(driver, elementScreenshot);
             // Tomar la altura del elemento después de desplazarse
-            int elementHeight = element.getSize().getHeight();
+            int elementHeight = elementScreenshot.getSize().getHeight();
             // Calcular porcentaje de Zoom necesario
             double windowHeight = driver.manage().window().getSize().getHeight();
             double zoomPercentage = 1.0;
@@ -2357,7 +2355,6 @@ public class SeleniumUtils {
                 LogsJB.info("*");
                 LogsJB.info("*");
                 LogsJB.info("Mensaje de Error Capturado: " + mesajeerror);
-                getImageScrennshot(driver, elemento);
                 LogsJB.info("*");
                 LogsJB.info("*");
                 Assert.fail(comment + mesajeerror);
