@@ -73,12 +73,7 @@ public class SeleniumUtils {
      * @param codigo Clave de la tecla que se desea presionar
      */
     public static void keyPress(WebDriver driver, Keys codigo) {
-        try {
-            Actions actions = new Actions(driver);
-            actions.sendKeys(codigo).perform();
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al presionar una tecla: ");
-        }
+        keyPress(driver, codigo, false);
     }
 
     /***
@@ -105,13 +100,7 @@ public class SeleniumUtils {
      * @param codigo Codigo numerico de la tecla que queremos presionar
      */
     public static void keyPress(WebDriver driver, int codigo) {
-        try {
-            char asciiValue = (char) codigo;
-            Actions actions = new Actions(driver);
-            actions.keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).perform();
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al presionar una tecla: ");
-        }
+        keyPress(driver, codigo, false);
     }
 
     /***
@@ -308,7 +297,7 @@ public class SeleniumUtils {
                 actions.moveToElement(elemento).perform();
             } catch (WebDriverException e5) {
                 // Capturar la excepción final si todas las opciones fallan
-                SeleniumParallel.printError(e5, "Todas las opciones de scroll han fallado para el elemento: " + elemento.toString());
+                SeleniumParallel.printError(e5, "Todas las opciones de scroll han fallado para el elemento: " + elemento);
             }
         }
     }
@@ -485,16 +474,7 @@ public class SeleniumUtils {
     public static File getImageScreeenshotWebElement(WebDriver driver, WebElement elementScreenshot) {
         try {
             if (!Objects.isNull(elementScreenshot)) {
-                String tempelement = SeleniumUtils.RefreshReferenceToElement(driver, elementScreenshot).toString().split(" -> ")[1];
-                String[] data = tempelement.split(": ");
-                String locator = data[0];
-                String term = data[1];
-                // Verificar si el string termina con "]},"
-                if (term.endsWith("]}")) {
-                    // Eliminar los últimos dos carácteres
-                    term = term.substring(0, term.length() - 2);
-                }
-                return getElementByLocator(driver, locator, term).getScreenshotAs(OutputType.FILE);
+                return elementScreenshot.getScreenshotAs(OutputType.FILE);
             }
             LogsJB.warning("No pudo tomar la captura de pantalla del elemento indicado, retorna null");
         } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
@@ -545,18 +525,8 @@ public class SeleniumUtils {
     public static WebElement RefreshReferenceToElement(WebDriver driver, WebElement elemento) {
         try {
             if (!Objects.isNull(elemento)) {
-                String tempelement = elemento.toString().split(" -> ")[1];
-                String[] data = tempelement.split(": ");
-                String locator = data[0];
-                String term = data[1];
-                // Verificar si el string termina con "]},"
-                if (term.endsWith("]}")) {
-                    // Eliminar los últimos dos carácteres
-                    term = term.substring(0, term.length() - 2);
-                } else if (term.endsWith("]]") && (StringUtils.equalsIgnoreCase(locator, "xpath") || StringUtils.equalsIgnoreCase(locator, "css selector"))) {
-                    // Eliminar los últimos dos carácteres
-                    term = term.substring(0, term.length() - 1);
-                }
+                String locator = getTermOrLocator(elemento, true);
+                String term = getTermOrLocator(elemento, false);
                 return getElementByLocator(driver, locator, term);
             }
             LogsJB.info("No fue posible refrescar la referencia al elemento");
@@ -567,6 +537,32 @@ public class SeleniumUtils {
             return null;
         }
         return null;
+    }
+
+    /**
+     * Obtiene el termino o el locator de un elemento web
+     *
+     * @param elemento      Elemento web del cual se desea obtener el termino o el locator
+     * @param locatorOrTerm True si se desea obtener el locator, False si se desea obtener el termino
+     * @return Retorna el locator o el termino del elemento web
+     */
+    public static String getTermOrLocator(WebElement elemento, boolean locatorOrTerm) {
+        String tempelement = elemento.toString().split(" -> ")[1];
+        String[] data = tempelement.split(": ");
+        String locator = data[0];
+        if (locatorOrTerm) {
+            return locator;
+        }
+        String term = data[1];
+        // Verificar si el string termina con "]},"
+        if (term.endsWith("]}")) {
+            // Eliminar los últimos dos carácteres
+            term = term.substring(0, term.length() - 2);
+        } else if (term.endsWith("]]") && (StringUtils.equalsIgnoreCase(locator, "xpath") || StringUtils.equalsIgnoreCase(locator, "css selector"))) {
+            // Eliminar los últimos dos carácteres
+            term = term.substring(0, term.length() - 1);
+        }
+        return term;
     }
 
     /**
@@ -993,7 +989,6 @@ public class SeleniumUtils {
     public static String getIdentificadorBy(By by) {
         String tempelement = by.toString();
         String[] data = tempelement.split(": ");
-        String locator = data[0];
         return data[1];
     }
 
@@ -1005,17 +1000,7 @@ public class SeleniumUtils {
      * @return retorna verdadero si se da la espera de manera correcta
      */
     public static boolean waitImplicity(WebDriver driver, By by) {
-        boolean bandera = false;
-        try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
-            wait.until(driver1 -> !ElementoDeshabilitado(driver1.findElement(by)));
-            bandera = true;
-        } catch (TimeoutException ignored) {
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al esperar la aparicion del elemento: ");
-        } finally {
-            return bandera;
-        }
+        return waitImplicity(driver, by, false);
     }
 
     /**
@@ -1329,9 +1314,7 @@ public class SeleniumUtils {
      * vacía
      */
     public static List<WebElement> getElementsIfExist(WebDriver driver, SearchContext searchContext, By element) {
-        List<WebElement> temp = new ArrayList<>();
-        temp = SeleniumUtils.getElementsIfExist(driver, searchContext, SeleniumUtils.getIdentificadorBy(element));
-        return temp;
+        return SeleniumUtils.getElementsIfExist(driver, searchContext, SeleniumUtils.getIdentificadorBy(element));
     }
 
     /**
@@ -1350,10 +1333,7 @@ public class SeleniumUtils {
             String color = element.getCssValue("background-color");
             if (element.isSelected() || StringUtils.containsIgnoreCase(color, "46, 152, 9")) {
                 LogsJB.info("Deselecciona el elemento: " + element);
-                String tempelement = element.toString().split(" -> ")[1];
-                String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
-                String locator = data[0];
-                String term = data[1];
+                String term = getTermOrLocator(element, false);
                 clicktoElementx2intents(driver, searchContext, term);
                 return true;
             } else {
@@ -1381,10 +1361,7 @@ public class SeleniumUtils {
             String color = element.getCssValue("background-color");
             if (!element.isSelected() && StringUtils.containsIgnoreCase(color, "164, 9, 32")) {
                 LogsJB.info("Selecciona el elemento: " + element);
-                String tempelement = element.toString().split(" -> ")[1];
-                String[] data = tempelement.substring(0, tempelement.length() - 1).split(": ");
-                String locator = data[0];
-                String term = data[1];
+                String term = getTermOrLocator(element, false);
                 clicktoElementx2intents(driver, searchcontext, term);
                 return true;
             } else {
@@ -1477,11 +1454,10 @@ public class SeleniumUtils {
      */
     public static File getImageScrennshot(WebDriver driver, WebElement elementScreenshot) {
         if (!Objects.isNull(elementScreenshot)) {
-            WebElement element = RefreshReferenceToElement(driver, elementScreenshot);
             // Desplazarse hasta el elemento
-            SeleniumUtils.posicionarmeEn(driver, element);
+            SeleniumUtils.posicionarmeEn(driver, elementScreenshot);
             // Tomar la altura del elemento después de desplazarse
-            int elementHeight = element.getSize().getHeight();
+            int elementHeight = elementScreenshot.getSize().getHeight();
             // Calcular porcentaje de Zoom necesario
             double windowHeight = driver.manage().window().getSize().getHeight();
             double zoomPercentage = 1.0;
@@ -1527,16 +1503,7 @@ public class SeleniumUtils {
      * @param by     Identificador del tipo By
      */
     public static boolean waitImplicityForElementNotExist(WebDriver driver, By by) {
-        try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
-            return true;
-        } catch (TimeoutException ignored) {
-            return false;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al esperar la aparicion del elemento: ");
-            return false;
-        }
+        return waitImplicityForElementNotExist(driver, by, false);
     }
 
     /**
@@ -1619,20 +1586,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOM(WebDriver driver, int repeticiones, Keys codigo) {
-        try {
-            for (int i = 0; i < repeticiones; i++) {
-                threadslepp(100);
-                Actions actions = new Actions(driver);
-                actions.keyDown(Keys.CONTROL).keyDown(codigo).keyUp(codigo).keyUp(Keys.CONTROL).perform();
-                LogsJB.info("Presiona la tecla: " + codigo);
-                LogsJB.info("Suelta la tecla: " + codigo);
-                threadslepp(100);
-            }
-            return true;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al Cambiar Zoom: ");
-            return false;
-        }
+        return cambiarZOOM(driver, repeticiones, codigo, false);
     }
 
     /***
@@ -1670,21 +1624,7 @@ public class SeleniumUtils {
      * @return
      */
     public static boolean cambiarZOOM(WebDriver driver, int repeticiones, int codigo) {
-        try {
-            for (int i = 0; i < repeticiones; i++) {
-                threadslepp(100);
-                char asciiValue = (char) codigo;
-                Actions actions = new Actions(driver);
-                actions.keyDown(Keys.CONTROL).keyDown(String.valueOf(asciiValue)).keyUp(String.valueOf(asciiValue)).keyUp(Keys.CONTROL).perform();
-                LogsJB.info("Presiona la tecla: " + codigo);
-                LogsJB.info("Suelta la tecla: " + codigo);
-                threadslepp(100);
-            }
-            return true;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al cambiar el Zoom: ");
-            return false;
-        }
+        return cambiarZOOM(driver, repeticiones, codigo, false);
     }
 
     /***
@@ -1766,20 +1706,7 @@ public class SeleniumUtils {
      *                 el desplazamiento es hacia arriba.
      */
     public static boolean scrollMouse(int cantidad) {
-        try {
-            Robot robot = new Robot();
-            int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
-            int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height / 2;
-            LogsJB.info("Altura de la pantalla " + alto * 2 + " ancho de la pantalla " + ancho * 2);
-            robot.mouseMove(ancho, alto);
-            robot.mouseWheel(cantidad);
-            LogsJB.info("Se realizo el movimiento del scroll: ");
-            threadslepp(100);
-            return true;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al realizar un el scroll: ");
-            return false;
-        }
+        return scrollMouse(cantidad, false);
     }
 
     /**
@@ -1815,16 +1742,7 @@ public class SeleniumUtils {
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
      */
     public static boolean scrollMouseDown(WebDriver driver, int cantidadScrolls) {
-        try {
-            Actions actions = new Actions(driver);
-            for (int i = 0; i < cantidadScrolls; i++) {
-                actions.sendKeys(Keys.PAGE_DOWN).build().perform();
-            }
-            return true;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al realizar el scroll: ");
-            return false;
-        }
+        return scrollMouseKey(driver, cantidadScrolls, Keys.PAGE_DOWN);
     }
 
     /**
@@ -1834,19 +1752,7 @@ public class SeleniumUtils {
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo.
      */
     public static boolean scrollMouseDown(WebDriver driver, int cantidadScrolls, boolean banderaAssert) {
-        try {
-            Actions actions = new Actions(driver);
-            for (int i = 0; i < cantidadScrolls; i++) {
-                actions.sendKeys(Keys.PAGE_DOWN).build().perform();
-            }
-            return true;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al realizar el scroll: ");
-            if (banderaAssert) {
-                Assert.fail("Error inesperado al intentar realizar el scroll: ");
-            }
-            return false;
-        }
+        return scrollMouseKey(driver, cantidadScrolls, Keys.PAGE_DOWN, banderaAssert);
     }
 
     /**
@@ -1856,16 +1762,24 @@ public class SeleniumUtils {
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
      */
     public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls) {
-        try {
-            Actions actions = new Actions(driver);
-            for (int i = 0; i < cantidadScrolls; i++) {
-                actions.sendKeys(Keys.PAGE_UP).build().perform();
-            }
-            return true;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al realizar el scroll: ");
-            return false;
-        }
+        return scrollMouseKey(driver, cantidadScrolls, Keys.PAGE_UP);
+    }
+    /**
+     * Mueve el escrol del mouse
+     *
+     * @param driver          Driver que está manipulando el navegador
+     * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
+     */
+    /**
+     * Mueve el escrol del mouse
+     *
+     * @param driver          Driver que está manipulando el navegador
+     * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
+     * @param key             Tecla que se desea presionar, aumentar o disminuir el zoom
+     * @return Retorna True si logra realizar el scroll, de lo contrario retorna False
+     */
+    public static boolean scrollMouseKey(WebDriver driver, int cantidadScrolls, Keys key) {
+        return scrollMouseKey(driver, cantidadScrolls, key, false);
     }
 
     /**
@@ -1875,10 +1789,22 @@ public class SeleniumUtils {
      * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
      */
     public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls, boolean banderaAssert) {
+        return scrollMouseKey(driver, cantidadScrolls, Keys.PAGE_UP, banderaAssert);
+    }
+
+    /***
+     * Mueve el escrol del mouse
+     * @param driver Driver que está manipulando el navegador
+     * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia abajo o hacía arriba dependiendo de la tecla que se envía
+     * @param key Tecla que se desea presionar, aumentar o disminuir el zoom
+     * @param banderaAssert Bandera con la cual se va a controlar si se desea un assert o no
+     * @return Retorna True si logra realizar el scroll, de lo contrario retorna False
+     */
+    public static boolean scrollMouseKey(WebDriver driver, int cantidadScrolls, Keys key, boolean banderaAssert) {
         try {
             Actions actions = new Actions(driver);
             for (int i = 0; i < cantidadScrolls; i++) {
-                actions.sendKeys(Keys.PAGE_UP).build().perform();
+                actions.sendKeys(key).build().perform();
             }
             return true;
         } catch (Exception e) {
@@ -2188,7 +2114,7 @@ public class SeleniumUtils {
      */
     public static void enviarTextoSiValido(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!cadenaNulaoVacia(value) && !value.equalsIgnoreCase(inespecific)) {
-            enviarTexto(driver, searchContext, element, false, value);
+            enviarTexto(driver, searchContext, element, value);
         }
     }
 
@@ -2216,10 +2142,10 @@ public class SeleniumUtils {
      * @param texto Texto que deseamos envíar al elmento
      */
     public static void enviarTextoX2(WebDriver driver, SearchContext searchContext, String elemento, String texto) {
-        enviarTexto(driver, searchContext, elemento, false, texto);
+        enviarTexto(driver, searchContext, elemento, texto);
         keyPress(driver, Keys.ENTER);
         SeleniumUtils.threadslepp(10);
-        enviarTexto(driver, searchContext, elemento, false, texto);
+        enviarTexto(driver, searchContext, elemento, texto);
         keyPress(driver, Keys.ENTER);
         SeleniumUtils.threadslepp(100);
     }
@@ -2279,39 +2205,12 @@ public class SeleniumUtils {
     /**
      * Envía un texto al elemento indicado, si este existe en el contexto actual.
      *
-     * @param driver     Driver que está manipulando el navegador
-     * @param element    Atributo del elemento, por medio del cual se realizara la busqueda
-     * @param texto      Texto a envíar al elemento indicado
-     * @param assertFail Bandera para controlar si se quiere controlar el Assert.fail
-     */
-    public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto, boolean assertFail) {
-        return sendKeysIfElementExist(driver, searchContext, element, texto);
-    }
-
-    /**
-     * Envía un texto al elemento indicado, si este existe en el contexto actual.
-     *
      * @param driver  Driver que está manipulando el navegador
      * @param element Atributo del elemento, por medio del cual se realizara la busqueda
      * @param texto   Texto a envíar al elemento indicad
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, String texto) {
-        return enviarTexto(driver, searchContext, element, texto, false);
-    }
-
-    /**
-     * Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir.
-     * Si el envío de texto falla, puede opcionalmente generar un fallo en la prueba.
-     *
-     * @param driver        El WebDriver que controla el navegador.
-     * @param searchContext El contexto de búsqueda para encontrar el elemento (puede ser una página o un marco).
-     * @param element       El selector del elemento al que se enviará el texto.
-     * @param assertFail    Indica si la prueba debe fallar (con Assert.fail) en caso de error al enviar el texto.
-     * @param texto         El texto o secuencia de caracteres que se enviará al elemento.
-     * @return true si el texto fue enviado correctamente, false si falló después de los intentos.
-     */
-    public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, boolean assertFail, CharSequence... texto) {
-        return sendKeysIfElementExist(driver, searchContext, element, texto);
+        return SeleniumUtils.sendKeysIfElementExist(driver, searchContext, element, texto);
     }
 
     /**
@@ -2325,7 +2224,7 @@ public class SeleniumUtils {
      * @return true si el texto fue enviado correctamente, false si falló después de los intentos.
      */
     public static boolean enviarTexto(WebDriver driver, SearchContext searchContext, String element, CharSequence... texto) {
-        return enviarTexto(driver, searchContext, element, false, texto);
+        return sendKeysIfElementExist(driver, searchContext, element, texto);
     }
 //Tercer lote de métodos
 
@@ -2356,7 +2255,7 @@ public class SeleniumUtils {
     public static void sendKeystoElementvalidValueForMap(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!SeleniumUtils.cadenaNulaoVacia(value)) {
             if (!value.equalsIgnoreCase(inespecific)) {
-                enviarTexto(driver, searchContext, element, false, value);
+                enviarTexto(driver, searchContext, element, value);
                 SeleniumUtils.keyPress(driver, Keys.ENTER);
             }
         }
@@ -2373,7 +2272,7 @@ public class SeleniumUtils {
     public static void sendKeystoElementvalidValue(WebDriver driver, SearchContext searchContext, String element, String value) {
         if (!SeleniumUtils.cadenaNulaoVacia(value)) {
             if (!value.equalsIgnoreCase(inespecific)) {
-                enviarTexto(driver, searchContext, element, false, value);
+                enviarTexto(driver, searchContext, element, value);
             }
         }
     }
@@ -2456,7 +2355,6 @@ public class SeleniumUtils {
                 LogsJB.info("*");
                 LogsJB.info("*");
                 LogsJB.info("Mensaje de Error Capturado: " + mesajeerror);
-                getImageScrennshot(driver, elemento);
                 LogsJB.info("*");
                 LogsJB.info("*");
                 Assert.fail(comment + mesajeerror);

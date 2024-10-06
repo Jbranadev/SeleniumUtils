@@ -96,13 +96,14 @@ public class SeleniumParallel {
                 //Limpia el elemento
                 exist = wait.until(new Function<>() {
                     public Boolean apply(WebDriver driver) {
-                        if (SeleniumUtils.ElementoDeshabilitado(searchContext.findElement(identificador))) {
+                        WebElement element = searchContext.findElement(identificador);
+                        if (SeleniumUtils.ElementoDeshabilitado(element)) {
                             LogsJB.warning(" El elemento no se encuentra habilitado para su limpieza " + identificador);
                             return true;
                         }
                         LogsJB.info(" Limpiando el elemento por medio de " + identificador);
                         latch.countDown(); // Marcar la tarea como completada
-                        boolean result = SeleniumUtils.cleanElement(driver, searchContext.findElement(identificador));
+                        boolean result = SeleniumUtils.cleanElement(driver, element);
                         if (!result) {
                             LogsJB.warning(" No pudo limpiar el elemento, " + identificador +
                                     " comuniquese con los administradores ");
@@ -139,7 +140,8 @@ public class SeleniumParallel {
                 //Envia el texto al elemento
                 exist = wait.until(new Function<>() {
                     public Boolean apply(WebDriver driver) {
-                        if (!searchContext.findElement(identificador).isEnabled()) {
+                        WebElement element = searchContext.findElement(identificador);
+                        if (!element.isEnabled()) {
                             LogsJB.warning(" El elemento " + identificador +
                                     " no se encuentra habilitado");
                             return true;
@@ -147,7 +149,7 @@ public class SeleniumParallel {
                         LogsJB.info(" Enviando Texto al elemento por medio de " + identificador +
                                 " : " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
                         latch.countDown(); // Marcar la tarea como completada
-                        boolean result = SeleniumUtils.sendKeysToElement(driver, searchContext.findElement(identificador), Texto);
+                        boolean result = SeleniumUtils.sendKeysToElement(driver, element, Texto);
                         if (!result) {
                             LogsJB.warning(" No pudo enviar el texto a el elemento, " + identificador +
                                     " comuniquese con los administradores ");
@@ -183,12 +185,13 @@ public class SeleniumParallel {
                 //Obtiene el Texto del Elemento
                 result = wait.until(new Function<>() {
                     public String apply(WebDriver driver) {
-                        if (!searchContext.findElement(identificador).isEnabled()) {
+                        WebElement element = searchContext.findElement(identificador);
+                        if (!element.isEnabled()) {
                             LogsJB.warning(" El elemento no se encuentra habilitado para obtener su texto " + identificador);
                             return "";
                         }
                         LogsJB.info(" Obteniendo el Texto del elemento por medio de " + identificador);
-                        return SeleniumUtils.getTextOfWebElement(driver, searchContext.findElement(identificador));
+                        return SeleniumUtils.getTextOfWebElement(driver, element);
                     }
                 });
             } catch (WebDriverException ignored) {
@@ -219,13 +222,14 @@ public class SeleniumParallel {
                 //Hace Click sobre el elemento
                 exist = wait.until(new Function<>() {
                     public Boolean apply(WebDriver driver) {
-                        if (SeleniumUtils.ElementoDeshabilitado(searchContext.findElement(identificador))) {
+                        WebElement element = searchContext.findElement(identificador);
+                        if (SeleniumUtils.ElementoDeshabilitado(element)) {
                             LogsJB.warning(" El elemento no se encuentra habilitado para hacer click en el " + identificador);
                             return true;
                         }
                         LogsJB.info(" Hace click en el elemento por medio de " + identificador);
                         latch.countDown(); // Marcar la tarea como completada
-                        boolean result = SeleniumUtils.clickToElement(driver, searchContext.findElement(identificador));
+                        boolean result = SeleniumUtils.clickToElement(driver, element);
                         if (!result) {
                             LogsJB.warning(" No pudo hacer click en el elemento, comuniquese con los administradores ");
                         }
