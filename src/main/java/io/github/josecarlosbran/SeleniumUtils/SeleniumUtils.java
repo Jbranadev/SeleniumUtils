@@ -2223,6 +2223,7 @@ public class SeleniumUtils {
      * @param timeduration   La duración máxima en segundos que se debe esperar al buscar el mensaje de error.
      * @param timerepetition El número de repeticiones para intentar buscar el mensaje de error en el elemento.
      */
+    /*
     public static void capturar500ServerError(WebDriver driver, SearchContext searchContext, String element, String messageWait, String comment, int timeduration, int timerepetition) {
         String mesajeerror = obtenerTextWebElementx2(driver, searchContext, element, timeduration, timerepetition);
         WebElement elemento = getElementIfExist(driver, searchContext, element);
@@ -2242,6 +2243,7 @@ public class SeleniumUtils {
             LogsJB.info("*");
         }
     }
+    */
 
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.

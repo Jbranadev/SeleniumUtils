@@ -866,7 +866,7 @@ public class SeleniumUtilsTest {
         logParrafo("Se le ingresa un texto sin normalizar, y el método debe de retornar un String normalizado y en mayusculas");
         String stringSinNormalizar = "café";
         String normalizado = SeleniumUtils.Normalizar(stringSinNormalizar);
-        Assert.assertEquals(normalizado, "CAFE");
+        Assert.assertEquals(normalizado, "CAFA");
     }
 
     @Test(testName = "NormalizarFallo", description = "Debe de retornar un error en el string en mayusculas y normalizado")
@@ -1296,14 +1296,6 @@ public class SeleniumUtilsTest {
         SeleniumUtils.switchFrame(driver, driver, "/html/body/iframe[1]");
     }
 
-    @Test(testName = "capturar500ServerError",
-            description = "Captura y registra un error 500 (Internal Server Error) en la aplicación si el texto de error es encontrado",
-            dependsOnMethods = "switchFrame")
-    public void capturar500ServerError() {
-        logParrafo("Captura y registra un error 500 (Internal Server Error)");
-        SeleniumUtils.capturar500ServerError(driver, driver, "//body", "500", "Se ha encontrado un error 500 en la página.", 5, 2);
-    }
-
     @Test(testName = "sendKeystoElementvalidValueForMap", description = "Envia el texto al elemento especificado",
             dependsOnMethods = "capturar500ServerError")
     public void sendKeystoElementvalidValueForMap() {
@@ -1326,6 +1318,27 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"))
         );
     }
+
+    @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores",
+            dependsOnMethods = "waitImplicityForElementNotExist")
+    public void handlePrompt() {
+        SeleniumUtils.handlePrompt(driver, "Texto");
+    }
+
+    @Test(testName = "obtenerTextWebElementx2_Tiempos", description = "Realiza 2 veces la busquedad de el texto de un elemento",
+            dependsOnMethods = "handlePrompt")
+    public void obtenerTextWebElementx2_Tiempos() {
+        logParrafo("Realiza 2 veces la busquedad de el texto de un elemento");
+        SeleniumUtils.obtenerTextWebElementx2(driver, driver, "textarea[id='APjFqb']",5,5);
+    }
+
+    @Test(testName = "getElementsIfExist", dependsOnMethods = "obtenerTextWebElementx2_Tiempos")
+    public void getElementsIfExist() {
+        By elemento = By.xpath("textarea[id='APjFqb']");
+        List<WebElement> elementos = SeleniumUtils.getElementsIfExist(driver, driver, elemento);
+        Assert.assertNotNull(elementos);
+    }
+
 //    @AfterTest
 //    public void AfterTest() {
 //        LogsJB.waitForOperationComplete();
