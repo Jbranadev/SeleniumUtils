@@ -1297,7 +1297,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "sendKeystoElementvalidValueForMap", description = "Envia el texto al elemento especificado",
-            dependsOnMethods = "capturar500ServerError")
+            dependsOnMethods = "switchFrame")
     public void sendKeystoElementvalidValueForMap() {
         logParrafo("Envia el texto al elemento especificado");
         SeleniumUtils.sendKeystoElementvalidValueForMap(driver, driver, "textarea[id='APjFqb']", "hola");
@@ -1322,7 +1322,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores",
             dependsOnMethods = "waitImplicityForElementNotExist")
     public void handlePrompt() {
-        SeleniumUtils.handlePrompt(driver, "Texto");
+        Assert.assertFalse(SeleniumUtils.handlePrompt(driver, "Texto"));
     }
 
     @Test(testName = "obtenerTextWebElementx2_Tiempos", description = "Realiza 2 veces la busquedad de el texto de un elemento",

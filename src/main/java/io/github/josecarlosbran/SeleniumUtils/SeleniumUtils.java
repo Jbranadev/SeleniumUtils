@@ -1659,12 +1659,7 @@ public class SeleniumUtils {
     public static boolean scrollMouseUp(WebDriver driver, int cantidadScrolls) {
         return scrollMouseKey(driver, cantidadScrolls, Keys.PAGE_UP);
     }
-    /**
-     * Mueve el escrol del mouse
-     *
-     * @param driver          Driver que está manipulando el navegador
-     * @param cantidadScrolls Cantidad de scrolls deseados, el scroll se hace hacia arriba.
-     */
+
     /**
      * Mueve el escrol del mouse
      *
@@ -2212,7 +2207,7 @@ public class SeleniumUtils {
         driver.switchTo().frame(iframe);
     }
 
-    /**
+    /*
      * Captura y registra un error 500 (Internal Server Error) en la aplicación si el texto de error es encontrado.
      *
      * @param driver         El controlador de WebDriver utilizado para interactuar con la página web.
@@ -2222,8 +2217,8 @@ public class SeleniumUtils {
      * @param comment        El comentario personalizado que se incluirá en caso de que se capture el error.
      * @param timeduration   La duración máxima en segundos que se debe esperar al buscar el mensaje de error.
      * @param timerepetition El número de repeticiones para intentar buscar el mensaje de error en el elemento.
-     */
-    /*
+
+
     public static void capturar500ServerError(WebDriver driver, SearchContext searchContext, String element, String messageWait, String comment, int timeduration, int timerepetition) {
         String mesajeerror = obtenerTextWebElementx2(driver, searchContext, element, timeduration, timerepetition);
         WebElement elemento = getElementIfExist(driver, searchContext, element);
@@ -2250,7 +2245,7 @@ public class SeleniumUtils {
      * @param driver Web Driver que manipula el navegador
      * @param texto Texto a ingresar en el prompt
      */
-    public static void handlePrompt(WebDriver driver, String texto) {
+    public static boolean handlePrompt(WebDriver driver, String texto) {
         try {
             // Intentar interactuar con el prompt usando JavaScript en caso de falla con Selenium
             SeleniumUtils.ejecutarJsComando(driver, "window.promptResult = prompt(arguments[0]);", texto);
@@ -2258,11 +2253,15 @@ public class SeleniumUtils {
             if (promptResult == null) {
                 throw new Exception("No se pudo manejar el prompt con JavaScript.");
             }
+            return true;
         } catch (Exception javascriptException) {
             // Intentar interactuar con el prompt usando Selenium
             Alert alert = driver.switchTo().alert();
             alert.sendKeys(texto);
             alert.accept();
+        }finally {
+            return false;
         }
+
     }
 }
