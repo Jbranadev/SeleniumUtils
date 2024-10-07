@@ -231,18 +231,15 @@ public class SeleniumUtils {
         // Utilizar JavaScript para borrar el contenido del elemento
         String text = SeleniumUtils.getTextOfWebElement(driver, element);
         if (!cadenaNulaoVacia(text)) {
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-            jsExecutor.executeScript("arguments[0].innerText = '';", element);
+            SeleniumUtils.ejecutarJsComando(driver, "arguments[0].innerText = '';", element);
             text = SeleniumUtils.getTextOfWebElement(driver, element);
         }
         if (!cadenaNulaoVacia(text)) {
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-            jsExecutor.executeScript("arguments[0].value = '';", element);
+            SeleniumUtils.ejecutarJsComando(driver, "arguments[0].value = '';", element);
             text = SeleniumUtils.getTextOfWebElement(driver, element);
         }
         if (!cadenaNulaoVacia(text)) {
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-            jsExecutor.executeScript("arguments[0].textContent = '';", element);
+            SeleniumUtils.ejecutarJsComando(driver, "arguments[0].textContent = '';", element);
             text = SeleniumUtils.getTextOfWebElement(driver, element);
         }
         if (!cadenaNulaoVacia(text)) {
@@ -265,7 +262,7 @@ public class SeleniumUtils {
         }
         LogsJB.debug("Posicionandonos en el elemento con scrollIntoViewIfNeeded.");
         // Opción 3: Usar scrollIntoViewIfNeeded (obsoleto en algunos navegadores)
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoViewIfNeeded(true);", elemento);
+        SeleniumUtils.ejecutarJsComando(driver, "arguments[0].scrollIntoViewIfNeeded(true);", elemento);
     }
 
     /***
@@ -547,8 +544,7 @@ public class SeleniumUtils {
                 result = true;
             }
             if (cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
-                ((JavascriptExecutor) driver)
-                        .executeScript("arguments[0].setAttribute('value', '" + keysToSend + "')", element);
+                SeleniumUtils.ejecutarJsComando(driver, "arguments[0].setAttribute('value', '" + keysToSend + "')", element);
                 text = element.getAttribute("value");
                 if (!cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
                     result = true;
@@ -556,8 +552,7 @@ public class SeleniumUtils {
             }
             text = SeleniumUtils.getTextOfWebElement(driver, element);
             if (cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
-                ((JavascriptExecutor) driver)
-                        .executeScript("arguments[0].setAttribute('innerText', '" + keysToSend + "')", element);
+                SeleniumUtils.ejecutarJsComando(driver, "arguments[0].setAttribute('innerText', '" + keysToSend + "')", element);
                 text = element.getAttribute("innerText");
                 if (!cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
                     result = true;
@@ -818,8 +813,7 @@ public class SeleniumUtils {
      * @return Retorna el texto del elemento, si no se puede obtener el texto, retorna una cadena vacía
      */
     public static String getTextUsingJavaScript(WebDriver driver, WebElement element) {
-        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver; // Asegúrate de tener una instancia válida de WebDriver
-        return (String) jsExecutor.executeScript("return arguments[0].textContent", element);
+        return (String) SeleniumUtils.ejecutarJsComando(driver, "return arguments[0].textContent", element);
     }
 
     /***
@@ -1357,8 +1351,7 @@ public class SeleniumUtils {
      * @param driver WebDriver es el que se estáblecera el marco actual
      */
     public static boolean FrameActivo(WebDriver driver) {
-        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-        String currentFrame = (String) jsExecutor.executeScript("return self.frameElement ? self.frameElement.id : ''");
+        String currentFrame = (String) SeleniumUtils.ejecutarJsComando(driver, "return self.frameElement ? self.frameElement.id : ''");
         LogsJB.info("Frame: " + currentFrame);
         return !currentFrame.isEmpty();
     }
@@ -1385,14 +1378,13 @@ public class SeleniumUtils {
                 zoomPercentage = Math.min(1.0, elementHeight / windowHeight); // Limitar zoom a máximo 100%
             }
             zoomPercentage = zoomPercentage < 0.5 ? 1 : zoomPercentage;
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            String zoomActual = js.executeScript("return document.body.style.zoom").toString();
+            String zoomActual = SeleniumUtils.ejecutarJsComando(driver, "return document.body.style.zoom").toString();
             // Aplicar el zoom usando JavaScript
             if (!cadenaNulaoVacia(zoomActual)) {
                 try {
                     double zoomActualValue = Double.parseDouble(zoomActual.replace("%", ""));
                     double newZoomValue = (zoomActualValue < 100.0) ? (zoomActualValue - 15.0) : 100.0;
-                    js.executeScript("document.body.style.zoom = '" + newZoomValue + "%'");
+                    SeleniumUtils.ejecutarJsComando(driver, "document.body.style.zoom = '" + newZoomValue + "%'");
                 } catch (NumberFormatException e) {
                     LogsJB.info("El valor de zoomActual no es numérico: " + zoomActual);
                 }
@@ -1401,11 +1393,11 @@ public class SeleniumUtils {
             if (Objects.isNull(scrFile)) {
                 TakesScreenshot scrShot = ((TakesScreenshot) driver);
                 // Restáurar el Zoom a 100% si fue ajustado
-                js.executeScript("document.body.style.zoom = '100%';");
+                SeleniumUtils.ejecutarJsComando(driver, "document.body.style.zoom = '100%';");
                 return scrShot.getScreenshotAs(OutputType.FILE);
             } else {
                 // Restáurar el Zoom a 100% si fue ajustado
-                js.executeScript("document.body.style.zoom = '100%';");
+                SeleniumUtils.ejecutarJsComando(driver, "document.body.style.zoom = '100%';");
                 return scrFile;
             }
         } else {
@@ -1454,8 +1446,7 @@ public class SeleniumUtils {
      * Debido a la naturaleza del manejo interno de accept por parte de javascript, la funcion DEBE DE LLAMARSE JUSTO ANTES DE DAR CLIC PARA DISPARAR EL CUADRO DE DIALOGO
      */
     public static boolean acceptConfirm(WebDriver driver, boolean aceptar) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("window.confirm=function(){return " + aceptar + "}");
+        SeleniumUtils.ejecutarJsComando(driver, "window.confirm=function(){return " + aceptar + "}");
         return true;
     }
 
@@ -1474,8 +1465,7 @@ public class SeleniumUtils {
         } catch (java.util.NoSuchElementException e) {
             // Manejar la falta de alerta específica si es necesario
             LogsJB.fatal("No se encontró ninguna alerta presente.");
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-            jsExecutor.executeScript("window.alert = function() {};");
+            SeleniumUtils.ejecutarJsComando(driver, "window.alert = function() {};");
             return false;
         } catch (Exception e) {
             SeleniumParallel.printError(e, "Error WebDriver al interactuar con la alerta: ");
@@ -1853,8 +1843,7 @@ public class SeleniumUtils {
             return true;
         } catch (WebDriverException e) {
             LogsJB.error("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            js.executeScript("arguments[0].click();", element);
+            SeleniumUtils.ejecutarJsComando(driver, "arguments[0].click();", element);
             LogsJB.info("Hizo clic en el elemento por medio de JavaScript.");
             return true;
         }
@@ -1948,14 +1937,16 @@ public class SeleniumUtils {
      * @param comandoJs El comando JavaScript que se va a ejecutar.
      * @return true si el comando se ejecuta correctamente, false en caso de error.
      */
-    public static boolean ejecutarJsComando(WebDriver driver, String comandoJs) {
+    public static Object ejecutarJsComando(WebDriver driver, String comandoJs, Object... args) {
         try {
-            ((JavascriptExecutor) driver).executeScript(comandoJs);
-            LogsJB.info("Ejecutado comando JS: " + comandoJs);
-            return true;
-        } catch (Exception ex) {
-            SeleniumParallel.printError(ex, "Error al ejecutar comando JS: " + comandoJs);
-            return false;
+            if (Objects.isNull(args)) {
+                return ((JavascriptExecutor) driver).executeScript(comandoJs);
+            } else {
+                return ((JavascriptExecutor) driver).executeScript(comandoJs, args);
+            }
+        } catch (Exception e) {
+            SeleniumParallel.printError(e, "Error al ejecutar comando JavaScript: " + comandoJs);
+            return null;
         }
     }
 
@@ -2260,9 +2251,8 @@ public class SeleniumUtils {
     public static void handlePrompt(WebDriver driver, String texto) {
         try {
             // Intentar interactuar con el prompt usando JavaScript en caso de falla con Selenium
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-            jsExecutor.executeScript("window.promptResult = prompt(arguments[0]);", texto);
-            String promptResult = (String) jsExecutor.executeScript("return window.promptResult;");
+            SeleniumUtils.ejecutarJsComando(driver, "window.promptResult = prompt(arguments[0]);", texto);
+            String promptResult = (String) SeleniumUtils.ejecutarJsComando(driver, "return window.promptResult;");
             if (promptResult == null) {
                 throw new Exception("No se pudo manejar el prompt con JavaScript.");
             }

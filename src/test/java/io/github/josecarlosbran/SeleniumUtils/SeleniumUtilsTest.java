@@ -949,8 +949,7 @@ public class SeleniumUtilsTest {
     public void JsComandoExito() {
         logParrafo("Debe de ejecutar un comando determinado de javascript por medio de un JavascriptExecutor ");
         String comando = "console.log('Comando ejecutado');";
-        boolean respuesta = SeleniumUtils.ejecutarJsComando(driver, comando);
-        Assert.assertTrue(respuesta);
+        SeleniumUtils.ejecutarJsComando(driver, comando, null);
     }
 
     @Test(testName = "JsComandoFallo", description = "Debe de fallar al momento de ejecutar un comando de javascript",
@@ -958,8 +957,7 @@ public class SeleniumUtilsTest {
     public void JsComandoFallo() {
         logParrafo("Debe de ejecutar un comando determinado de javascript por medio de un JavascriptExecutor ");
         String comando = null;
-        boolean respuesta = SeleniumUtils.ejecutarJsComando(driver, comando);
-        Assert.assertFalse(respuesta);
+        SeleniumUtils.ejecutarJsComando(driver, comando, null);
     }
 
     @Test(testName = "selectOptionWithoutComment", description = "Debería de seleccionar la opcion de un select con comentario",
