@@ -48,7 +48,7 @@ public class SeleniumUtilsTest {
     }
 
     @BeforeClass
-    public void setUp() {
+    public void setUp() throws IllegalAccessException {
 //        wdm = WebDriverManager.chromedriver().driverVersion("126.0.0").browserInDocker();
 //        driver = wdm.create();
         WebDriverManager.chromedriver().setup();
@@ -569,7 +569,7 @@ public class SeleniumUtilsTest {
     public void selectOptionWithComment() {
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
         boolean respuesta = false;
-        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario", false);
+        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", false);
         Assert.assertTrue(respuesta);
     }
 
@@ -981,7 +981,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "selectStandarValues - WaitImplicity Overdrive", description = "Prueba de valores predeterminados y waitImplicity Overdrive",
             dependsOnMethods = "selectOptionWithoutComment")
-    public void selectStandarValues() {
+    public void selectStandarValues() throws IllegalAccessException {
         logParrafo("Funcion para comprobar varibales de control");
         Integer SerachTime = SeleniumUtils.getSearchTime();
         SeleniumUtils.setSearchTime(SerachTime);
@@ -989,7 +989,7 @@ public class SeleniumUtilsTest {
         SeleniumUtils.setInespecific(inespecific);
         Integer SearchRepetitionTime = SeleniumUtils.getSearchRepetitionTime();
         SeleniumUtils.setSearchRepetitionTime(SearchRepetitionTime);
-        boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"), true);
+        boolean condicion = SeleniumUtils.waitImplicity(driver, By.xpath("//*[@id=\"hplogo\"]"));
         Assert.assertFalse(condicion);
     }
 
@@ -1177,7 +1177,7 @@ public class SeleniumUtilsTest {
     public void selectOptionWithComment_Overdrive_Seteo() {
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
         boolean respuesta = false;
-        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", "comentario");
+        respuesta = SeleniumUtils.selectOption(driver, driver, "elemento", "opcion", false);
         Assert.assertTrue(respuesta);
     }
 
@@ -1327,13 +1327,6 @@ public class SeleniumUtilsTest {
         logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe ");
         Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"))
         );
-    }
-
-    @Test(testName = "waitCall", description = "Debería de hacer un waitCall exitosamente",
-            dependsOnMethods = "waitImplicityForElementNotExist")
-    public void waitCall() {
-        logParrafo("Debe de llamar al waitCall y retornar sin errores, pasando el driver y la duración");
-        Assert.assertTrue(SeleniumUtils.waitCall(driver, 1));
     }
 //    @AfterTest
 //    public void AfterTest() {

@@ -34,7 +34,7 @@ public class SeleniumUtils {
     }
 
     // Método para cambiar el valor de 'inespecific' usando Reflection
-    public static void setInespecific(String newInespecific) {
+    public static void setInespecific(String newInespecific) throws IllegalAccessException {
         setFieldValue("inespecific", newInespecific);
     }
 
@@ -44,7 +44,7 @@ public class SeleniumUtils {
     }
 
     // Método para cambiar el valor de 'searchTime' usando Reflection
-    public static void setSearchTime(Integer newSearchTime) {
+    public static void setSearchTime(Integer newSearchTime) throws IllegalAccessException {
         setFieldValue("searchTime", newSearchTime);
     }
 
@@ -54,17 +54,13 @@ public class SeleniumUtils {
     }
 
     // Método para cambiar el valor de 'searchRepetitionTime' usando Reflection
-    public static void setSearchRepetitionTime(Integer newSearchRepetitionTime) {
+    public static void setSearchRepetitionTime(Integer newSearchRepetitionTime) throws IllegalAccessException {
         setFieldValue("searchRepetitionTime", newSearchRepetitionTime);
     }
 
     // Método privado que maneja la lógica de cambio de cualquier campo usando Reflection
-    private static void setFieldValue(String fieldName, Object newValue) {
-        try {
-            FieldUtils.writeDeclaredStaticField(SeleniumUtils.class, fieldName, newValue, true);
-        } catch (IllegalAccessException e) {
-            SeleniumParallel.printError(e, "Error inesperado al Cambiar el valor de: " + fieldName + "valor: " + e.getMessage());
-        }
+    private static void setFieldValue(String fieldName, Object newValue) throws IllegalAccessException {
+        FieldUtils.writeDeclaredStaticField(SeleniumUtils.class, fieldName, newValue, true);
     }
 
     /***
@@ -152,22 +148,17 @@ public class SeleniumUtils {
      * @return Retorna True si el elemento esta habilitado, False si no esta habilitado o visible.
      */
     public static boolean ElementoDeshabilitado(WebElement element) {
-        try {
-            if (Objects.isNull(element)) {
-                LogsJB.warning("El elemento es nulo. No se puede verificar la habilitación.");
-                return true; // Se puede considerar deshabilitado si el elemento es nulo
-            }
-            // Verificar si el elemento está deshabilitado o no visible
-            if (!element.isEnabled() || !element.isDisplayed()) {
-                LogsJB.debug("El elemento está deshabilitado o no visible.");
-                return true;
-            }
-            // Si se llega hasta aquí, el elemento está habilitado y visible
-            return false;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al verificar si el elemento está deshabilitado: ");
-            return true; // En caso de excepción, consideramos el elemento como deshabilitado
+        if (Objects.isNull(element)) {
+            LogsJB.warning("El elemento es nulo. No se puede verificar la habilitación.");
+            return true; // Se puede considerar deshabilitado si el elemento es nulo
         }
+        // Verificar si el elemento está deshabilitado o no visible
+        if (!element.isEnabled() || !element.isDisplayed()) {
+            LogsJB.debug("El elemento está deshabilitado o no visible.");
+            return true;
+        }
+        // Si se llega hasta aquí, el elemento está habilitado y visible
+        return false;
     }
 
     /**
@@ -208,29 +199,21 @@ public class SeleniumUtils {
      * @return True si logra limpiar el elemento, False si no logra limpiar el elemento o si sucede un error.
      */
     public static boolean cleanElement(WebDriver driver, WebElement element) {
-        try {
-            if (Objects.isNull(element)) {
-                LogsJB.warning("El elemento es nulo. No se puede limpiar.");
-                return false;
-            }
-            // Limpiar el elemento
-            element.clear();
-            String text = SeleniumUtils.getTextOfWebElement(driver, element);
-            //Quiero que en lugar de obtener los atributos, si la cadena no esta vacía, se limpie el elemento,
-            // limpiando el inner text, el value y por medio de java script
-            if (!cadenaNulaoVacia(text)) {
-                return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
-            }
-            LogsJB.debug("Limpió el elemento por medio del API estandar de selenium.");
-            SeleniumUtils.posicionarmeEn(driver, element);
-            return true;
-        } catch (ElementNotInteractableException e) {
-            LogsJB.warning("Capturó ElementNotInteractableException. Intentará limpiar mediante JavaScript.");
-            return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al intentar limpiar el elemento: ");
+        if (Objects.isNull(element)) {
+            LogsJB.warning("El elemento es nulo. No se puede limpiar.");
             return false;
         }
+        // Limpiar el elemento
+        element.clear();
+        String text = SeleniumUtils.getTextOfWebElement(driver, element);
+        //Quiero que en lugar de obtener los atributos, si la cadena no esta vacía, se limpie el elemento,
+        // limpiando el inner text, el value y por medio de java script
+        if (!cadenaNulaoVacia(text)) {
+            return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
+        }
+        LogsJB.debug("Limpió el elemento por medio del API estandar de selenium.");
+        SeleniumUtils.posicionarmeEn(driver, element);
+        return true;
     }
 
     /**
@@ -241,38 +224,33 @@ public class SeleniumUtils {
      * @return True si logra limpiar el elemento, False si no logra limpiar el elemento o si sucede un error.
      */
     public static boolean limpiarTextUsingJavaScript(WebDriver driver, WebElement element) {
-        try {
-            if (Objects.isNull(element)) {
-                LogsJB.warning("El elemento es nulo. No se puede limpiar.");
-                return false;
-            }
-            // Utilizar JavaScript para borrar el contenido del elemento
-            String text = SeleniumUtils.getTextOfWebElement(driver, element);
-            if (!cadenaNulaoVacia(text)) {
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                jsExecutor.executeScript("arguments[0].innerText = '';", element);
-                text = SeleniumUtils.getTextOfWebElement(driver, element);
-            }
-            if (!cadenaNulaoVacia(text)) {
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                jsExecutor.executeScript("arguments[0].value = '';", element);
-                text = SeleniumUtils.getTextOfWebElement(driver, element);
-            }
-            if (!cadenaNulaoVacia(text)) {
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                jsExecutor.executeScript("arguments[0].textContent = '';", element);
-                text = SeleniumUtils.getTextOfWebElement(driver, element);
-            }
-            if (!cadenaNulaoVacia(text)) {
-                LogsJB.debug("No fue posible limpiar el elmento por medio de JavaScript.");
-                return false;
-            }
-            LogsJB.debug("Limpió el elemento por medio de JavaScript.");
-            return true;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al intentar limpiar el elemento por medio de JavaScript: ");
+        if (Objects.isNull(element)) {
+            LogsJB.warning("El elemento es nulo. No se puede limpiar.");
             return false;
         }
+        // Utilizar JavaScript para borrar el contenido del elemento
+        String text = SeleniumUtils.getTextOfWebElement(driver, element);
+        if (!cadenaNulaoVacia(text)) {
+            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+            jsExecutor.executeScript("arguments[0].innerText = '';", element);
+            text = SeleniumUtils.getTextOfWebElement(driver, element);
+        }
+        if (!cadenaNulaoVacia(text)) {
+            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+            jsExecutor.executeScript("arguments[0].value = '';", element);
+            text = SeleniumUtils.getTextOfWebElement(driver, element);
+        }
+        if (!cadenaNulaoVacia(text)) {
+            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+            jsExecutor.executeScript("arguments[0].textContent = '';", element);
+            text = SeleniumUtils.getTextOfWebElement(driver, element);
+        }
+        if (!cadenaNulaoVacia(text)) {
+            LogsJB.debug("No fue posible limpiar el elmento por medio de JavaScript.");
+            return false;
+        }
+        LogsJB.debug("Limpió el elemento por medio de JavaScript.");
+        return true;
     }
 
     /**
@@ -286,20 +264,8 @@ public class SeleniumUtils {
             return;
         }
         LogsJB.debug("Posicionandonos en el elemento con scrollIntoViewIfNeeded.");
-        try {
-            // Opción 3: Usar scrollIntoViewIfNeeded (obsoleto en algunos navegadores)
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoViewIfNeeded(true);", elemento);
-        } catch (WebDriverException e3) {
-            LogsJB.warning("Fallo con scrollIntoViewIfNeeded, intentando con Actions perform.");
-            try {
-                // Último recurso: Usar Actions para desplazarse al elemento
-                Actions actions = new Actions(driver);
-                actions.moveToElement(elemento).perform();
-            } catch (WebDriverException e5) {
-                // Capturar la excepción final si todas las opciones fallan
-                SeleniumParallel.printError(e5, "Todas las opciones de scroll han fallado para el elemento: " + elemento);
-            }
-        }
+        // Opción 3: Usar scrollIntoViewIfNeeded (obsoleto en algunos navegadores)
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoViewIfNeeded(true);", elemento);
     }
 
     /***
@@ -477,10 +443,7 @@ public class SeleniumUtils {
                 return elementScreenshot.getScreenshotAs(OutputType.FILE);
             }
             LogsJB.warning("No pudo tomar la captura de pantalla del elemento indicado, retorna null");
-        } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
-            return null;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al tomar la captura de pantalla del elemento: ");
+        } catch (Exception ex) {
             return null;
         }
         return null;
@@ -530,10 +493,7 @@ public class SeleniumUtils {
                 return getElementByLocator(driver, locator, term);
             }
             LogsJB.info("No fue posible refrescar la referencia al elemento");
-        } catch (org.openqa.selenium.InvalidSelectorException | org.openqa.selenium.NoSuchElementException ex) {
-            return null;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al refrescar el elemento: ");
+        } catch (Exception ex) {
             return null;
         }
         return null;
@@ -833,21 +793,17 @@ public class SeleniumUtils {
             return "";
         }
         String text = null;
-        try {
-            posicionarmeEn(driver, element);
-            text = element.getText();
-            if (cadenaNulaoVacia(text)) {
-                text = element.getAttribute("innerText");
-            }
-            if (cadenaNulaoVacia(text)) {
-                text = element.getAttribute("value");
-            }
-            if (cadenaNulaoVacia(text)) {
-                // Intentar obtener el texto utilizando JavaScript en caso de que las formas estándar fallen
-                text = getTextUsingJavaScript(driver, element);
-            }
-        } catch (WebDriverException e) {
-            SeleniumParallel.printError(e, "Error al intentar obtener el texto del elemento: ");
+        posicionarmeEn(driver, element);
+        text = element.getText();
+        if (cadenaNulaoVacia(text)) {
+            text = element.getAttribute("innerText");
+        }
+        if (cadenaNulaoVacia(text)) {
+            text = element.getAttribute("value");
+        }
+        if (cadenaNulaoVacia(text)) {
+            // Intentar obtener el texto utilizando JavaScript en caso de que las formas estándar fallen
+            text = getTextUsingJavaScript(driver, element);
         }
         if (cadenaNulaoVacia(text)) {
             LogsJB.warning(" No se pudo obtener el texto del elemento, comuníquese con los administradores ");
@@ -862,13 +818,8 @@ public class SeleniumUtils {
      * @return Retorna el texto del elemento, si no se puede obtener el texto, retorna una cadena vacía
      */
     public static String getTextUsingJavaScript(WebDriver driver, WebElement element) {
-        try {
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver; // Asegúrate de tener una instancia válida de WebDriver
-            return (String) jsExecutor.executeScript("return arguments[0].textContent", element);
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error al intentar obtener el texto mediante JavaScript: ");
-            return "";
-        }
+        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver; // Asegúrate de tener una instancia válida de WebDriver
+        return (String) jsExecutor.executeScript("return arguments[0].textContent", element);
     }
 
     /***
@@ -1000,29 +951,12 @@ public class SeleniumUtils {
      * @return retorna verdadero si se da la espera de manera correcta
      */
     public static boolean waitImplicity(WebDriver driver, By by) {
-        return waitImplicity(driver, by, false);
-    }
-
-    /**
-     * Espera implícita de 30 segundos, luego de los 30 segundos lanzara excepción
-     *
-     * @param driver        Driver que está manipulando el navegador
-     * @param by            Identificador del tipo By
-     * @param banderaAssert bandera para decidir si se quiere manejar o no, el assertFail
-     * @return retorna verdadero si se da la espera de manera correcta
-     */
-    public static boolean waitImplicity(WebDriver driver, By by, boolean banderaAssert) {
         boolean bandera = false;
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(getSearchTime()));
             wait.until(driver1 -> !ElementoDeshabilitado(driver1.findElement(by)));
             bandera = true;
         } catch (TimeoutException ignored) {
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al esperar la aparicion del elemento: ");
-            if (banderaAssert) {
-                Assert.fail("Error inesperado al esperar la aparicion del elemento: " + by);
-            }
         } finally {
             return bandera;
         }
@@ -1430,22 +1364,6 @@ public class SeleniumUtils {
     }
 
     /**
-     * Función que permite implementar y modificar un tiempo de espera.
-     *
-     * @param driver maneja los tiempos de espera para la carga de elementos
-     * @param segs   indica los segundos del tiempo de espera.
-     */
-    public static boolean waitCall(WebDriver driver, int segs) {
-        try {
-            driver.manage().timeouts().implicitlyWait(segs, TimeUnit.SECONDS);
-            return true;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error al intentar modificar el tiempo de espera: ");
-            return false;
-        }
-    }
-
-    /**
      * Función para guardar la captura de pantalla de la página web y la guarda en un archivo
      *
      * @param driver            WebDriver que representa la sesión del navegador
@@ -1536,18 +1454,9 @@ public class SeleniumUtils {
      * Debido a la naturaleza del manejo interno de accept por parte de javascript, la funcion DEBE DE LLAMARSE JUSTO ANTES DE DAR CLIC PARA DISPARAR EL CUADRO DE DIALOGO
      */
     public static boolean acceptConfirm(WebDriver driver, boolean aceptar) {
-        try {
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            js.executeScript("window.confirm=function(){return " + aceptar + "}");
-            return true;
-        } catch (WebDriverException e) {
-            SeleniumParallel.printError(e, "Error WebDriver al interactuar con la alerta: ");
-            return false;
-            // Puedes agregar más manejo de excepciones específicas según sea necesario
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error WebDriver al interactuar con la alerta: ");
-            return false;
-        }
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.confirm=function(){return " + aceptar + "}");
+        return true;
     }
 
     /***
@@ -1568,10 +1477,6 @@ public class SeleniumUtils {
             JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
             jsExecutor.executeScript("window.alert = function() {};");
             return false;
-        } catch (WebDriverException e) {
-            SeleniumParallel.printError(e, "Error WebDriver al interactuar con la alerta: ");
-            return false;
-            // Puedes agregar más manejo de excepciones específicas según sea necesario
         } catch (Exception e) {
             SeleniumParallel.printError(e, "Error WebDriver al interactuar con la alerta: ");
             return false;
@@ -1822,10 +1727,9 @@ public class SeleniumUtils {
      * @param searchcontext Contexto en el que se desea buscar el elemento
      * @param element Atributo del elemento, por medio del cual se realizara la busquedad
      * @param opcion Opcion del elemento que queremos seleccionar
-     * @param comment Comentario que será colocado sobre la imagen capturada si el Elemento indicado existe
      * @param banderaAssert Bandera con la cual se va a controlar si se desea un assert o no
      */
-    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment, boolean banderaAssert) {
+    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, boolean banderaAssert) {
         try {
             WebElement elemento = SeleniumUtils.getElementIfExist(driver, searchcontext, element);
             if (!Objects.isNull(elemento)) {
@@ -1853,19 +1757,6 @@ public class SeleniumUtils {
             }
             return false;
         }
-    }
-
-    /**
-     * @param driver
-     * @param searchcontext
-     * @param element
-     * @param opcion
-     * @param comment
-     * @return
-     */
-    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, String comment) {
-        // Llamamos al método original y pasamos banderaAssert = false
-        return selectOption(driver, searchcontext, element, opcion, comment, false);
     }
 
     /***
@@ -1951,26 +1842,21 @@ public class SeleniumUtils {
      * @return Retorna True si logra hacer clic en el elemento, de lo contrario retorna False
      */
     public static boolean clickToElement(WebDriver driver, WebElement element) {
-        try {
-            if (Objects.isNull(element)) {
-                LogsJB.fatal("El elemento es nulo. No se puede hacer clic.");
-                return false;
-            }
-            try {
-                SeleniumUtils.posicionarmeEn(driver, element);
-                element.click();
-                LogsJB.info("Hizo clic en el elemento directamente.");
-                return true;
-            } catch (WebDriverException e) {
-                LogsJB.error("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
-                JavascriptExecutor js = (JavascriptExecutor) driver;
-                js.executeScript("arguments[0].click();", element);
-                LogsJB.info("Hizo clic en el elemento por medio de JavaScript.");
-                return true;
-            }
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al intentar hacer clic en el elemento: " + element);
+        if (Objects.isNull(element)) {
+            LogsJB.fatal("El elemento es nulo. No se puede hacer clic.");
             return false;
+        }
+        try {
+            SeleniumUtils.posicionarmeEn(driver, element);
+            element.click();
+            LogsJB.info("Hizo clic en el elemento directamente.");
+            return true;
+        } catch (WebDriverException e) {
+            LogsJB.error("Capturó ElementNotInteractableException. Intentará hacer clic mediante JavaScript.");
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click();", element);
+            LogsJB.info("Hizo clic en el elemento por medio de JavaScript.");
+            return true;
         }
     }
 
@@ -2381,15 +2267,10 @@ public class SeleniumUtils {
                 throw new Exception("No se pudo manejar el prompt con JavaScript.");
             }
         } catch (Exception javascriptException) {
-            try {
-                // Intentar interactuar con el prompt usando Selenium
-                Alert alert = driver.switchTo().alert();
-                alert.sendKeys(texto);
-                alert.accept();
-            } catch (Exception seleniumException) {
-                // Lanzar excepción si no se puede manejar el prompt ni con Selenium ni con JavaScript
-                throw new RuntimeException("Error al manejar el prompt con Selenium: " + javascriptException.getMessage());
-            }
+            // Intentar interactuar con el prompt usando Selenium
+            Alert alert = driver.switchTo().alert();
+            alert.sendKeys(texto);
+            alert.accept();
         }
     }
 }
