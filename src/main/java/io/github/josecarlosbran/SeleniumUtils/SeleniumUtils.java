@@ -59,7 +59,7 @@ public class SeleniumUtils {
     }
 
     // Método privado que maneja la lógica de cambio de cualquier campo usando Reflection
-    private static void setFieldValue(String fieldName, Object newValue) throws IllegalAccessException {
+    public static void setFieldValue(String fieldName, Object newValue) throws IllegalAccessException {
         FieldUtils.writeDeclaredStaticField(SeleniumUtils.class, fieldName, newValue, true);
     }
 

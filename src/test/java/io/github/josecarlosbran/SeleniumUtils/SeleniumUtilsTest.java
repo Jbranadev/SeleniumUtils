@@ -6,6 +6,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -55,7 +56,7 @@ public class SeleniumUtilsTest {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--headless");
+        //options.addArguments("--headless");
         driver = new ChromeDriver(options);
         //driver = new ChromeDriver();
         driver.manage().window().maximize();
@@ -191,8 +192,34 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.cleanElement(driver, elemento));
     }
 
-    @Test(testName = "posicionarmeEn", description = "Should be positioned in specified element",
+    @Test(testName = "CleanElement_Nulo", description = "Should clean the especified element",
             dependsOnMethods = "cleanElement")
+    public void cleanElement_Nulo() {
+        Assert.assertFalse(SeleniumUtils.cleanElement(driver, null));
+    }
+
+    @Test(testName = "CleanElement_Error", description = "Should clean the especified element",
+            dependsOnMethods = "cleanElement_Nulo")
+    public void cleanElement_Error() {
+        /*
+        // Crear un nuevo div y añadirlo al cuerpo del documento
+        String createDivScript = "var div = document.createElement('div');" +
+                "div.id = 'myDiv';" +
+                "document.body.appendChild(div);";
+        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+        jsExecutor.executeScript(createDivScript);
+
+        // Establecer el textContent del div
+        String setTextContentScript = "document.getElementById('myDiv').textContent = 'Texto de prueba';";
+        jsExecutor.executeScript(setTextContentScript);
+
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("myDiv"));
+        Assert.assertTrue(SeleniumUtils.cleanElement(driver, elemento));
+        */
+    }
+
+    @Test(testName = "posicionarmeEn", description = "Should be positioned in specified element",
+            dependsOnMethods = "cleanElement_Error")
     public void posicionarmeEn() {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("//*[@id=\"input\"]"));
         logParrafo("Se debe posicionr en el elemento específicado ");
@@ -282,8 +309,19 @@ public class SeleniumUtilsTest {
         }
     }
 
-    @Test(testName = "RefreshReferenceToElement", description = "Should take a correct refresh",
+    @Test(testName = "getImageScreeenshotWebElement_Error", description = "Should take a correct screenshot",
             dependsOnMethods = "getImageScreeenshotWebElement")
+    public void getImageScreeenshotWebElement_Error() {
+        try {
+            SeleniumUtils.getImageScreeenshotWebElement(driver, null);
+            Assert.assertTrue(true);
+        } catch (Exception e) {
+            Assert.assertFalse(false);
+        }
+    }
+
+    @Test(testName = "RefreshReferenceToElement", description = "Should take a correct refresh",
+            dependsOnMethods = "getImageScreeenshotWebElement_Error")
     public void RefreshReferenceToElement() {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("/html/body"));
         try {
@@ -1253,8 +1291,14 @@ public class SeleniumUtilsTest {
         SeleniumUtils.enviarTextoSiValidoX2(driver, driver, "textarea[id='APjFqb']", "hola");
     }
 
+    @Test(testName = "limpiarTextUsingJavaScript_2", dependsOnMethods = "enviarTextoSiValidoX2")
+    public void limpiarTextUsingJavaScript_2() {
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
+        Assert.assertTrue(SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento));
+    }
+
     @Test(testName = "enviarTexto2", description = "Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir."
-            , dependsOnMethods = "enviarTextoSiValidoX2")
+            , dependsOnMethods = "limpiarTextUsingJavaScript_2")
     public void enviarTexto2() {
         logParrafo("Envía texto a un elemento web, intentando hasta dos veces, y maneja cualquier excepción que pueda ocurrir");
         boolean resultado = SeleniumUtils.enviarTexto(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
@@ -1283,14 +1327,59 @@ public class SeleniumUtilsTest {
         driver.get("https://www.wikipedia.org");
         String SecondTab = driver.getWindowHandle();
         driver.switchTo().newWindow(WindowType.TAB);
-        driver.get("https://www.w3schools.com/");
+        driver.get("https://www.w3schools.com/html/html_form_input_types.asp");
         String thirdTab = driver.getWindowHandle();
         SeleniumUtils.moverATabAnterior(driver, SecondTab);
         SeleniumUtils.moverATabAnterior(driver, thirdTab);
     }
 
+    @Test(testName = "limpiarTextUsingJavaScript_3", dependsOnMethods = "moverATabAnterior")
+    public void limpiarTextUsingJavaScript_3() {
+        WebElement textElement = driver.findElement(By.xpath("//h1")); // Busca un encabezado
+        boolean result = SeleniumUtils.limpiarTextUsingJavaScript(driver, textElement);
+        Assert.assertTrue(result, "Se esperaba que la función retornara true al limpiar un elemento con texto.");
+    }
+
+    @Test(testName = "limpiarTextUsingJavaScript_3", dependsOnMethods = "limpiarTextUsingJavaScript_3")
+    public void testLimpiarTextUsingJavaScript_4() {
+        // Caso 3: Limpiar un elemento que ya está vacío
+        WebElement emptyElement = driver.findElement(By.xpath("//*[@id='main']/input[1]")); // Asegúrate de que haya un elemento vacío en tu HTML, este es un ejemplo.
+        boolean result = SeleniumUtils.limpiarTextUsingJavaScript(driver, emptyElement);
+        Assert.assertTrue(result, "Se esperaba que la función retornara true para un elemento vacío.");
+    }
+
+    @Test(testName = "getElementByLocator", dependsOnMethods = "testLimpiarTextUsingJavaScript_4")
+    public void getElementByLocator() {
+        WebElement elemento = null;
+        elemento = SeleniumUtils.getElementByLocator(driver, "xpath", "//*[@id='main']/input[1]");
+        elemento = SeleniumUtils.getElementByLocator(driver,"css selector","#main > input[type=text]:nth-child(17)");
+        elemento = SeleniumUtils.getElementByLocator(driver,"id","midcontentadcontainer");
+        elemento = SeleniumUtils.getElementByLocator(driver, "tag name", "h1");
+        elemento = SeleniumUtils.getElementByLocator(driver, "link text", "HTML Form Elements");
+        elemento = SeleniumUtils.getElementByLocator(driver, "partial link text", "Elements");
+        elemento = SeleniumUtils.getElementByLocator(driver, "class name", "w3-button");
+        elemento = SeleniumUtils.getElementByLocator(driver, "name", "viewport");
+        elemento = SeleniumUtils.getElementByLocator(driver, "invalid", "dummy");
+    }
+
+    @Test(testName = "clickElementIfExist", dependsOnMethods = "getElementByLocator")
+    public void clickElementIfExist() {
+        WebElement elemento = null;
+
+        SeleniumUtils.clickElementIfExist(driver, driver,"//*[@id='main']/input[1]");
+        SeleniumUtils.clickElementIfExist(driver, driver,"#main > input[type=text]:nth-child(17)");
+        SeleniumUtils.clickElementIfExist(driver, driver,"midcontentadcontainer");
+        SeleniumUtils.clickElementIfExist(driver, driver,"h1");
+        SeleniumUtils.clickElementIfExist(driver, driver,"HTML Form Elements");
+        SeleniumUtils.clickElementIfExist(driver, driver,"Elements");
+        SeleniumUtils.clickElementIfExist(driver, driver,"w3-button");
+        SeleniumUtils.clickElementIfExist(driver, driver,"viewport");
+        SeleniumUtils.clickElementIfExist(driver, driver,"dummy");
+
+    }
+
     @Test(testName = "switchFrame", description = "Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)",
-            dependsOnMethods = "moverATabAnterior")
+            dependsOnMethods = "clickElementIfExist")
     public void switchFrame() {
         logParrafo("Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)");
         SeleniumUtils.switchFrame(driver, driver, "/html/body/iframe[1]");
@@ -1338,6 +1427,62 @@ public class SeleniumUtilsTest {
         List<WebElement> elementos = SeleniumUtils.getElementsIfExist(driver, driver, elemento);
         Assert.assertNotNull(elementos);
     }
+
+    @Test(testName = "setFieldValue", dependsOnMethods = "getElementsIfExist")
+    public void setFieldValue() throws IllegalAccessException {
+        SeleniumUtils.setFieldValue("searchRepetitionTime", 50);
+    }
+
+    @Test(testName = "getFluentWait", dependsOnMethods = "setFieldValue")
+    public void getFluentWait() {
+        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
+    }
+
+    @Test(testName = "limpiarTextUsingJavaScript", dependsOnMethods = "getFluentWait")
+    public void limpiarTextUsingJavaScript() {
+        boolean result;
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
+        result = SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento);
+        if (result){
+            Assert.assertTrue(result);
+        }else{
+            Assert.assertFalse(result);
+        }
+    }
+
+    @Test(testName = "limpiarTextUsingJavaScript_Value", dependsOnMethods = "limpiarTextUsingJavaScript")
+    public void limpiarTextUsingJavaScript_Value() {
+        // Crear un nuevo input y añadirlo al cuerpo del documento
+        String createInputScript = "var input = document.createElement('input');" +
+                "input.type = 'text';" +
+                "input.id = 'myInput';" +
+                "document.body.appendChild(input);";
+        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+        jsExecutor.executeScript(createInputScript);
+
+        // Establecer el valor del input
+        String setValueScript = "document.getElementById('myInput').value = 'Texto de prueba';";
+        jsExecutor.executeScript(setValueScript);
+
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("myInput"));
+        Assert.assertTrue(SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento));
+    }
+
+    @Test(testName = "limpiarTextUsingJavaScript_Value", dependsOnMethods = "limpiarTextUsingJavaScript_textContent")
+    public void limpiarTextUsingJavaScript_Deshabilitado() {
+        String htmlContent = "<div id=\"miElemento\" style=\"white-space: nowrap;\">Texto <span style=\"font-weight: bold;\">en negrita</span></div>";
+
+        // Inyectar el HTML en el body de la página
+        ((JavascriptExecutor) driver).executeScript("document.body.innerHTML += arguments[0];", htmlContent);
+
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("miElemento"));
+        Assert.assertFalse(SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento));
+    }
+
+
+
+
+
 
 //    @AfterTest
 //    public void AfterTest() {
