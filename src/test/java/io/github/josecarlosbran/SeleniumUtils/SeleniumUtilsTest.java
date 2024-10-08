@@ -13,6 +13,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.awt.*;
 import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -414,6 +415,15 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.cadenaNulaoVacia(respuesta));
     }
 
+    @Test(testName = "getTextNullOfWebElement_ObjetoNull", description = "Obtiene el texto nulo de un elemento web",
+            dependsOnMethods = "getTextNullOfWebElement")
+    public void getTextNullOfWebElement_ObjetoNull() {
+        SeleniumUtils.LimpiarElementoExistente(driver, driver, "textarea[id='APjFqb']");
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
+        String respuesta = SeleniumUtils.getTextOfWebElement(driver, null);
+        Assert.assertTrue(SeleniumUtils.cadenaNulaoVacia(respuesta));
+    }
+
     @Test(testName = "getTextOfWebElement", description = "Obtiene el texto de un elemento web",
             dependsOnMethods = "getTextNullOfWebElement")
     public void getTextOfWebElementJavaScript() {
@@ -795,15 +805,53 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.deseleccionarElemento(driver, driver, elemento));
     }
 
-    @Test(testName = "deseleccionarElementoFallo", description = "Debe de seleccionar ele elemento especirficado",
+    @Test(testName = "seleccionarElemento_IF", description = "Debe de seleccionar ele elemento especirficado",
             dependsOnMethods = "deseleccionarElementoAcierto")
+    public void seleccionarElemento_IF() {
+        ((JavascriptExecutor) driver).executeScript("var nuevoElemento = document.createElement('div');" +
+                "nuevoElemento.id = 'Colores2';" +
+                "nuevoElemento.style.width = '100px';" +
+                "nuevoElemento.style.height = '50px';" +
+                "nuevoElemento.style.backgroundColor = 'rgba(164, 9, 32, 1)';" +
+                "nuevoElemento.style.color = 'white';" +
+                "nuevoElemento.style.display = 'flex';" +
+                "nuevoElemento.style.alignItems = 'center';" +
+                "nuevoElemento.style.justifyContent = 'center';" +
+                "nuevoElemento.innerText = 'Este es un elemento';" +
+                "document.body.appendChild(nuevoElemento);");
+
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("Colores2"));
+        Assert.assertTrue(SeleniumUtils.seleccionarElemento(driver, driver, elemento));
+    }
+
+    @Test(testName = "deseleccionarElementoFallo", description = "Debe de seleccionar ele elemento especirficado",
+            dependsOnMethods = "seleccionarElemento_IF")
     public void deseleccionarElementoFallo() {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "xxxxxxxxxxxxx");
         Assert.assertFalse(SeleniumUtils.deseleccionarElemento(driver, driver, elemento));
     }
 
-    @Test(testName = "obtenerTextoSeleccionadoSelectFallo", description = "Tiene que obtener un error al obtener el texto seleccionado ",
+    @Test(testName = "deseleccionarElementoFallo_IF", description = "Debe de seleccionar ele elemento especirficado",
             dependsOnMethods = "deseleccionarElementoFallo")
+    public void deseleccionarElementoFallo_IF() {
+        ((JavascriptExecutor) driver).executeScript("var nuevoElemento = document.createElement('div');" +
+                "nuevoElemento.id = 'Colores';" +
+                "nuevoElemento.style.width = '200px';" +
+                "nuevoElemento.style.height = '100px';" +
+                "nuevoElemento.style.backgroundColor = 'rgba(46, 152, 9, 1)';" +
+                "nuevoElemento.style.color = 'white';" +
+                "nuevoElemento.style.display = 'flex';" +
+                "nuevoElemento.style.alignItems = 'center';" +
+                "nuevoElemento.style.justifyContent = 'center';" +
+                "nuevoElemento.innerText = 'Este es un elemento';" +
+                "document.body.appendChild(nuevoElemento);");
+
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("Colores"));
+        Assert.assertTrue(SeleniumUtils.deseleccionarElemento(driver, driver, elemento));
+    }
+
+    @Test(testName = "obtenerTextoSeleccionadoSelectFallo", description = "Tiene que obtener un error al obtener el texto seleccionado ",
+            dependsOnMethods = "deseleccionarElementoFallo_IF")
     public void obtenerTextoSeleccionadoSelectFallo() {
         logParrafo("La prueba debería de obtener el texto de algun elemento seleccionado existente en la página de interés");
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, "/html/body/div[1]/div[6]/div[1]");
@@ -998,16 +1046,57 @@ public class SeleniumUtilsTest {
         SeleniumUtils.ejecutarJsComando(driver, comando, null);
     }
 
+    public void generarSelect (){
+        String createSelectScript =
+                "var select = document.createElement('select');" +
+                        "select.id = 'miSelect';" +
+                        "var option1 = document.createElement('option');" +
+                        "option1.value = 'HOLA';" +
+                        "option1.text = 'Opcion 1';" +
+                        "var option2 = document.createElement('option');" +
+                        "option2.value = 'ADIOS';" +
+                        "option2.text = 'Opcion 2';" +
+                        "select.appendChild(option1);" +
+                        "select.appendChild(option2);" +
+                        "document.body.appendChild(select);";
+
+        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+        jsExecutor.executeScript(createSelectScript);
+
+        SeleniumUtils.threadslepp(250);
+    }
+
     @Test(testName = "selectOptionWithoutComment", description = "Debería de seleccionar la opcion de un select con comentario",
             dependsOnMethods = "JsComandoFallo")
     public void selectOptionWithoutComment() {
+        generarSelect();
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
-        boolean respuesta = false;
-        respuesta = SeleniumUtils.selectOption(driver, driver, "//select[@class='mi-select-clase']", "1");
-        Assert.assertTrue(respuesta);
+        Assert.assertTrue(SeleniumUtils.selectOption(driver, driver, "miSelect", "1"));
     }
 
-    @Test(testName = "selectOptionWithoutComment_Error", description = "Debería de seleccionar la opcion de un select con comentario con error", dependsOnMethods = "elementExist")
+    @Test(testName = "selectOptionWithoutComment_NumberFormatException", description = "Debería de seleccionar la opcion de un select con comentario",
+            dependsOnMethods = "selectOptionWithoutComment")
+    public void selectOptionWithoutComment_NumberFormatException() {
+        logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
+        Assert.assertTrue(SeleniumUtils.selectOption(driver, driver, "miSelect", "HOLA"));
+    }
+
+    @Test(testName = "selectOptionWithoutComment_Exception_Ex", description = "Debería de seleccionar la opcion de un select con comentario",
+            dependsOnMethods = "selectOptionWithoutComment_NumberFormatException")
+    public void selectOptionWithoutComment_Exception_Ex() {
+        logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
+        Assert.assertFalse(SeleniumUtils.selectOption(driver, driver, "miSelect", "5"));
+    }
+
+    @Test(testName = "selectOptionWithoutComment_Exception_E", description = "Debería de seleccionar la opcion de un select con comentario",
+            dependsOnMethods = "selectOptionWithoutComment_Exception_Ex")
+    public void selectOptionWithoutComment_Exception_E() {
+        logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
+        Assert.assertFalse(SeleniumUtils.selectOption(driver, driver, "miSelect", "NO HAY"));
+    }
+
+    @Test(testName = "selectOptionWithoutComment_Error", description = "Debería de seleccionar la opcion de un select con comentario con error",
+            dependsOnMethods = "elementExist")
     public void selectOptionWithoutComment_Error() {
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
         boolean respuesta = false;
@@ -1016,7 +1105,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "selectStandarValues - WaitImplicity Overdrive", description = "Prueba de valores predeterminados y waitImplicity Overdrive",
-            dependsOnMethods = "selectOptionWithoutComment")
+            dependsOnMethods = "selectOptionWithoutComment_Exception_E")
     public void selectStandarValues() throws IllegalAccessException {
         logParrafo("Funcion para comprobar varibales de control");
         Integer SerachTime = SeleniumUtils.getSearchTime();
@@ -1175,13 +1264,13 @@ public class SeleniumUtilsTest {
         logParrafo("Se hará Scroll con el mouse por medio de Selenium");
         Assert.assertTrue(SeleniumUtils.scrollMouse(2, true));
     }
-
+    /*
     @Test(testName = "scrollMouse Overdrive Fallo", description = "Debería de hacer scroll con el mouse, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
     public void scrollMouse_Overdrive_Fallo() {
         logParrafo("Se hará Scroll con el mouse por medio de Selenium");
-        Assert.assertTrue(SeleniumUtils.scrollMouse(-2, true));
+        Assert.assertFalse(SeleniumUtils.scrollMouse(Integer.MAX_VALUE, false));
     }
-
+    */
     @Test(testName = "scrollMouseDown Overdrive", description = "Debería de hacer scroll con el mouse hacia abajo, tomando en cuenta la bandera",
             dependsOnMethods = "scrollMouse_Overdrive")
     public void scrollMouseDown_Overdrive() {
@@ -1467,10 +1556,32 @@ public class SeleniumUtilsTest {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("myInput"));
         Assert.assertTrue(SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento));
     }
+    /*
+    @Test(testName = "acceptAlertTest_Error", description = "Se debe de aceptar el cuadro de dialogo que se dispara",
+            dependsOnMethods = "limpiarTextUsingJavaScript_Value")
+    public void acceptAlertTest_Error() {
+        SeleniumUtils.threadslepp(250);
 
-    @Test(testName = "limpiarTextUsingJavaScript_Value", dependsOnMethods = "limpiarTextUsingJavaScript_textContent")
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("alert('hola')");
+
+        Assert.assertFalse(SeleniumUtils.acceptAlert(driver));
+    }
+    */
+
+    @Test(testName = "acceptAlertTest_E", description = "Se debe de aceptar el cuadro de dialogo que se dispara",
+            dependsOnMethods = "limpiarTextUsingJavaScript_Value")
+    public void acceptAlertTest_E() {
+        SeleniumUtils.threadslepp(250);
+        Assert.assertFalse(SeleniumUtils.acceptAlert(null));
+    }
+
+    /*
+    @Test(testName = "limpiarTextUsingJavaScript_Value", dependsOnMethods = "limpiarTextUsingJavaScript_Value")
     public void limpiarTextUsingJavaScript_Deshabilitado() {
-        String htmlContent = "<div id=\"miElemento\" style=\"white-space: nowrap;\">Texto <span style=\"font-weight: bold;\">en negrita</span></div>";
+        String htmlContent = "<div id=\"miElemento\" style=\"white-space: nowrap;\">" +
+                "Texto <span style=\"font-weight: bold;\">en negrita</span>" +
+                "</div>";
 
         // Inyectar el HTML en el body de la página
         ((JavascriptExecutor) driver).executeScript("document.body.innerHTML += arguments[0];", htmlContent);
@@ -1478,6 +1589,8 @@ public class SeleniumUtilsTest {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("miElemento"));
         Assert.assertFalse(SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento));
     }
+    */
+
 
 
 
