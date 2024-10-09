@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
@@ -16,10 +17,7 @@ import java.nio.file.Path;
 import java.text.Normalizer;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class SeleniumUtils {
     @Getter(AccessLevel.PACKAGE)
@@ -624,49 +622,49 @@ public class SeleniumUtils {
             CountDownLatch latchName, Future<T> futureName) {
         while (System.currentTimeMillis() < endTime) {
             try {
-                if (futureId.isDone()) {
+                if (latchId.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureId.isDone()) {
                     T result = futureId.get();
                     if (result != null && !result.toString().isEmpty()) {
                         return result;
                     }
                 }
-                if (futureClassName.isDone()) {
+                if (latchClassName.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureClassName.isDone()) {
                     T result = futureClassName.get();
                     if (result != null && !result.toString().isEmpty()) {
                         return result;
                     }
                 }
-                if (futureCss.isDone()) {
+                if (latchCss.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureCss.isDone()) {
                     T result = futureCss.get();
                     if (result != null && !result.toString().isEmpty()) {
                         return result;
                     }
                 }
-                if (futureTagName.isDone()) {
+                if (latchTagName.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureTagName.isDone()) {
                     T result = futureTagName.get();
                     if (result != null && !result.toString().isEmpty()) {
                         return result;
                     }
                 }
-                if (futureLinkText.isDone()) {
+                if (latchLinkText.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureLinkText.isDone()) {
                     T result = futureLinkText.get();
                     if (result != null && !result.toString().isEmpty()) {
                         return result;
                     }
                 }
-                if (futurePartialLinkText.isDone()) {
+                if (latchPartialLinkText.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futurePartialLinkText.isDone()) {
                     T result = futurePartialLinkText.get();
                     if (result != null && !result.toString().isEmpty()) {
                         return result;
                     }
                 }
-                if (futureXpath.isDone()) {
+                if (latchXpath.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureXpath.isDone()) {
                     T result = futureXpath.get();
                     if (result != null && !result.toString().isEmpty()) {
                         return result;
                     }
                 }
-                if (futureName.isDone()) {
+                if (latchName.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureName.isDone()) {
                     T result = futureName.get();
                     if (result != null && !result.toString().isEmpty()) {
                         return result;
