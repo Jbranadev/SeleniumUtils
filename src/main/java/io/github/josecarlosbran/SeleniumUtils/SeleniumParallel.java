@@ -178,7 +178,7 @@ public class SeleniumParallel {
      * @return Retorna un Future<String> con el texto del elemento, si el elemento no existe o sucede un error
      * durante la obtención del texto, se retornara un String vacio
      */
-    static Future<String> getTextIfElementExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, String locator, String element) {
+    static Future<String> getTextIfElementExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, String locator, String element, CountDownLatch latch) {
         Callable<String> run = () -> {
             String result = "";
             try {
@@ -191,6 +191,7 @@ public class SeleniumParallel {
                             LogsJB.warning(" El elemento no se encuentra habilitado para obtener su texto " + identificador);
                             return "";
                         }
+                        latch.countDown(); // Marcar la tarea como completada
                         LogsJB.info(" Obteniendo el Texto del elemento por medio de " + identificador);
                         return SeleniumUtils.getTextOfWebElement(driver, element);
                     }
