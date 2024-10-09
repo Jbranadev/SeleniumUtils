@@ -258,7 +258,7 @@ public class SeleniumParallel {
      * @return Retorna un Future<List<WebElement>> con los elementos encontrados, si no se encuentran elementos o sucede un error
      * durante la busqueda, se retornara una lista vacia
      */
-    static Future<List<WebElement>> getElementsIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, String locator, String element, CharSequence... Texto) {
+    static Future<List<WebElement>> getElementsIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, String locator, String element, CountDownLatch latch) {
         Callable<List<WebElement>> run = () -> {
             List<WebElement> elementos = new ArrayList<>();
             try {
@@ -266,6 +266,7 @@ public class SeleniumParallel {
                 elementos = wait.until(new Function<>() {
                     public List<WebElement> apply(WebDriver driver) {
                         LogsJB.trace(" Obtiene los elementos por medio de " + identificador.toString());
+                        latch.countDown(); // Marcar la tarea como completada
                         return searchContext.findElements(identificador).isEmpty() ? null : searchContext.findElements(identificador);
                     }
                 });
@@ -289,7 +290,7 @@ public class SeleniumParallel {
      * @return Retorna un Future<WebElement> con el elemento encontrado, si no se encuentra el elemento o sucede un error
      * durante la busqueda, se retornara un elemento nulo
      */
-    static Future<WebElement> getElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, String locator, String element, CharSequence... Texto) {
+    static Future<WebElement> getElementIfExist(WebDriver driver, Wait<WebDriver> wait, SearchContext searchContext, String locator, String element, CountDownLatch latch) {
         Callable<WebElement> run = () -> {
             final WebElement[] elemento = {null};
             try {
@@ -297,6 +298,7 @@ public class SeleniumParallel {
                 wait.until(new Function<WebDriver, Boolean>() {
                     public Boolean apply(WebDriver driver) {
                         LogsJB.trace(" Obtiene el elemento por medio de " + identificador.toString());
+                        latch.countDown(); // Marcar la tarea como completada
                         elemento[0] = searchContext.findElement(identificador);
                         return true;
                     }
