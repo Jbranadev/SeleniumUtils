@@ -227,25 +227,37 @@ public class SeleniumUtils {
             return false;
         }
         // Utilizar JavaScript para borrar el contenido del elemento
-        String text = SeleniumUtils.getTextOfWebElement(driver, element);
-        if (!cadenaNulaoVacia(text)) {
-            SeleniumUtils.ejecutarJsComando(driver, "arguments[0].innerText = '';", element);
-            text = SeleniumUtils.getTextOfWebElement(driver, element);
-        }
-        if (!cadenaNulaoVacia(text)) {
-            SeleniumUtils.ejecutarJsComando(driver, "arguments[0].value = '';", element);
-            text = SeleniumUtils.getTextOfWebElement(driver, element);
-        }
-        if (!cadenaNulaoVacia(text)) {
-            SeleniumUtils.ejecutarJsComando(driver, "arguments[0].textContent = '';", element);
-            text = SeleniumUtils.getTextOfWebElement(driver, element);
-        }
+        String text = SeleniumUtils.limpiarTextJavaScript(driver, element);
         if (!cadenaNulaoVacia(text)) {
             LogsJB.debug("No fue posible limpiar el elmento por medio de JavaScript.");
             return false;
         }
         LogsJB.debug("Limpió el elemento por medio de JavaScript.");
         return true;
+    }
+
+    /***
+     * Limpiar el texto de un elemento por medio de JavaScript
+     * @param driver Driver que manipula el navegador
+     * @param element Elemento que se desea limpiar
+     * @return Retorna el texto limpio, si logra limpiarlo, de lo contrario retorna el texto original
+     */
+    public static String limpiarTextJavaScript(WebDriver driver, WebElement element) {
+        String text = null;
+        String[] propiedades = new String[]{"innerText", "value", "textContent"};
+        for (String propiedad : propiedades) {
+            text = SeleniumUtils.getTextOfWebElement(driver, element);
+            if (!cadenaNulaoVacia(text)) {
+                SeleniumUtils.ejecutarJsComando(driver, "arguments[0]." +
+                        propiedad +
+                        " = '';", element);
+                text = SeleniumUtils.getTextOfWebElement(driver, element);
+            }
+            if (cadenaNulaoVacia(text)) {
+                break;
+            }
+        }
+        return text;
     }
 
     /**
