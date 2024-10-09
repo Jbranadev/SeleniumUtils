@@ -1467,11 +1467,18 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "waitImplicityForElementNotExist")
     public void handlePrompt() {
         simularAlertJavascript();
+        Assert.assertFalse(SeleniumUtils.handlePrompt(driver, "Texto"));
+    }
+
+    @Test(testName = "handlePrompt_Error", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores con error",
+            dependsOnMethods = "handlePrompt")
+    public void handlePrompt_Error() {
+        simularAlertJavascript();
         Assert.assertFalse(SeleniumUtils.handlePrompt(driver, null));
     }
 
     @Test(testName = "obtenerTextWebElementx2_Tiempos", description = "Realiza 2 veces la busquedad de el texto de un elemento",
-            dependsOnMethods = "handlePrompt")
+            dependsOnMethods = "handlePrompt_Error")
     public void obtenerTextWebElementx2_Tiempos() {
         logParrafo("Realiza 2 veces la busquedad de el texto de un elemento");
         SeleniumUtils.obtenerTextWebElementx2(driver, driver, "textarea[id='APjFqb']", 5, 5);
