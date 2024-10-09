@@ -543,25 +543,7 @@ public class SeleniumUtils {
             if (!cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
                 result = true;
             }
-            if (cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
-                SeleniumUtils.ejecutarJsComando(driver, "arguments[0].setAttribute('value', '" + keysToSend + "')", element);
-                text = element.getAttribute("value");
-                if (!cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
-                    result = true;
-                }
-            }
-            text = SeleniumUtils.getTextOfWebElement(driver, element);
-            if (cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
-                SeleniumUtils.ejecutarJsComando(driver, "arguments[0].setAttribute('innerText', '" + keysToSend + "')", element);
-                text = element.getAttribute("innerText");
-                if (!cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
-                    result = true;
-                }
-            }
-            text = SeleniumUtils.getTextOfWebElement(driver, element);
-            if (cadenaNulaoVacia(text)) {
-                result = false;
-            }
+            return SeleniumUtils.sendKeyTextJavaScript(driver, element, temp, keysToSend);
         } catch (Exception e) {
             SeleniumParallel.printError(e, "Error inesperado al intentar enviar el texto: " + Arrays.toString(keysToSend) +
                     " al  elemento: " + element.toString());
@@ -569,6 +551,35 @@ public class SeleniumUtils {
         } finally {
             return result;
         }
+    }
+
+    /***
+     * Envia el texto al elemento indicado, si este existe en el contexto actual.
+     * @param driver Driver que está manipulando el navegador
+     * @param element Elemento al que se enviará el texto
+     * @param temp Texto que se enviará al elemento
+     * @param keysToSend Caracteres que se enviarán al elemento
+     * @return Retorna True si logra enviar el texto al elemento, False si no logra enviar el texto o si sucede un error en la ejecución de esta instrucción.
+     */
+    public static boolean sendKeyTextJavaScript(WebDriver driver, WebElement element, String temp, CharSequence... keysToSend) {
+        boolean result = false;
+        String[] propiedades = new String[]{"innerText", "value", "textContent"};
+        String text = null;
+        for (String propiedad : propiedades) {
+            text = SeleniumUtils.getTextOfWebElement(driver, element);
+            if (cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
+                SeleniumUtils.ejecutarJsComando(driver, "arguments[0].setAttribute('" +
+                        propiedad +
+                        "', '" + keysToSend + "')", element);
+                text = element.getAttribute("value");
+                if (!cadenaNulaoVacia(text) || cadenaNulaoVacia(temp)) {
+                    result = true;
+                }
+            } else {
+                break;
+            }
+        }
+        return result;
     }
 
     /**

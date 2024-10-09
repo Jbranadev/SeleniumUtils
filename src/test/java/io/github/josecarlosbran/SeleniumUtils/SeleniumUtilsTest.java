@@ -62,7 +62,7 @@ public class SeleniumUtilsTest {
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.DEBUG);
-        SeleniumUtils.setSearchTime(1500);
+        SeleniumUtils.setSearchTime(1000);
         SeleniumUtils.setSearchRepetitionTime(50);
     }
 
@@ -1069,8 +1069,16 @@ public class SeleniumUtilsTest {
         Assert.assertFalse(SeleniumUtils.selectOption(driver, driver, "miSelect", "5"));
     }
 
+    @Test(testName = "selectOptionWithoutComment_Exception_Ex", description = "Debería de seleccionar la opcion de un select con comentario lanzando una bandera assertfail",
+            dependsOnMethods = "selectOptionWithoutComment_Exception_Ex"
+            , expectedExceptions = {AssertionError.class})
+    public void selectOptionWithoutComment_Exception_ExAssertFail() {
+        logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
+        Assert.assertFalse(SeleniumUtils.selectOption(driver, driver, "miSelect", "5", true));
+    }
+
     @Test(testName = "selectOptionWithoutComment_Exception_E", description = "Debería de seleccionar la opcion de un select con comentario",
-            dependsOnMethods = "selectOptionWithoutComment_Exception_Ex")
+            dependsOnMethods = "selectOptionWithoutComment_Exception_ExAssertFail")
     public void selectOptionWithoutComment_Exception_E() {
         logParrafo("El proceso completo, debería de darle click al select, luego se despliegan las opciones y se selecciona la especificada");
         Assert.assertFalse(SeleniumUtils.selectOption(driver, driver, "miSelect", "NO HAY"));
