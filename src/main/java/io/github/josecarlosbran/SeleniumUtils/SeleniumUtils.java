@@ -11,13 +11,11 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.file.Path;
 import java.text.Normalizer;
 import java.time.Duration;
-import java.util.List;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -1595,42 +1593,6 @@ public class SeleniumUtils {
     }
 
     /**
-     * Mueve el scroll del mouse
-     *
-     * @param cantidad Si el número es positivo, el desplazamiento es hacia abajo en la pantalla, si el número es negativo
-     *                 el desplazamiento es hacia arriba.
-     */
-    public static boolean scrollMouse(int cantidad) {
-        return scrollMouse(cantidad, false);
-    }
-
-    /**
-     * Mueve el scroll del mouse
-     *
-     * @param cantidad Si el número es positivo, el desplazamiento es hacia abajo en la pantalla, si el número es negativo
-     *                 el desplazamiento es hacia arriba.
-     */
-    public static boolean scrollMouse(int cantidad, boolean banderaAssert) {
-        try {
-            Robot robot = new Robot();
-            int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width / 2;
-            int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height / 2;
-            LogsJB.info("Altura de la pantalla " + alto * 2 + " ancho de la pantalla " + ancho * 2);
-            robot.mouseMove(ancho, alto);
-            robot.mouseWheel(cantidad);
-            LogsJB.info("Se realizo el movimiento del scroll: ");
-            threadslepp(100);
-            return true;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al realizar un el scroll: ");
-            if (banderaAssert) {
-                Assert.fail("Error inesperado al intentar realizar el scroll: ");
-            }
-            return false;
-        }
-    }
-
-    /**
      * Mueve el escrol del mouse
      *
      * @param driver          Driver que está manipulando el navegador
@@ -2259,9 +2221,8 @@ public class SeleniumUtils {
             Alert alert = driver.switchTo().alert();
             alert.sendKeys(texto);
             alert.accept();
-        }finally {
+        } finally {
             return false;
         }
-
     }
 }

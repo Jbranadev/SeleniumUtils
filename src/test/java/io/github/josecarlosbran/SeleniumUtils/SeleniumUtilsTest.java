@@ -13,7 +13,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.awt.*;
 import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -572,21 +571,8 @@ public class SeleniumUtilsTest {
         Assert.assertFalse(SeleniumUtils.cambiarZOOMMas(null, 2));
     }
 
-    @Test(testName = "scrollMouse", description = "Debería de hacer scroll con el mouse",
-            dependsOnMethods = "cambiarZoomMasFallo")
-    public void scrollMouse() {
-        logParrafo("Se hará Scroll con el mouse por medio de Selenium");
-        Assert.assertTrue(SeleniumUtils.scrollMouse(2));
-    }
-
-    @Test(testName = "scrollMouse Fallo", description = "Debería de hacer scroll con el mouse", dependsOnMethods = "elementExist")
-    public void scrollMouse_Fallo() {
-        logParrafo("Se hará Scroll con el mouse por medio de Selenium");
-        Assert.assertTrue(SeleniumUtils.scrollMouse(Integer.MAX_VALUE));
-    }
-
     @Test(testName = "scrollMouseDown", description = "Debería de hacer scroll con el mouse hacia abajo",
-            dependsOnMethods = "scrollMouse")
+            dependsOnMethods = "cambiarZoomMasFallo")
     public void scrollMouseDown() {
         logParrafo("Se hará Scroll hacia abajo con el mouse por medio de Selenium");
         Assert.assertTrue(SeleniumUtils.scrollMouseDown(driver, 2));
@@ -819,7 +805,6 @@ public class SeleniumUtilsTest {
                 "nuevoElemento.style.justifyContent = 'center';" +
                 "nuevoElemento.innerText = 'Este es un elemento';" +
                 "document.body.appendChild(nuevoElemento);");
-
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("Colores2"));
         Assert.assertTrue(SeleniumUtils.seleccionarElemento(driver, driver, elemento));
     }
@@ -845,7 +830,6 @@ public class SeleniumUtilsTest {
                 "nuevoElemento.style.justifyContent = 'center';" +
                 "nuevoElemento.innerText = 'Este es un elemento';" +
                 "document.body.appendChild(nuevoElemento);");
-
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("Colores"));
         Assert.assertTrue(SeleniumUtils.deseleccionarElemento(driver, driver, elemento));
     }
@@ -1046,7 +1030,7 @@ public class SeleniumUtilsTest {
         SeleniumUtils.ejecutarJsComando(driver, comando, null);
     }
 
-    public void generarSelect (){
+    public void generarSelect() {
         String createSelectScript =
                 "var select = document.createElement('select');" +
                         "select.id = 'miSelect';" +
@@ -1059,10 +1043,8 @@ public class SeleniumUtilsTest {
                         "select.appendChild(option1);" +
                         "select.appendChild(option2);" +
                         "document.body.appendChild(select);";
-
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
         jsExecutor.executeScript(createSelectScript);
-
         SeleniumUtils.threadslepp(250);
     }
 
@@ -1258,21 +1240,8 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.cambiarZOOMMas(driver, 2, true));
     }
 
-    @Test(testName = "scrollMouse Overdrive", description = "Debería de hacer scroll con el mouse, tomando en cuenta la bandera",
-            dependsOnMethods = "cambiarZoomMas_Overdrive")
-    public void scrollMouse_Overdrive() {
-        logParrafo("Se hará Scroll con el mouse por medio de Selenium");
-        Assert.assertTrue(SeleniumUtils.scrollMouse(2, true));
-    }
-    /*
-    @Test(testName = "scrollMouse Overdrive Fallo", description = "Debería de hacer scroll con el mouse, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
-    public void scrollMouse_Overdrive_Fallo() {
-        logParrafo("Se hará Scroll con el mouse por medio de Selenium");
-        Assert.assertFalse(SeleniumUtils.scrollMouse(Integer.MAX_VALUE, false));
-    }
-    */
     @Test(testName = "scrollMouseDown Overdrive", description = "Debería de hacer scroll con el mouse hacia abajo, tomando en cuenta la bandera",
-            dependsOnMethods = "scrollMouse_Overdrive")
+            dependsOnMethods = "cambiarZoomMas_Overdrive")
     public void scrollMouseDown_Overdrive() {
         logParrafo("Se hará Scroll hacia abajo con el mouse por medio de Selenium");
         Assert.assertTrue(SeleniumUtils.scrollMouseDown(driver, 2, true));
@@ -1441,8 +1410,8 @@ public class SeleniumUtilsTest {
     public void getElementByLocator() {
         WebElement elemento = null;
         elemento = SeleniumUtils.getElementByLocator(driver, "xpath", "//*[@id='main']/input[1]");
-        elemento = SeleniumUtils.getElementByLocator(driver,"css selector","#main > input[type=text]:nth-child(17)");
-        elemento = SeleniumUtils.getElementByLocator(driver,"id","midcontentadcontainer");
+        elemento = SeleniumUtils.getElementByLocator(driver, "css selector", "#main > input[type=text]:nth-child(17)");
+        elemento = SeleniumUtils.getElementByLocator(driver, "id", "midcontentadcontainer");
         elemento = SeleniumUtils.getElementByLocator(driver, "tag name", "h1");
         elemento = SeleniumUtils.getElementByLocator(driver, "link text", "HTML Form Elements");
         elemento = SeleniumUtils.getElementByLocator(driver, "partial link text", "Elements");
@@ -1454,17 +1423,15 @@ public class SeleniumUtilsTest {
     @Test(testName = "clickElementIfExist", dependsOnMethods = "getElementByLocator")
     public void clickElementIfExist() {
         WebElement elemento = null;
-
-        SeleniumUtils.clickElementIfExist(driver, driver,"//*[@id='main']/input[1]");
-        SeleniumUtils.clickElementIfExist(driver, driver,"#main > input[type=text]:nth-child(17)");
-        SeleniumUtils.clickElementIfExist(driver, driver,"midcontentadcontainer");
-        SeleniumUtils.clickElementIfExist(driver, driver,"h1");
-        SeleniumUtils.clickElementIfExist(driver, driver,"HTML Form Elements");
-        SeleniumUtils.clickElementIfExist(driver, driver,"Elements");
-        SeleniumUtils.clickElementIfExist(driver, driver,"w3-button");
-        SeleniumUtils.clickElementIfExist(driver, driver,"viewport");
-        SeleniumUtils.clickElementIfExist(driver, driver,"dummy");
-
+        SeleniumUtils.clickElementIfExist(driver, driver, "//*[@id='main']/input[1]");
+        SeleniumUtils.clickElementIfExist(driver, driver, "#main > input[type=text]:nth-child(17)");
+        SeleniumUtils.clickElementIfExist(driver, driver, "midcontentadcontainer");
+        SeleniumUtils.clickElementIfExist(driver, driver, "h1");
+        SeleniumUtils.clickElementIfExist(driver, driver, "HTML Form Elements");
+        SeleniumUtils.clickElementIfExist(driver, driver, "Elements");
+        SeleniumUtils.clickElementIfExist(driver, driver, "w3-button");
+        SeleniumUtils.clickElementIfExist(driver, driver, "viewport");
+        SeleniumUtils.clickElementIfExist(driver, driver, "dummy");
     }
 
     @Test(testName = "switchFrame", description = "Función para cambiar el contexto del WebDriver para interactuar con un marco (frame)",
@@ -1507,7 +1474,7 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "handlePrompt")
     public void obtenerTextWebElementx2_Tiempos() {
         logParrafo("Realiza 2 veces la busquedad de el texto de un elemento");
-        SeleniumUtils.obtenerTextWebElementx2(driver, driver, "textarea[id='APjFqb']",5,5);
+        SeleniumUtils.obtenerTextWebElementx2(driver, driver, "textarea[id='APjFqb']", 5, 5);
     }
 
     @Test(testName = "getElementsIfExist", dependsOnMethods = "obtenerTextWebElementx2_Tiempos")
@@ -1532,9 +1499,9 @@ public class SeleniumUtilsTest {
         boolean result;
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("textarea[id='APjFqb']"));
         result = SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento);
-        if (result){
+        if (result) {
             Assert.assertTrue(result);
-        }else{
+        } else {
             Assert.assertFalse(result);
         }
     }
@@ -1548,11 +1515,9 @@ public class SeleniumUtilsTest {
                 "document.body.appendChild(input);";
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
         jsExecutor.executeScript(createInputScript);
-
         // Establecer el valor del input
         String setValueScript = "document.getElementById('myInput').value = 'Texto de prueba';";
         jsExecutor.executeScript(setValueScript);
-
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("myInput"));
         Assert.assertTrue(SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento));
     }
@@ -1590,13 +1555,6 @@ public class SeleniumUtilsTest {
         Assert.assertFalse(SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento));
     }
     */
-
-
-
-
-
-
-
 //    @AfterTest
 //    public void AfterTest() {
 //        LogsJB.waitForOperationComplete();
