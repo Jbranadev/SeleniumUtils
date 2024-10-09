@@ -2058,12 +2058,12 @@ public class SeleniumUtils {
         }
     }
     */
-
+/*
     /***
      * Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores.
      * @param driver Web Driver que manipula el navegador
      * @param texto Texto a ingresar en el prompt
-     */
+
     public static boolean handlePrompt(WebDriver driver, String texto) {
         try {
             // Intentar interactuar con el prompt usando JavaScript en caso de falla con Selenium
@@ -2082,4 +2082,5 @@ public class SeleniumUtils {
             return false;
         }
     }
+ */
 }

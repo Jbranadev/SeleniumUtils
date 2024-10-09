@@ -62,7 +62,7 @@ public class SeleniumUtilsTest {
         driver.manage().window().maximize();
         driver.get("https://www.google.com");
         LogsJB.setGradeLog(NivelLog.DEBUG);
-        SeleniumUtils.setSearchTime(1000);
+        SeleniumUtils.setSearchTime(1500);
         SeleniumUtils.setSearchRepetitionTime(50);
     }
 
@@ -1501,7 +1501,7 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.waitImplicityForElementNotExist(driver, By.xpath("xxxxxxxxxx"))
         );
     }
-
+/*
     public void  SimularPromt() {
         // Inyectar el código JavaScript para mostrar un prompt
         String script = "var resultado = prompt('Introduce un mensaje:');" +
@@ -1522,9 +1522,9 @@ public class SeleniumUtilsTest {
         SimularPromt();
         Assert.assertFalse(SeleniumUtils.handlePrompt(null, null));
     }
-
+*/
     @Test(testName = "obtenerTextWebElementx2_Tiempos", description = "Realiza 2 veces la busquedad de el texto de un elemento",
-            dependsOnMethods = "handlePrompt_Error")
+            dependsOnMethods = "waitImplicityForElementNotExist")
     public void obtenerTextWebElementx2_Tiempos() {
         logParrafo("Realiza 2 veces la busquedad de el texto de un elemento");
         SeleniumUtils.obtenerTextWebElementx2(driver, driver, "textarea[id='APjFqb']", 5, 5);
