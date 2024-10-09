@@ -201,7 +201,6 @@ public class SeleniumUtilsTest {
     @Test(testName = "CleanElement_Error", description = "Should clean the especified element",
             dependsOnMethods = "cleanElement_Nulo")
     public void cleanElement_Error() {
-        /*
         // Crear un nuevo div y añadirlo al cuerpo del documento
         String createDivScript = "var div = document.createElement('div');" +
                 "div.id = 'myDiv';" +
@@ -215,7 +214,7 @@ public class SeleniumUtilsTest {
 
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("myDiv"));
         Assert.assertTrue(SeleniumUtils.cleanElement(driver, elemento));
-        */
+
     }
 
     @Test(testName = "posicionarmeEn", description = "Should be positioned in specified element",
@@ -302,7 +301,7 @@ public class SeleniumUtilsTest {
     public void getImageScreeenshotWebElement() {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("/html/body"));
         try {
-            SeleniumUtils.getImageScreeenshotWebElement(driver, elemento);
+            SeleniumUtils.getImageScreeenshotWebElement(elemento);
             Assert.assertTrue(true);
         } catch (Exception e) {
             Assert.assertFalse(false);
@@ -313,7 +312,7 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "getImageScreeenshotWebElement")
     public void getImageScreeenshotWebElement_Error() {
         try {
-            SeleniumUtils.getImageScreeenshotWebElement(driver, null);
+            SeleniumUtils.getImageScreeenshotWebElement(null);
             Assert.assertTrue(true);
         } catch (Exception e) {
             Assert.assertFalse(false);
@@ -1467,7 +1466,8 @@ public class SeleniumUtilsTest {
     @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores",
             dependsOnMethods = "waitImplicityForElementNotExist")
     public void handlePrompt() {
-        Assert.assertFalse(SeleniumUtils.handlePrompt(driver, "Texto"));
+        simularAlertJavascript();
+        Assert.assertFalse(SeleniumUtils.handlePrompt(driver, null));
     }
 
     @Test(testName = "obtenerTextWebElementx2_Tiempos", description = "Realiza 2 veces la busquedad de el texto de un elemento",
@@ -1538,7 +1538,7 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "limpiarTextUsingJavaScript_Value")
     public void acceptAlertTest_E() {
         SeleniumUtils.threadslepp(250);
-        Assert.assertFalse(SeleniumUtils.acceptAlert(null));
+        Assert.assertTrue(SeleniumUtils.acceptAlert(null));
     }
 
     /*

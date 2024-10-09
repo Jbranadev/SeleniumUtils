@@ -197,21 +197,20 @@ public class SeleniumUtils {
      * @return True si logra limpiar el elemento, False si no logra limpiar el elemento o si sucede un error.
      */
     public static boolean cleanElement(WebDriver driver, WebElement element) {
-        if (Objects.isNull(element)) {
-            LogsJB.warning("El elemento es nulo. No se puede limpiar.");
-            return false;
-        }
-        // Limpiar el elemento
-        element.clear();
-        String text = SeleniumUtils.getTextOfWebElement(driver, element);
-        //Quiero que en lugar de obtener los atributos, si la cadena no esta vacía, se limpie el elemento,
-        // limpiando el inner text, el value y por medio de java script
-        if (!cadenaNulaoVacia(text)) {
+        try{
+            if (Objects.isNull(element)) {
+                LogsJB.warning("El elemento es nulo. No se puede limpiar.");
+                return false;
+            }
+            // Limpiar el elemento
+            element.clear();
+            LogsJB.debug("Limpió el elemento por medio del API estandar de selenium.");
+            SeleniumUtils.posicionarmeEn(driver, element);
+            return true;
+        }catch (Exception e){
+            LogsJB.debug("No fue posible limpiar el elemento por medio del api estandar, se intenta por medio de JavaScript");
             return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
         }
-        LogsJB.debug("Limpió el elemento por medio del API estandar de selenium.");
-        SeleniumUtils.posicionarmeEn(driver, element);
-        return true;
     }
 
     /**
@@ -229,7 +228,7 @@ public class SeleniumUtils {
         // Utilizar JavaScript para borrar el contenido del elemento
         String text = SeleniumUtils.limpiarTextJavaScript(driver, element);
         if (!cadenaNulaoVacia(text)) {
-            LogsJB.debug("No fue posible limpiar el elmento por medio de JavaScript.");
+            LogsJB.debug("No fue posible limpiar el elemento por medio de JavaScript.");
             return false;
         }
         LogsJB.debug("Limpió el elemento por medio de JavaScript.");
@@ -440,19 +439,14 @@ public class SeleniumUtils {
 
     /***
      * Toma la captura de pantalla sobre el elemento proporcionado como parametro
-     * @param driver Driver que manipula el navegador
      * @param elementScreenshot Elemento sobre el cual se desea tomar la captura de pantalla
      * @return Retorna un objeto File que representa la captura de pantalla del elemento, si no logra tomar la captura de pantalla retorna null
      */
-    public static File getImageScreeenshotWebElement(WebDriver driver, WebElement elementScreenshot) {
-        try {
+    public static File getImageScreeenshotWebElement( WebElement elementScreenshot) {
             if (!Objects.isNull(elementScreenshot)) {
                 return elementScreenshot.getScreenshotAs(OutputType.FILE);
             }
             LogsJB.warning("No pudo tomar la captura de pantalla del elemento indicado, retorna null");
-        } catch (Exception ex) {
-            return null;
-        }
         return null;
     }
 
@@ -493,16 +487,12 @@ public class SeleniumUtils {
      * @return null si no logra refrescar el elemento, caso contrario la referencia al elemento
      */
     public static WebElement RefreshReferenceToElement(WebDriver driver, WebElement elemento) {
-        try {
-            if (!Objects.isNull(elemento)) {
+            if (!Objects.isNull(elemento) || !Objects.isNull(driver)) {
                 String locator = getTermOrLocator(elemento, true);
                 String term = getTermOrLocator(elemento, false);
                 return getElementByLocator(driver, locator, term);
             }
             LogsJB.info("No fue posible refrescar la referencia al elemento");
-        } catch (Exception ex) {
-            return null;
-        }
         return null;
     }
 
@@ -1399,7 +1389,7 @@ public class SeleniumUtils {
                     LogsJB.info("El valor de zoomActual no es numérico: " + zoomActual);
                 }
             }
-            File scrFile = SeleniumUtils.getImageScreeenshotWebElement(driver, elementScreenshot);
+            File scrFile = SeleniumUtils.getImageScreeenshotWebElement(elementScreenshot);
             if (Objects.isNull(scrFile)) {
                 TakesScreenshot scrShot = ((TakesScreenshot) driver);
                 // Restáurar el Zoom a 100% si fue ajustado
@@ -1472,14 +1462,10 @@ public class SeleniumUtils {
             LogsJB.info(text);
             alert.accept();
             return true;
-        } catch (java.util.NoSuchElementException e) {
-            // Manejar la falta de alerta específica si es necesario
+        } catch (Exception e) {
             LogsJB.fatal("No se encontró ninguna alerta presente.");
             SeleniumUtils.ejecutarJsComando(driver, "window.alert = function() {};");
-            return false;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error WebDriver al interactuar con la alerta: ");
-            return false;
+            return true;
         }
     }
 
@@ -1689,43 +1675,6 @@ public class SeleniumUtils {
      * @param banderaAssert Bandera con la cual se va a controlar si se desea un assert o no
      */
     public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion, boolean banderaAssert) {
-        try {
-            WebElement elemento = SeleniumUtils.getElementIfExist(driver, searchcontext, element);
-            if (!Objects.isNull(elemento)) {
-                //Si encuentra el elemento ejecuta este codigo
-                try {
-                    int opcionint;
-                    opcionint = Integer.parseInt(opcion);
-                    LogsJB.info("Parcio la opcion a entero: " + opcionint);
-                    new Select(elemento).selectByIndex(opcionint - 1);
-                    LogsJB.info("Encontro el elemento Select: " + element + " " +
-                            "Procedera a seleccionar la opcion por medio del Index numerico");
-                } catch (NumberFormatException e) {
-                    new Select(elemento).selectByVisibleText(opcion);
-                    LogsJB.info("Encontro el elemento Select: " + element + " " +
-                            "Procedera a seleccionar la opcion por medio del Texto Visible");
-                }
-            } else {
-                LogsJB.info("No pudo encontrar el elemento: " + element + " por lo que no se pudo seleccionar la opcion indicada");
-            }
-            return true;
-        } catch (Exception e) {
-            SeleniumParallel.printError(e, "Error inesperado al seleccionar el elemento: " + element);
-            if (banderaAssert) {
-                Assert.fail("Error inesperado al seleccionar el elemento: " + element);
-            }
-            return false;
-        }
-    }
-
-    /***
-     *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
-     * @param driver Driver que está manipulando el navegador
-     * @param searchcontext Contexto en el que se desea buscar el elemento
-     * @param element Atributo del elemento, por medio del cual se realizara la busquedad
-     * @param opcion Opcion del elemento que queremos seleccionar
-     */
-    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion) {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, searchcontext, element);
         try {
             if (!Objects.isNull(elemento)) {
@@ -1762,8 +1711,22 @@ public class SeleniumUtils {
             return true;
         } catch (Exception e) {
             SeleniumParallel.printError(e, "Error inesperado al seleccionar el elemento: " + element);
+            if (banderaAssert) {
+                Assert.fail("Error inesperado al seleccionar el elemento: " + element);
+            }
+            return false;
         }
-        return false;
+    }
+
+    /***
+     *Selecciona la opcion indicada, si el elemento proporcionado existe en el contexto actual
+     * @param driver Driver que está manipulando el navegador
+     * @param searchcontext Contexto en el que se desea buscar el elemento
+     * @param element Atributo del elemento, por medio del cual se realizara la busquedad
+     * @param opcion Opcion del elemento que queremos seleccionar
+     */
+    public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion) {
+        return SeleniumUtils.selectOption(driver,searchcontext,element,opcion,false);
     }
 
     /***
