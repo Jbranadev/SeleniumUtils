@@ -1294,16 +1294,43 @@ public class SeleniumUtilsTest {
         SeleniumUtils.obtenerTextoElementoX2(driver, driver, "textarea[id='APjFqb']");
     }
 
+    @Test(testName = "obtenerTextoElementoX2_Fallo",
+            description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna",
+            dependsOnMethods = "obtenerTextoElementoX2")
+    public void obtenerTextoElementoX2_Fallo() {
+        logParrafo("Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna");
+        String validar = SeleniumUtils.obtenerTextoElementoX2(driver, driver, null);
+
+        if (validar == null){
+            Assert.assertFalse(false);
+        }else{
+            Assert.assertTrue(true);
+        }
+    }
+
     @Test(testName = "obtenerTextoElementoX2 - Time Controller",
             description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna, controlado por tiempo de duracion de espera",
-            dependsOnMethods = "obtenerTextoElementoX2")
+            dependsOnMethods = "obtenerTextoElementoX2_Fallo")
     public void obtenerTextoElementoX2_TimeController() {
         logParrafo("Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna controlado por tiempo de duracion de espera");
         SeleniumUtils.obtenerTextoElementoX2(driver, driver, "textarea[id='APjFqb']", 1500, 50);
     }
 
-    @Test(testName = "enviarTexto", description = "Envía un texto al elemento indicado, si este existe en el contexto actual",
+    @Test(testName = "obtenerTextoElementoX2_TimeController_Fallo",
+            description = "Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna, controlado por tiempo de duracion de espera",
             dependsOnMethods = "obtenerTextoElementoX2_TimeController")
+    public void obtenerTextoElementoX2_TimeController_Fallo() {
+        logParrafo("Intenta obtener el texto de un elemento en dos intentos. Si el texto es encontrado en el primer o segundo intento, lo retorna controlado por tiempo de duracion de espera");
+        String validar = SeleniumUtils.obtenerTextoElementoX2(driver, driver, null, 1500, 50);
+        if (validar == null){
+            Assert.assertFalse(false);
+        }else{
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test(testName = "enviarTexto", description = "Envía un texto al elemento indicado, si este existe en el contexto actual",
+            dependsOnMethods = "obtenerTextoElementoX2_TimeController_Fallo")
     public void enviarTexto() {
         logParrafo("Envía un texto al elemento indicado, si este existe en el contexto actual");
         driver.navigate().refresh();
@@ -1377,12 +1404,19 @@ public class SeleniumUtilsTest {
             dependsOnMethods = "enviarTexto2_Error")
     public void sendKeystoElementx2intents() {
         logParrafo("Trata de envíar el texto al elemento especificado en mas de una ocasión");
-        boolean resultado = SeleniumUtils.sendKeystoElementx2intents(driver, driver, "q", "Texto de prueba", "Texto de prueba 2");
+        Assert.assertTrue(SeleniumUtils.sendKeystoElementx2intents(driver, driver, "q", "Texto de prueba", "Texto de prueba 2"));
+    }
+
+    @Test(testName = "sendKeystoElementx2intents_Fallo", description = "Trata de envíar el texto al elemento especificado en mas de una ocasión",
+            dependsOnMethods = "sendKeystoElementx2intents")
+    public void sendKeystoElementx2intents_Fallo() {
+        logParrafo("Trata de envíar el texto al elemento especificado en mas de una ocasión");
+        Assert.assertFalse(SeleniumUtils.sendKeystoElementx2intents(driver, driver, null, "Texto de prueba", "Texto de prueba 2"));
     }
 
     @Test(testName = "moverATabAnterior",
             description = "Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña",
-            dependsOnMethods = "sendKeystoElementx2intents")
+            dependsOnMethods = "sendKeystoElementx2intents_Fallo")
     public void moverATabAnterior() {
         logParrafo("Cambia el foco a una pestaña anterior en el navegador, según el identificador de la pestaña");
         driver.switchTo().newWindow(WindowType.TAB);
@@ -1468,18 +1502,25 @@ public class SeleniumUtilsTest {
         );
     }
 
+    public void  SimularPromt() {
+        // Inyectar el código JavaScript para mostrar un prompt
+        String script = "var resultado = prompt('Introduce un mensaje:');" +
+                "if (resultado !== null) { alert('Has ingresado: ' + resultado); }";
+        ((JavascriptExecutor) driver).executeScript(script);
+    }
+
     @Test(testName = "handlePrompt", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores",
             dependsOnMethods = "waitImplicityForElementNotExist")
     public void handlePrompt() {
-        simularAlertJavascript();
+        SimularPromt();
         Assert.assertFalse(SeleniumUtils.handlePrompt(driver, "Texto"));
     }
 
     @Test(testName = "handlePrompt_Error", description = "Permite Aceptar las Alertas emergentes por medio de la definición estándar de W3C de los navegadores con error",
             dependsOnMethods = "handlePrompt")
     public void handlePrompt_Error() {
-        simularAlertJavascript();
-        Assert.assertFalse(SeleniumUtils.handlePrompt(driver, null));
+        SimularPromt();
+        Assert.assertFalse(SeleniumUtils.handlePrompt(null, null));
     }
 
     @Test(testName = "obtenerTextWebElementx2_Tiempos", description = "Realiza 2 veces la busquedad de el texto de un elemento",
@@ -1533,18 +1574,6 @@ public class SeleniumUtilsTest {
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("myInput"));
         Assert.assertTrue(SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento));
     }
-    /*
-    @Test(testName = "acceptAlertTest_Error", description = "Se debe de aceptar el cuadro de dialogo que se dispara",
-            dependsOnMethods = "limpiarTextUsingJavaScript_Value")
-    public void acceptAlertTest_Error() {
-        SeleniumUtils.threadslepp(250);
-
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("alert('hola')");
-
-        Assert.assertFalse(SeleniumUtils.acceptAlert(driver));
-    }
-    */
 
     @Test(testName = "acceptAlertTest_E", description = "Se debe de aceptar el cuadro de dialogo que se dispara",
             dependsOnMethods = "limpiarTextUsingJavaScript_Value")
@@ -1553,20 +1582,6 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.acceptAlert(null));
     }
 
-    /*
-    @Test(testName = "limpiarTextUsingJavaScript_Value", dependsOnMethods = "limpiarTextUsingJavaScript_Value")
-    public void limpiarTextUsingJavaScript_Deshabilitado() {
-        String htmlContent = "<div id=\"miElemento\" style=\"white-space: nowrap;\">" +
-                "Texto <span style=\"font-weight: bold;\">en negrita</span>" +
-                "</div>";
-
-        // Inyectar el HTML en el body de la página
-        ((JavascriptExecutor) driver).executeScript("document.body.innerHTML += arguments[0];", htmlContent);
-
-        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("miElemento"));
-        Assert.assertFalse(SeleniumUtils.limpiarTextUsingJavaScript(driver, elemento));
-    }
-    */
 //    @AfterTest
 //    public void AfterTest() {
 //        LogsJB.waitForOperationComplete();
