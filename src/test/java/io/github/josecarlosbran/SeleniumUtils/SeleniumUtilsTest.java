@@ -207,14 +207,11 @@ public class SeleniumUtilsTest {
                 "document.body.appendChild(div);";
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
         jsExecutor.executeScript(createDivScript);
-
         // Establecer el textContent del div
         String setTextContentScript = "document.getElementById('myDiv').textContent = 'Texto de prueba';";
         jsExecutor.executeScript(setTextContentScript);
-
         WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.id("myDiv"));
         Assert.assertTrue(SeleniumUtils.cleanElement(driver, elemento));
-
     }
 
     @Test(testName = "posicionarmeEn", description = "Should be positioned in specified element",

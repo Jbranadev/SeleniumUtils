@@ -52,7 +52,7 @@ public class SeleniumParallel {
      * @return Retorna un Future<Boolean> con el resultado de la búsqueda, true si encuentra el elemento, false
      * si no lo encuentra o si sucede un error dentro de la busqueda
      */
-    static Future<Boolean> elementExist(Wait<WebDriver> wait, SearchContext searchContext, String locator, String element) {
+    static Future<Boolean> elementExist(Wait<WebDriver> wait, SearchContext searchContext, String locator, String element, CountDownLatch latch) {
         Callable<Boolean> run = () -> {
             boolean exist = false;
             try {
@@ -61,6 +61,7 @@ public class SeleniumParallel {
                 exist = wait.until(new Function<>() {
                     public Boolean apply(WebDriver driver) {
                         List<WebElement> elements = searchContext.findElements(identificador);
+                        latch.countDown(); // Marcar la tarea como completada
                         return !elements.isEmpty();
                     }
                 });

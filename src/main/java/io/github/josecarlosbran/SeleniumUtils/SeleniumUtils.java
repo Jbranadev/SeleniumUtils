@@ -197,7 +197,7 @@ public class SeleniumUtils {
      * @return True si logra limpiar el elemento, False si no logra limpiar el elemento o si sucede un error.
      */
     public static boolean cleanElement(WebDriver driver, WebElement element) {
-        try{
+        try {
             if (Objects.isNull(element)) {
                 LogsJB.warning("El elemento es nulo. No se puede limpiar.");
                 return false;
@@ -207,7 +207,7 @@ public class SeleniumUtils {
             LogsJB.debug("Limpió el elemento por medio del API estandar de selenium.");
             SeleniumUtils.posicionarmeEn(driver, element);
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             LogsJB.debug("No fue posible limpiar el elemento por medio del api estandar, se intenta por medio de JavaScript");
             return SeleniumUtils.limpiarTextUsingJavaScript(driver, element);
         }
@@ -286,55 +286,38 @@ public class SeleniumUtils {
         LogsJB.debug("* ");
         LogsJB.debug(" Buscara si existe el elemento indicado: " + element);
         LogsJB.debug("* ");
+        CountDownLatch latchId = new CountDownLatch(1);
+        CountDownLatch latchClassName = new CountDownLatch(1);
+        CountDownLatch latchCss = new CountDownLatch(1);
+        CountDownLatch latchTagName = new CountDownLatch(1);
+        CountDownLatch latchLinkText = new CountDownLatch(1);
+        CountDownLatch latchPartialLinkText = new CountDownLatch(1);
+        CountDownLatch latchXpath = new CountDownLatch(1);
+        CountDownLatch latchName = new CountDownLatch(1);
+        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
+        //Declaración de features para obtener el resultado de buscar los elementos en cuestión
+        Future<Boolean> futureId = SeleniumParallel.elementExist(wait, searchContext, "id", element, latchId);
+        Future<Boolean> futureClassName = SeleniumParallel.elementExist(wait, searchContext, "class name", element, latchClassName);
+        Future<Boolean> futureCss = SeleniumParallel.elementExist(wait, searchContext, "css selector", element, latchCss);
+        Future<Boolean> futureTagName = SeleniumParallel.elementExist(wait, searchContext, "tag name", element, latchTagName);
+        Future<Boolean> futureLinkText = SeleniumParallel.elementExist(wait, searchContext, "link text", element, latchLinkText);
+        Future<Boolean> futurePartialLinkText = SeleniumParallel.elementExist(wait, searchContext, "partial link text", element, latchPartialLinkText);
+        Future<Boolean> futureXpath = SeleniumParallel.elementExist(wait, searchContext, "xpath", element, latchXpath);
+        Future<Boolean> futureName = SeleniumParallel.elementExist(wait, searchContext, "name", element, latchName);
         //Crea las variables de control que no permiten que sobre pase los 7,000 milisegundos la busqueda del elemento
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
-        Wait<WebDriver> wait = SeleniumUtils.getFluentWait(driver, SeleniumUtils.getSearchTime(), SeleniumUtils.getSearchRepetitionTime());
-        //Declaración de features para obtener el resultado de buscar los elementos en cuestión
-        Future<Boolean> futureId = SeleniumParallel.elementExist(wait, searchContext, "id", element);
-        Future<Boolean> futureClassName = SeleniumParallel.elementExist(wait, searchContext, "class name", element);
-        Future<Boolean> futureCss = SeleniumParallel.elementExist(wait, searchContext, "css selector", element);
-        Future<Boolean> futureTagName = SeleniumParallel.elementExist(wait, searchContext, "tag name", element);
-        Future<Boolean> futureLinkText = SeleniumParallel.elementExist(wait, searchContext, "link text", element);
-        Future<Boolean> futurePartialLinkText = SeleniumParallel.elementExist(wait, searchContext, "partial link text", element);
-        Future<Boolean> futureXpath = SeleniumParallel.elementExist(wait, searchContext, "xpath", element);
-        Future<Boolean> futureName = SeleniumParallel.elementExist(wait, searchContext, "name", element);
+
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (System.currentTimeMillis() < endTime) {
-            try {
-                if (futureId.isDone() && futureId.get()) {
-                    return true;
-                }
-                if (futureClassName.isDone() && futureClassName.get()) {
-                    return true;
-                }
-                if (futureCss.isDone() && futureCss.get()) {
-                    return true;
-                }
-                if (futureTagName.isDone() && futureTagName.get()) {
-                    return true;
-                }
-                if (futureLinkText.isDone() && futureLinkText.get()) {
-                    return true;
-                }
-                if (futurePartialLinkText.isDone() && futurePartialLinkText.get()) {
-                    return true;
-                }
-                if (futureXpath.isDone() && futureXpath.get()) {
-                    return true;
-                }
-                if (futureName.isDone() && futureName.get()) {
-                    return true;
-                }
-            } catch (Exception e) {
-                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
-            }
-        }
+        boolean result = waitForElement(endTime, SeleniumUtils.getSearchRepetitionTime(),
+                latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName, latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No Existe el elemento especificado: " + element);
+        } else {
+            return result;
         }
         //Retorna Falso si el elemento no Existe
         return false;
@@ -376,40 +359,14 @@ public class SeleniumUtils {
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (System.currentTimeMillis() < endTime) {
-            try {
-                if (latchId.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureId.get();
-                }
-                if (latchClassName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureClassName.get();
-                }
-                if (latchCss.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureCss.get();
-                }
-                if (latchTagName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureTagName.get();
-                }
-                if (latchLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureLinkText.get();
-                }
-                if (latchPartialLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futurePartialLinkText.get();
-                }
-                if (latchXpath.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureXpath.get();
-                }
-                if (latchName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureName.get();
-                }
-            } catch (Exception e) {
-                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
-            }
-        }
+        boolean result = waitForElement(endTime, SeleniumUtils.getSearchRepetitionTime(),
+                latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName, latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No logro limpiar el elemento especificado: " + element);
+        } else {
+            return result;
         }
         //Retorna Falso si el elemento no Existe
         return false;
@@ -442,11 +399,11 @@ public class SeleniumUtils {
      * @param elementScreenshot Elemento sobre el cual se desea tomar la captura de pantalla
      * @return Retorna un objeto File que representa la captura de pantalla del elemento, si no logra tomar la captura de pantalla retorna null
      */
-    public static File getImageScreeenshotWebElement( WebElement elementScreenshot) {
-            if (!Objects.isNull(elementScreenshot)) {
-                return elementScreenshot.getScreenshotAs(OutputType.FILE);
-            }
-            LogsJB.warning("No pudo tomar la captura de pantalla del elemento indicado, retorna null");
+    public static File getImageScreeenshotWebElement(WebElement elementScreenshot) {
+        if (!Objects.isNull(elementScreenshot)) {
+            return elementScreenshot.getScreenshotAs(OutputType.FILE);
+        }
+        LogsJB.warning("No pudo tomar la captura de pantalla del elemento indicado, retorna null");
         return null;
     }
 
@@ -487,12 +444,12 @@ public class SeleniumUtils {
      * @return null si no logra refrescar el elemento, caso contrario la referencia al elemento
      */
     public static WebElement RefreshReferenceToElement(WebDriver driver, WebElement elemento) {
-            if (!Objects.isNull(elemento) || !Objects.isNull(driver)) {
-                String locator = getTermOrLocator(elemento, true);
-                String term = getTermOrLocator(elemento, false);
-                return getElementByLocator(driver, locator, term);
-            }
-            LogsJB.info("No fue posible refrescar la referencia al elemento");
+        if (!Objects.isNull(elemento) || !Objects.isNull(driver)) {
+            String locator = getTermOrLocator(elemento, true);
+            String term = getTermOrLocator(elemento, false);
+            return getElementByLocator(driver, locator, term);
+        }
+        LogsJB.info("No fue posible refrescar la referencia al elemento");
         return null;
     }
 
@@ -620,43 +577,61 @@ public class SeleniumUtils {
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        while (System.currentTimeMillis() < endTime) {
-            try {
-                if (latchId.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureId.get();
-                }
-                if (latchClassName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureClassName.get();
-                }
-                if (latchCss.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureCss.get();
-                }
-                if (latchTagName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureTagName.get();
-                }
-                if (latchLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureLinkText.get();
-                }
-                if (latchPartialLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futurePartialLinkText.get();
-                }
-                if (latchXpath.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureXpath.get();
-                }
-                if (latchName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    return futureName.get();
-                }
-            } catch (Exception e) {
-                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
-            }
-        }
+        boolean result = waitForElement(endTime, SeleniumUtils.getSearchRepetitionTime(),
+                latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName, latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No logro encontrar y setear el Texto: " + Arrays.toString(Texto) +
                     " en el elemento especificado: " + element);
+        } else {
+            return result;
         }
         //Retorna Falso si el elemento no Existe
+        return false;
+    }
+
+    public static Boolean waitForElement(
+            long endTime,
+            int searchRepetitionTime,
+            CountDownLatch latchId, Future<Boolean> futureId,
+            CountDownLatch latchClassName, Future<Boolean> futureClassName,
+            CountDownLatch latchCss, Future<Boolean> futureCss,
+            CountDownLatch latchTagName, Future<Boolean> futureTagName,
+            CountDownLatch latchLinkText, Future<Boolean> futureLinkText,
+            CountDownLatch latchPartialLinkText, Future<Boolean> futurePartialLinkText,
+            CountDownLatch latchXpath, Future<Boolean> futureXpath,
+            CountDownLatch latchName, Future<Boolean> futureName) {
+        while (System.currentTimeMillis() < endTime) {
+            try {
+                if (latchId.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureId.get()) {
+                    return true;
+                }
+                if (latchClassName.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureClassName.get()) {
+                    return true;
+                }
+                if (latchCss.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureCss.get()) {
+                    return true;
+                }
+                if (latchTagName.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureTagName.get()) {
+                    return true;
+                }
+                if (latchLinkText.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureLinkText.get()) {
+                    return true;
+                }
+                if (latchPartialLinkText.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futurePartialLinkText.get()) {
+                    return true;
+                }
+                if (latchXpath.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureXpath.get()) {
+                    return true;
+                }
+                if (latchName.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureName.get()) {
+                    return true;
+                }
+            } catch (Exception e) {
+                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
+            }
+        }
         return false;
     }
 
@@ -861,56 +836,14 @@ public class SeleniumUtils {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
-        while (System.currentTimeMillis() < endTime) {
-            try {
-                if (latchId.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    if (futureId.get()) {
-                        return true;
-                    }
-                }
-                if (latchClassName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    if (futureClassName.get()) {
-                        return true;
-                    }
-                }
-                if (latchCss.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    if (futureCss.get()) {
-                        return true;
-                    }
-                }
-                if (latchTagName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    if (futureTagName.get()) {
-                        return true;
-                    }
-                }
-                if (latchLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    if (futureLinkText.get()) {
-                        return true;
-                    }
-                }
-                if (latchPartialLinkText.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    if (futurePartialLinkText.get()) {
-                        return true;
-                    }
-                }
-                if (latchXpath.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    if (futureXpath.get()) {
-                        return true;
-                    }
-                }
-                if (latchName.await(getSearchRepetitionTime(), TimeUnit.MILLISECONDS)) {
-                    if (futureName.get()) {
-                        return true;
-                    }
-                }
-            } catch (Exception e) {
-                SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
-            }
-        }
+        boolean result = waitForElement(endTime, SeleniumUtils.getSearchRepetitionTime(),
+                latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName, latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
         if (System.currentTimeMillis() >= endTime) {
             LogsJB.info(" No pudo hacer click en el elemento especificado, ya que no existe: " + element);
+        } else {
+            return result;
         }
         //Retorna Falso si el elemento no Existe
         return false;
@@ -1737,7 +1670,7 @@ public class SeleniumUtils {
      * @param opcion Opcion del elemento que queremos seleccionar
      */
     public static boolean selectOption(WebDriver driver, SearchContext searchcontext, String element, String opcion) {
-        return SeleniumUtils.selectOption(driver,searchcontext,element,opcion,false);
+        return SeleniumUtils.selectOption(driver, searchcontext, element, opcion, false);
     }
 
     /***
