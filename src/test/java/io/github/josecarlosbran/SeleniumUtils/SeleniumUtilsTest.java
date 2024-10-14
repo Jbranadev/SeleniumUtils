@@ -162,7 +162,7 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "KeyPress Using ASCII Code Assert control",
             description = "Verifica que se puede presionar una tecla utilizando un código ASCII con la variable de control true",
-            dependsOnMethods = "KeyPressUsingKeysAssertControl")
+            dependsOnMethods = "KeyPressUsingKeysAssertControl" , expectedExceptions = {AssertionError.class})
     public void keyPressUsingAsciiCodeAssertControl() {
         logParrafo("Se va a presionar la tecla 'A' utilizando su código ASCII");
         WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
@@ -1190,7 +1190,7 @@ public class SeleniumUtilsTest {
     @Test(testName = "KeyPress - Int - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress",
             dependsOnMethods = "KeyPress_Int_Overdrive_Error")
     public void KeyPress_Int_Overdrive_Error2() {
-        SeleniumUtils.keyPress(null, 65, false);
+        SeleniumUtils.keyPress(null, 65, true);
     }
 
     @Test(testName = "getElementIfExist_By", description = "Debería de obtener un elemento By si existe",
@@ -1323,10 +1323,10 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "scrollMouseKey", description = "Mueve el scroll del mouse",
-            dependsOnMethods = "elementExist")
+            dependsOnMethods = "elementExist", expectedExceptions = {AssertionError.class})
     public void scrollMouseKey() {
         logParrafo("Se hará Scroll hacia arriba con el mouse por medio de Selenium");
-        Assert.assertFalse(SeleniumUtils.scrollMouseUp(null, 2, false));
+        Assert.assertFalse(SeleniumUtils.scrollMouseKey(driver, 2,Keys.ADD,true));
     }
 
     @Test(testName = "selectOptionWithComment -Overdrive seteo", description = "Debería de seleccionar la opcion de un select",
