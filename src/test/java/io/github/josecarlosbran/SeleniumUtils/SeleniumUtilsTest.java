@@ -162,14 +162,14 @@ public class SeleniumUtilsTest {
 
     @Test(testName = "KeyPress Using ASCII Code Assert control",
             description = "Verifica que se puede presionar una tecla utilizando un código ASCII con la variable de control true",
-            dependsOnMethods = "KeyPressUsingKeysAssertControl" , expectedExceptions = {AssertionError.class})
+            dependsOnMethods = "KeyPressUsingKeysAssertControl" )
     public void keyPressUsingAsciiCodeAssertControl() {
         logParrafo("Se va a presionar la tecla 'A' utilizando su código ASCII");
         WebElement searchBox = SeleniumUtils.getElementIfExist(driver, driver, "textarea[id='APjFqb']");  // Encuentra la barra de búsqueda
         searchBox.clear();  // Limpia la barra de búsqueda para comenzar con un campo vacío
         searchBox.click();
         // Presiona la tecla 'A' (código ASCII 65)
-        SeleniumUtils.keyPress(driver, 65, true);
+        SeleniumUtils.keyPress(driver, 65, false);
         // Verifica que la barra de búsqueda contiene la letra 'A'
         Assert.assertEquals(searchBox.getAttribute("value"), "A", "La tecla 'A' no fue presionada correctamente");
     }
@@ -1188,7 +1188,7 @@ public class SeleniumUtilsTest {
     }
 
     @Test(testName = "KeyPress - Int - Overdrive - Error", description = "Funcion para comprobar el Assert.Fail de KeyPress",
-            dependsOnMethods = "KeyPress_Int_Overdrive_Error")
+            dependsOnMethods = "KeyPress_Int_Overdrive_Error", expectedExceptions = {AssertionError.class})
     public void KeyPress_Int_Overdrive_Error2() {
         SeleniumUtils.keyPress(null, 65, true);
     }
