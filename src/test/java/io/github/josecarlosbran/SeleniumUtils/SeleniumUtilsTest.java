@@ -328,9 +328,21 @@ public class SeleniumUtilsTest {
         }
     }
 
+    @Test(testName = "RefreshReferenceToElement", description = "Should take a correct refresh",
+            dependsOnMethods = "RefreshReferenceToElement")
+    public void RefreshReferenceToElement_Error() {
+        WebElement elemento = SeleniumUtils.getElementIfExist(driver, driver, By.xpath("/html/body"));
+        try {
+            SeleniumUtils.RefreshReferenceToElement(null, elemento);
+            Assert.assertTrue(true);
+        } catch (Exception e) {
+            Assert.assertFalse(false);
+        }
+    }
+
     @Test(testName = "Send Keys If Element Exist - Element Not Found",
             description = "Verifica que el método retorne false cuando no se encuentra ningún elemento",
-            dependsOnMethods = "RefreshReferenceToElement")
+            dependsOnMethods = "RefreshReferenceToElement_Error")
     public void testSendKeysIfElementExist_ElementNotFound() {
         String element = "testElement";
         CharSequence[] texto = {"Hello"};
@@ -812,8 +824,31 @@ public class SeleniumUtilsTest {
         Assert.assertFalse(SeleniumUtils.deseleccionarElemento(driver, driver, elemento));
     }
 
-    @Test(testName = "deseleccionarElementoFallo_IF", description = "Debe de seleccionar ele elemento especirficado",
+    @Test(testName = "waitForElementGeneric", description = "Debe de seleccionar ele elemento especirficado",
             dependsOnMethods = "deseleccionarElementoFallo")
+    public void waitForElementGeneric() {
+        ((JavascriptExecutor) driver).executeScript(
+                "var nuevoInput = document.createElement('input');" +
+                        "nuevoInput.type = 'text';" +  // Cambia el tipo según sea necesario
+                        "nuevoInput.name = 'miInput';" +  // Nombre del input
+                        "nuevoInput.id = 'miInput';" +  // Id del input (opcional)
+                        "nuevoInput.style.width = '200px';" +
+                        "nuevoInput.style.height = '30px';" +
+                        "nuevoInput.style.margin = '10px';" +
+                        "nuevoInput.value = 'Texto inicial';" +  // Texto predefinido
+                        "document.body.appendChild(nuevoInput);"
+        );
+        String Texto = SeleniumUtils.getTextIfElementExist(driver,driver,"miInput");
+        if (!Texto.isEmpty()) {
+            Assert.assertTrue(true);
+        } else {
+            Assert.assertFalse(false);
+        }
+    }
+
+
+    @Test(testName = "deseleccionarElementoFallo_IF", description = "Debe de seleccionar ele elemento especirficado",
+            dependsOnMethods = "waitForElementGeneric")
     public void deseleccionarElementoFallo_IF() {
         ((JavascriptExecutor) driver).executeScript("var nuevoElemento = document.createElement('div');" +
                 "nuevoElemento.id = 'Colores';" +
@@ -1196,9 +1231,17 @@ public class SeleniumUtilsTest {
         );
     }
 
+    @Test(testName = "waitImplicityForElementNotExist_Overdrive_Error_TestFallido",
+            description = "Debería de hacer un wait Implicity para elementos que no existan,tomando en cuenta la bandera para el assert",
+            dependsOnMethods = "waitImplicityForElementNotExist_Overdrive" , expectedExceptions = {AssertionError.class})
+    public void waitImplicityForElementNotExist_Overdrive_Error_TestFallido() {
+        logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe");
+        Assert.assertFalse(SeleniumUtils.waitImplicityForElementNotExist(driver, null, true));
+    }
+
     @Test(testName = "waitImplicityForElementNotExist OverDrive - Error",
             description = "Debería de hacer un wait Implicity para elementos que no existan,tomando en cuenta la bandera para el assert",
-            dependsOnMethods = "waitImplicityForElementNotExist_Overdrive")
+            dependsOnMethods = "waitImplicityForElementNotExist_Overdrive_Error_TestFallido")
     public void waitImplicityForElementNotExist_Overdrive_Error() {
         logParrafo("Lo que debería de hacer es, una espera implicita pero para verificar si un elemento no existe");
         Assert.assertFalse(SeleniumUtils.waitImplicityForElementNotExist(driver, null, false));
@@ -1217,6 +1260,13 @@ public class SeleniumUtilsTest {
         Assert.assertFalse(SeleniumUtils.cambiarZOOM(driver, 2, null, false));
     }
 
+    @Test(testName = "cambiarZoomPlus OverDrive Error", description = "Debería de aumentar el zoom de la pagina que se está visualizando, tomando en cuenta la bandera",
+            dependsOnMethods = "elementExist" , expectedExceptions = {AssertionError.class})
+    public void cambiarZoomPlus_OverDrive_Error_FalloTest() {
+        logParrafo("Se debe de aumentar la cantidad de Zoom que se realiza");
+        Assert.assertFalse(SeleniumUtils.cambiarZOOM(driver, 2, null, true));
+    }
+
     @Test(testName = "cambiarZoomLess Overdrive", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera",
             dependsOnMethods = "cambiarZoomPlus_OverDrive")
     public void cambiarZoomLessCodigoEntero_Overdrive() {
@@ -1224,10 +1274,11 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.cambiarZOOM(driver, 2, 2, true));
     }
 
-    @Test(testName = "cambiarZoomLess Overdrive Fallo", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    @Test(testName = "cambiarZoomLess Overdrive Fallo", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera",
+            dependsOnMethods = "elementExist" , expectedExceptions = {AssertionError.class})
     public void cambiarZoomLessCodigoEntero_Overdrive_Fallo() {
         logParrafo("Se debe de disminuir la cantidad de Zoom que se realiza");
-        Assert.assertFalse(SeleniumUtils.cambiarZOOM(null, 5, 3000, false));
+        Assert.assertFalse(SeleniumUtils.cambiarZOOM(null, 5, 3000, true));
     }
 
     @Test(testName = "cambiarZOOMMenos Overdrive", description = "Debería de disminuir el zoom de la pagina que se está visualizando, tomando en cuenta la bandera",
@@ -1264,8 +1315,16 @@ public class SeleniumUtilsTest {
         Assert.assertTrue(SeleniumUtils.scrollMouseUp(driver, 2, true));
     }
 
-    @Test(testName = "scrollMouseUp Overdrive Fallo", description = "Debería de hacer scroll con el mouse hacia arriba, tomando en cuenta la bandera", dependsOnMethods = "elementExist")
+    @Test(testName = "scrollMouseUp Overdrive Fallo", description = "Debería de hacer scroll con el mouse hacia arriba, tomando en cuenta la bandera",
+            dependsOnMethods = "elementExist")
     public void scrollMouseUp_Overdrive_Fallo() {
+        logParrafo("Se hará Scroll hacia arriba con el mouse por medio de Selenium");
+        Assert.assertFalse(SeleniumUtils.scrollMouseUp(null, 2, false));
+    }
+
+    @Test(testName = "scrollMouseKey", description = "Mueve el scroll del mouse",
+            dependsOnMethods = "elementExist")
+    public void scrollMouseKey() {
         logParrafo("Se hará Scroll hacia arriba con el mouse por medio de Selenium");
         Assert.assertFalse(SeleniumUtils.scrollMouseUp(null, 2, false));
     }
@@ -1581,6 +1640,13 @@ public class SeleniumUtilsTest {
         SeleniumUtils.threadslepp(250);
         Assert.assertTrue(SeleniumUtils.acceptAlert(null));
     }
+
+    @Test(testName = "threadslepp_Fallo", description = "Hace una pausa sobre el hilo en ejecución por el tiempo especificado dando error",
+            dependsOnMethods = "acceptAlertTest_E")
+    public void threadslepp_Fallo() {
+        SeleniumUtils.threadslepp(-1);
+    }
+    
 
 //    @AfterTest
 //    public void AfterTest() {

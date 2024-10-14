@@ -443,7 +443,7 @@ public class SeleniumUtils {
      * @return null si no logra refrescar el elemento, caso contrario la referencia al elemento
      */
     public static WebElement RefreshReferenceToElement(WebDriver driver, WebElement elemento) {
-        if (!Objects.isNull(elemento) || !Objects.isNull(driver)) {
+        if (!Objects.isNull(elemento) && !Objects.isNull(driver)) {
             String locator = getTermOrLocator(elemento, true);
             String term = getTermOrLocator(elemento, false);
             return getElementByLocator(driver, locator, term);
