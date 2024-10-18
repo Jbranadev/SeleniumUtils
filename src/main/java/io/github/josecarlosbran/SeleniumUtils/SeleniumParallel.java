@@ -102,8 +102,8 @@ public class SeleniumParallel {
                             LogsJB.warning(" El elemento no se encuentra habilitado para su limpieza " + identificador);
                             return true;
                         }
-                        LogsJB.info(" Limpiando el elemento por medio de " + identificador);
                         latch.countDown(); // Marcar la tarea como completada
+                        LogsJB.info(" Limpiando el elemento por medio de " + identificador);
                         boolean result = SeleniumUtils.cleanElement(driver, element);
                         if (!result) {
                             LogsJB.warning(" No pudo limpiar el elemento, " + identificador +
@@ -147,9 +147,9 @@ public class SeleniumParallel {
                                     " no se encuentra habilitado");
                             return true;
                         }
+                        latch.countDown(); // Marcar la tarea como completada
                         LogsJB.info(" Enviando Texto al elemento por medio de " + identificador +
                                 " : " + Arrays.toString(Texto).substring(1, Arrays.toString(Texto).length() - 1));
-                        latch.countDown(); // Marcar la tarea como completada
                         boolean result = SeleniumUtils.sendKeysToElement(driver, element, Texto);
                         if (!result) {
                             LogsJB.warning(" No pudo enviar el texto a el elemento, " + identificador +
@@ -229,8 +229,8 @@ public class SeleniumParallel {
                             LogsJB.warning(" El elemento no se encuentra habilitado para hacer click en el " + identificador);
                             return true;
                         }
-                        LogsJB.info(" Hace click en el elemento por medio de " + identificador);
                         latch.countDown(); // Marcar la tarea como completada
+                        LogsJB.info(" Hace click en el elemento por medio de " + identificador);
                         boolean result = SeleniumUtils.clickToElement(driver, element);
                         if (!result) {
                             LogsJB.warning(" No pudo hacer click en el elemento, comuniquese con los administradores ");
