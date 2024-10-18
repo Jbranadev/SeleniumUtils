@@ -1,3 +1,13 @@
+# Version: 1.1.3
+
+* [#28](https://github.com/Jbranadev/SeleniumUtils/pull/28): Bump codecov/codecov-action from 4.5.0 to 4.6.0
+* [#29](https://github.com/Jbranadev/SeleniumUtils/pull/29): Bump github/codeql-action from 3.26.9 to 3.26.11
+* [#30](https://github.com/Jbranadev/SeleniumUtils/pull/30): Bump actions/checkout from 4.2.0 to 4.2.1
+* [#31](https://github.com/Jbranadev/SeleniumUtils/pull/31): Bump github/codeql-action from 3.26.11 to 3.26.12
+* [#32](https://github.com/Jbranadev/SeleniumUtils/pull/32): Bump actions/upload-artifact from 4.4.0 to 4.4.3
+* [#33](https://github.com/Jbranadev/SeleniumUtils/pull/33): Release 1.1.3.7
+
+
 # Version: 1.1.1
 
 * [#1](https://github.com/Jbranadev/SeleniumUtils/pull/1): Bump org.seleniumhq.selenium:selenium-java from 4.22.0 to

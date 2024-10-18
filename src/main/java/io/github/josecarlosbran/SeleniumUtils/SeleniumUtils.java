@@ -309,7 +309,7 @@ public class SeleniumUtils {
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        boolean result = waitForElement(endTime, SeleniumUtils.getSearchRepetitionTime(),
+        boolean result = waitForElement(
                 latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName, latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
@@ -358,7 +358,7 @@ public class SeleniumUtils {
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        boolean result = waitForElement(endTime, SeleniumUtils.getSearchRepetitionTime(),
+        boolean result = waitForElement(
                 latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName, latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
@@ -576,7 +576,7 @@ public class SeleniumUtils {
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        boolean result = waitForElement(endTime, SeleniumUtils.getSearchRepetitionTime(),
+        boolean result = waitForElement(
                 latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName, latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
@@ -591,8 +591,6 @@ public class SeleniumUtils {
     }
 
     public static Boolean waitForElement(
-            long endTime,
-            int searchRepetitionTime,
             CountDownLatch latchId, Future<Boolean> futureId,
             CountDownLatch latchClassName, Future<Boolean> futureClassName,
             CountDownLatch latchCss, Future<Boolean> futureCss,
@@ -601,7 +599,7 @@ public class SeleniumUtils {
             CountDownLatch latchPartialLinkText, Future<Boolean> futurePartialLinkText,
             CountDownLatch latchXpath, Future<Boolean> futureXpath,
             CountDownLatch latchName, Future<Boolean> futureName) {
-        Boolean result = waitForElementGeneric(endTime, searchRepetitionTime, latchId, futureId, latchClassName, futureClassName,
+        Boolean result = waitForElementGeneric(latchId, futureId, latchClassName, futureClassName,
                 latchCss, futureCss, latchTagName, futureTagName, latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         if (Objects.isNull(result)) {
             result = false;
@@ -610,8 +608,6 @@ public class SeleniumUtils {
     }
 
     public static <T> T waitForElementGeneric(
-            long endTime,
-            int searchRepetitionTime,
             CountDownLatch latchId, Future<T> futureId,
             CountDownLatch latchClassName, Future<T> futureClassName,
             CountDownLatch latchCss, Future<T> futureCss,
@@ -620,61 +616,64 @@ public class SeleniumUtils {
             CountDownLatch latchPartialLinkText, Future<T> futurePartialLinkText,
             CountDownLatch latchXpath, Future<T> futureXpath,
             CountDownLatch latchName, Future<T> futureName) {
+        T result = null;
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + SeleniumUtils.getSearchTime();
         while (System.currentTimeMillis() < endTime) {
             try {
-                if (latchId.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureId.isDone()) {
-                    T result = futureId.get();
+                if (latchId.await(searchRepetitionTime, TimeUnit.MICROSECONDS) && futureId.isDone()) {
+                    result = futureId.get();
                     if (result != null && !result.toString().isEmpty()) {
-                        return result;
+                        break;
                     }
                 }
-                if (latchClassName.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureClassName.isDone()) {
-                    T result = futureClassName.get();
+                if (latchClassName.await(searchRepetitionTime, TimeUnit.MICROSECONDS) && futureClassName.isDone()) {
+                    result = futureClassName.get();
                     if (result != null && !result.toString().isEmpty()) {
-                        return result;
+                        break;
                     }
                 }
-                if (latchCss.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureCss.isDone()) {
-                    T result = futureCss.get();
+                if (latchCss.await(searchRepetitionTime, TimeUnit.MICROSECONDS) && futureCss.isDone()) {
+                    result = futureCss.get();
                     if (result != null && !result.toString().isEmpty()) {
-                        return result;
+                        break;
                     }
                 }
-                if (latchTagName.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureTagName.isDone()) {
-                    T result = futureTagName.get();
+                if (latchTagName.await(searchRepetitionTime, TimeUnit.MICROSECONDS) && futureTagName.isDone()) {
+                    result = futureTagName.get();
                     if (result != null && !result.toString().isEmpty()) {
-                        return result;
+                        break;
                     }
                 }
-                if (latchLinkText.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureLinkText.isDone()) {
-                    T result = futureLinkText.get();
+                if (latchLinkText.await(searchRepetitionTime, TimeUnit.MICROSECONDS) && futureLinkText.isDone()) {
+                    result = futureLinkText.get();
                     if (result != null && !result.toString().isEmpty()) {
-                        return result;
+                        break;
                     }
                 }
-                if (latchPartialLinkText.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futurePartialLinkText.isDone()) {
-                    T result = futurePartialLinkText.get();
+                if (latchPartialLinkText.await(searchRepetitionTime, TimeUnit.MICROSECONDS) && futurePartialLinkText.isDone()) {
+                    result = futurePartialLinkText.get();
                     if (result != null && !result.toString().isEmpty()) {
-                        return result;
+                        break;
                     }
                 }
-                if (latchXpath.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureXpath.isDone()) {
-                    T result = futureXpath.get();
+                if (latchXpath.await(searchRepetitionTime, TimeUnit.MICROSECONDS) && futureXpath.isDone()) {
+                    result = futureXpath.get();
                     if (result != null && !result.toString().isEmpty()) {
-                        return result;
+                        break;
                     }
                 }
-                if (latchName.await(searchRepetitionTime, TimeUnit.MILLISECONDS) && futureName.isDone()) {
-                    T result = futureName.get();
+                if (latchName.await(searchRepetitionTime, TimeUnit.MICROSECONDS) && futureName.isDone()) {
+                    result = futureName.get();
                     if (result != null && !result.toString().isEmpty()) {
-                        return result;
+                        break;
                     }
                 }
             } catch (Exception e) {
                 SeleniumParallel.printError(e, "Error al obtener el resultado del Future: ");
             }
         }
-        return null;
+        return result;
     }
 
     /***
@@ -726,7 +725,7 @@ public class SeleniumUtils {
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        texto = waitForElementGeneric(endTime, timeRepetition,
+        texto = waitForElementGeneric(
                 latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName,
                 latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
@@ -851,7 +850,7 @@ public class SeleniumUtils {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
-        boolean result = waitForElement(endTime, SeleniumUtils.getSearchRepetitionTime(),
+        boolean result = waitForElement(
                 latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName, latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         LogsJB.debug("Fecha actual: " + new Date(System.currentTimeMillis()));
@@ -953,7 +952,7 @@ public class SeleniumUtils {
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        elementos = waitForElementGeneric(endTime, SeleniumUtils.getSearchRepetitionTime(),
+        elementos = waitForElementGeneric(
                 latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName,
                 latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
@@ -1019,7 +1018,7 @@ public class SeleniumUtils {
         long endTime = startTime + SeleniumUtils.getSearchTime();
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
         // Esperará saber si existe el elemento en alguno de los tipos usando Future
-        elemento = waitForElementGeneric(endTime, SeleniumUtils.getSearchRepetitionTime(),
+        elemento = waitForElementGeneric(
                 latchId, futureId, latchClassName, futureClassName, latchCss, futureCss, latchTagName, futureTagName,
                 latchLinkText, futureLinkText, latchPartialLinkText, futurePartialLinkText, latchXpath, futureXpath, latchName, futureName);
         LogsJB.debug("Fecha contra la que se comparara si transcurren los " + SeleniumUtils.getSearchTime() + " mili segundos: " + new Date(endTime));
