@@ -408,29 +408,29 @@ public class SeleniumUtils {
 
     /***
      * Obtiene el elemento web por medio de un locator y un elemento
-     * @param driver Driver que manipula el navegador
+     * @param searchContext Driver que manipula el navegador
      * @param locator Tipo de locator que se utilizará para buscar el elemento
      * @param element Criterio que se utilizará para buscar el elemento
      * @return Retorna el WebElement si logra encontrarlo, de lo contrario retorna null
      */
-    public static WebElement getElementByLocator(WebDriver driver, String locator, String element) {
+    public static WebElement getElementByLocator(SearchContext searchContext, String locator, String element) {
         switch (locator) {
             case "xpath":
-                return driver.findElement(By.xpath(element));
+                return searchContext.findElement(By.xpath(element));
             case "css selector":
-                return driver.findElement(By.cssSelector(element));
+                return searchContext.findElement(By.cssSelector(element));
             case "id":
-                return driver.findElement(By.id(element));
+                return searchContext.findElement(By.id(element));
             case "tag name":
-                return driver.findElement(By.tagName(element));
+                return searchContext.findElement(By.tagName(element));
             case "name":
-                return driver.findElement(By.name(element));
+                return searchContext.findElement(By.name(element));
             case "link text":
-                return driver.findElement(By.linkText(element));
+                return searchContext.findElement(By.linkText(element));
             case "partial link text":
-                return driver.findElement(By.partialLinkText(element));
+                return searchContext.findElement(By.partialLinkText(element));
             case "class name":
-                return driver.findElement(By.className(element));
+                return searchContext.findElement(By.className(element));
         }
         return null;
     }
@@ -438,15 +438,15 @@ public class SeleniumUtils {
     /**
      * Actualiza la referencia al elemento si está disponible en el contexto actual de selenium
      *
-     * @param driver   Driver que manipula el navegador
+     * @param searchContext   Contexto de búsqueda en el que se buscará el elemento
      * @param elemento Elemento a refrescar
      * @return null si no logra refrescar el elemento, caso contrario la referencia al elemento
      */
-    public static WebElement RefreshReferenceToElement(WebDriver driver, WebElement elemento) {
-        if (!Objects.isNull(elemento) && !Objects.isNull(driver)) {
+    public static WebElement RefreshReferenceToElement(SearchContext searchContext, WebElement elemento) {
+        if (!Objects.isNull(elemento) && !Objects.isNull(searchContext)) {
             String locator = getTermOrLocator(elemento, true);
             String term = getTermOrLocator(elemento, false);
-            return getElementByLocator(driver, locator, term);
+            return getElementByLocator(searchContext, locator, term);
         }
         LogsJB.info("No fue posible refrescar la referencia al elemento");
         return null;
